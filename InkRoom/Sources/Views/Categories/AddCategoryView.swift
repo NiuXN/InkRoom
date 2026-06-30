@@ -42,7 +42,7 @@ struct AddCategoryView: View {
 
                                     Image(safeSystemName: icon)
                                         .font(.system(size: 18))
-                                        .foregroundStyle(selectedIcon == icon ? .white : Color.inkRoomTextSecondary)
+                                        .foregroundStyle(selectedIcon == icon ? Color.inkRoomOnPrimary : Color.inkRoomTextSecondary)
                                 }
                             }
                             .buttonStyle(.plain)
@@ -62,12 +62,12 @@ struct AddCategoryView: View {
                             } label: {
                                 ZStack {
                                     Circle()
-                                        .fill(Color(hex: colorHex) ?? .gray)
+                                        .fill(Color(hex: colorHex) ?? Color.inkRoomTextTertiary)
                                         .frame(width: 32, height: 32)
 
                                     if selectedColorHex == colorHex {
                                         Circle()
-                                            .stroke(.white, lineWidth: 2)
+                                            .stroke(Color.inkRoomOnPrimary, lineWidth: 2)
                                             .frame(width: 28, height: 28)
                                     }
                                 }
@@ -120,7 +120,9 @@ struct AddCategoryView: View {
                 }
             }
         }
+        #if os(macOS)
         .frame(minWidth: 360, minHeight: 520)
+        #endif
     }
 }
 
@@ -131,36 +133,34 @@ struct CategoryPreviewCard: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(Color(hex: colorHex)?.opacity(0.15) ?? .gray.opacity(0.15))
-                    .frame(width: 40, height: 40)
-
-                Image(safeSystemName: icon)
-                    .font(.system(size: 18))
-                    .foregroundStyle(Color(hex: colorHex) ?? .gray)
-            }
+            IconBadgeView(
+                icon: icon,
+                iconSize: 18,
+                badgeSize: 40,
+                color: Color(hex: colorHex) ?? Color.inkRoomTextTertiary,
+                background: Color(hex: colorHex)?.opacity(0.15) ?? Color.inkRoomTextTertiary.opacity(0.15)
+            )
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(name)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.inkRoomBodyEmphasized)
                     .foregroundStyle(Color.inkRoomTextPrimary)
 
                 Text("0 本")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color(hex: colorHex) ?? .gray)
+                    .font(.inkRoomCaption)
+                    .foregroundStyle(Color(hex: colorHex) ?? Color.inkRoomTextTertiary)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
-                    .background(Color(hex: colorHex)?.opacity(0.1) ?? .gray.opacity(0.1))
+                    .background(Color(hex: colorHex)?.opacity(0.1) ?? Color.inkRoomTextTertiary.opacity(0.1))
                     .clipShape(.rect(cornerRadius: 4))
             }
 
             Spacer()
         }
-        .padding(14)
+        .padding(LayoutMetrics.cardPadding)
         .frame(width: 240)
         .background(Color.inkRoomCard)
-        .clipShape(.rect(cornerRadius: 12))
+        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
     }
 }
 

@@ -60,7 +60,9 @@ struct ContentView: View {
         }
     }
 
-    // MARK: - Compact Layout (iPhone, narrow windows)
+    // MARK: - Compact Layout (iPhone)
+    // macOS 始终走 expandedLayout，不会进入此分支
+    @ViewBuilder
     private var compactLayout: some View {
         #if os(iOS)
         SwipeableTabContainer(selectedTab: $selectedTab) {
@@ -86,18 +88,8 @@ struct ContentView: View {
             selectedBook = nil
         }
         #else
-        legacyTabLayout
+        EmptyView()
         #endif
-    }
-
-    private var legacyTabLayout: some View {
-        TabView(selection: $selectedTab) {
-            tabRoot(LibraryView(selectedBook: $selectedBook), section: .library)
-            tabRoot(CategoriesView(), section: .categories)
-            tabRoot(StatisticsView(), section: .statistics)
-            tabRoot(SettingsView(), section: .settings)
-        }
-        .inkRoomTabBarStyle()
     }
 
     @ViewBuilder
@@ -112,17 +104,6 @@ struct ContentView: View {
         case .settings:
             SettingsView()
         }
-    }
-
-    private func tabRoot<Content: View>(_ content: Content, section: AppSection) -> some View {
-        NavigationStack {
-            content
-        }
-        .tabItem {
-            Image(systemName: section.icon)
-            Text(section.rawValue)
-        }
-        .tag(section)
     }
 
     // MARK: - Expanded Layout (iPad, macOS, wide windows)

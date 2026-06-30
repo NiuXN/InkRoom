@@ -58,15 +58,7 @@ struct ReadingSettingsSection: View {
         value: String?
     ) -> some View {
         HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(Color.inkRoomPrimaryLight)
-                    .frame(width: 32, height: 32)
-
-                Image(systemName: icon)
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color.inkRoomPrimary)
-            }
+            IconBadgeView(icon: icon, iconSize: 14)
 
             Text(title)
 

@@ -42,15 +42,18 @@ struct ReaderTOCSidebar: View {
     }
     
     private func tabButton(title: String, tab: ReaderTocTab) -> some View {
-        Button {
+        let isSelected = tocTab == tab
+        return Button {
             tocTab = tab
         } label: {
             Text(title)
-                .font(.system(size: 15, weight: tocTab == tab ? .semibold : .regular))
-                .foregroundStyle(tocTab == tab ? Color.inkRoomTextPrimary : Color.inkRoomTextTertiary)
+                .font(.inkRoomHeadline)
+                .fontWeight(isSelected ? .semibold : .regular)
+                .foregroundStyle(isSelected ? Color.inkRoomTextPrimary : Color.inkRoomTextTertiary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 12)
         }
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
     
     private var chaptersList: some View {
@@ -70,7 +73,7 @@ struct ReaderTOCSidebar: View {
         } label: {
             HStack {
                 Text(chapter.title)
-                    .font(.system(size: 15))
+                    .font(.inkRoomHeadline)
                     .foregroundStyle(Color.inkRoomTextPrimary)
                     .fontWeight(isCurrentChapter ? .semibold : .regular)
                 
@@ -91,6 +94,7 @@ struct ReaderTOCSidebar: View {
             isCurrentChapter ?
             Color.inkRoomPrimary.opacity(0.08) : Color.clear
         )
+        .accessibilityValue(isCurrentChapter ? "当前章节" : "")
         .id("toc-chapter-\(chapter.id)")
     }
     
@@ -98,12 +102,7 @@ struct ReaderTOCSidebar: View {
         ScrollView {
             LazyVStack(spacing: 0) {
                 if readerVM.bookmarks.isEmpty {
-                    emptyState(
-                        icon: "bookmark",
-                        text: "暂无书签"
-                    )
-                    .padding(.top, 48)
-                    .frame(maxWidth: .infinity)
+                    EmptyStateView(icon: "bookmark", title: "暂无书签", message: "添加书签后会显示在这里")
                 } else {
                     ForEach(readerVM.bookmarks) { bookmark in
                         bookmarkRow(bookmark)
@@ -120,17 +119,17 @@ struct ReaderTOCSidebar: View {
             } label: {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(bookmark.chapterTitle)
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.inkRoomBodyEmphasized)
                         .foregroundStyle(Color.inkRoomTextPrimary)
                         .lineLimit(1)
                     
                     Text(bookmark.content)
-                        .font(.system(size: 12))
+                        .font(.inkRoomFootnote)
                         .foregroundStyle(Color.inkRoomTextTertiary)
                         .lineLimit(2)
                     
                     Text("第 \(bookmark.page) 页")
-                        .font(.system(size: 11))
+                        .font(.inkRoomCaption)
                         .foregroundStyle(Color.inkRoomTextTertiary.opacity(0.7))
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -156,25 +155,18 @@ struct ReaderTOCSidebar: View {
             searchBar
             
             if isSearching {
-                emptyState(
-                    icon: nil,
-                    text: "搜索中...",
-                    showProgress: true
-                )
-                .padding(.top, 48)
-                .frame(maxWidth: .infinity)
+                LoadingStateView(text: "搜索中…")
             } else if searchResults.isEmpty {
-                emptyState(
+                EmptyStateView(
                     icon: "magnifyingglass",
-                    text: searchText.isEmpty ? "输入关键词搜索" : "无搜索结果"
+                    title: searchText.isEmpty ? "搜索正文" : "无搜索结果",
+                    message: searchText.isEmpty ? "输入关键词开始查找" : "试试其他关键词"
                 )
-                .padding(.top, 48)
-                .frame(maxWidth: .infinity)
             } else {
                 ScrollView {
                     LazyVStack(spacing: 0) {
                         Text("共 \(searchResults.count) 个结果")
-                            .font(.system(size: 12))
+                            .font(.inkRoomFootnote)
                             .foregroundStyle(Color.inkRoomTextTertiary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 16)
@@ -190,40 +182,12 @@ struct ReaderTOCSidebar: View {
     }
     
     private var searchBar: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 14))
-                .foregroundStyle(Color.inkRoomTextTertiary)
-            
-            TextField("搜索内容", text: $searchText)
-                .font(.system(size: 14))
-                .foregroundStyle(Color.inkRoomTextPrimary)
-                .submitLabel(.search)
-                .onSubmit {
-                    scheduleSearch(immediate: true)
-                }
-                .onChange(of: searchText) { _, _ in
-                    scheduleSearch()
-                }
-            
-            if !searchText.isEmpty {
-                Button {
-                    searchText = ""
-                    searchResults = []
-                    isSearching = false
-                    searchTask?.cancel()
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 14))
-                        .foregroundStyle(Color.inkRoomTextTertiary)
-                }
-                .accessibilityLabel("清除搜索")
-            }
+        InkRoomSearchBar(text: $searchText, placeholder: "搜索内容") {
+            scheduleSearch(immediate: true)
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(Color.inkRoomBackgroundElevated)
-        .clipShape(.rect(cornerRadius: 8))
+        .onChange(of: searchText) { _, _ in
+            scheduleSearch()
+        }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
     }
@@ -234,16 +198,16 @@ struct ReaderTOCSidebar: View {
         } label: {
             VStack(alignment: .leading, spacing: 6) {
                 Text(result.chapterTitle)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.inkRoomBodyEmphasized)
                     .foregroundStyle(Color.inkRoomTextPrimary)
                     .lineLimit(1)
                 
                 result.attributedContext
-                    .font(.system(size: 12))
+                    .font(.inkRoomFootnote)
                     .lineLimit(2)
                 
                 Text("第 \(result.page) 页")
-                    .font(.system(size: 11))
+                    .font(.inkRoomCaption)
                     .foregroundStyle(Color.inkRoomTextTertiary.opacity(0.7))
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -252,23 +216,6 @@ struct ReaderTOCSidebar: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-    }
-    
-    private func emptyState(icon: String?, text: String, showProgress: Bool = false) -> some View {
-        VStack(spacing: 8) {
-            if showProgress {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .scaleEffect(0.9)
-            } else if let icon {
-                Image(systemName: icon)
-                    .font(.system(size: 32))
-                    .foregroundStyle(Color.inkRoomTextTertiary)
-            }
-            Text(text)
-                .font(.system(size: 13))
-                .foregroundStyle(Color.inkRoomTextTertiary)
-        }
     }
     
     private func scheduleSearch(immediate: Bool = false) {

@@ -35,7 +35,6 @@ struct BookDetailView: View {
                 dismiss()
             }
         }
-        .navigationTitle("")
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -48,7 +47,7 @@ struct BookDetailView: View {
                     }
                 } label: {
                     Image(systemName: isFavorite ? "heart.fill" : "heart")
-                        .font(.system(size: 18))
+                        .font(.inkRoomTitle)
                         .foregroundStyle(isFavorite ? Color.inkRoomPrimary : Color.inkRoomTextTertiary)
                 }
                 .accessibilityLabel(isFavorite ? "取消收藏" : "添加收藏")
@@ -71,7 +70,7 @@ struct BookDetailView: View {
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
-                        .font(.system(size: 18))
+                        .font(.inkRoomTitle)
                         .foregroundStyle(Color.inkRoomTextTertiary)
                 }
                 .accessibilityLabel("更多选项")
@@ -114,7 +113,7 @@ struct BookDetailView: View {
                 detailsSection
             }
             .padding(.horizontal, 16)
-            .padding(.bottom, 100)
+            .padding(.bottom, LayoutMetrics.bottomInsetForTabBar)
         }
     }
 
@@ -141,11 +140,11 @@ struct BookDetailView: View {
         }
     }
 
-    private func coverView(width: CGFloat, height: CGFloat, shadowRadius: CGFloat, shadowY: CGFloat, cornerRadius: CGFloat = 12) -> some View {
+    private func coverView(width: CGFloat, height: CGFloat, shadowRadius: CGFloat, shadowY: CGFloat, cornerRadius: CGFloat = LayoutMetrics.cornerRadiusCard) -> some View {
         CoverImageView(coverURL: currentBook.coverImageURL, title: currentBook.title, isGrid: true)
             .frame(width: width, height: height)
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-            .shadow(color: .black.opacity(0.1), radius: shadowRadius, y: shadowY)
+            .shadow(color: Color.inkRoomShadow(opacity: 0.1), radius: shadowRadius, y: shadowY)
     }
 
     private var coverSection: some View {
@@ -154,18 +153,18 @@ struct BookDetailView: View {
                 .padding(.top, 24)
 
             Text(currentBook.author)
-                .font(.system(size: 15))
+                .font(.inkRoomHeadline)
                 .foregroundStyle(Color.inkRoomTextSecondary)
         }
     }
 
     private var coverSectionLarge: some View {
         VStack(spacing: 16) {
-            coverView(width: 220, height: 300, shadowRadius: 16, shadowY: 6, cornerRadius: 16)
+            coverView(width: 220, height: 300, shadowRadius: 16, shadowY: 6, cornerRadius: LayoutMetrics.cornerRadiusLarge)
                 .padding(.top, 8)
 
             Text(currentBook.author)
-                .font(.system(size: 16))
+                .font(.inkRoomHeadline)
                 .foregroundStyle(Color.inkRoomTextSecondary)
         }
     }
@@ -173,7 +172,7 @@ struct BookDetailView: View {
     private var infoSection: some View {
         VStack(spacing: 8) {
             Text(currentBook.title)
-                .font(.system(size: 22, weight: .bold))
+                .font(.inkRoomLargeTitle)
                 .foregroundStyle(Color.inkRoomTextPrimary)
                 .multilineTextAlignment(.center)
 
@@ -181,7 +180,7 @@ struct BookDetailView: View {
                 Label("\(currentBook.totalPages) 页", systemImage: "doc.text")
                 Label(wordCountText, systemImage: "character")
             }
-            .font(.system(size: 13))
+            .font(.inkRoomSubheadlineRegular)
             .foregroundStyle(Color.inkRoomTextTertiary)
         }
     }
@@ -189,18 +188,18 @@ struct BookDetailView: View {
     private var infoSectionLeading: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(currentBook.title)
-                .font(.system(size: 28, weight: .bold))
+                .font(.inkRoomLargeTitle)
                 .foregroundStyle(Color.inkRoomTextPrimary)
 
             Text(currentBook.author)
-                .font(.system(size: 16))
+                .font(.inkRoomHeadline)
                 .foregroundStyle(Color.inkRoomTextSecondary)
 
             HStack(spacing: 20) {
                 Label("\(currentBook.totalPages) 页", systemImage: "doc.text")
                 Label(wordCountText, systemImage: "character")
             }
-            .font(.system(size: 14))
+            .font(.inkRoomBody)
             .foregroundStyle(Color.inkRoomTextTertiary)
         }
     }
@@ -209,13 +208,13 @@ struct BookDetailView: View {
         VStack(spacing: 8) {
             HStack {
                 Text("阅读进度")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.inkRoomSubheadline)
                     .foregroundStyle(Color.inkRoomTextSecondary)
 
                 Spacer()
 
                 Text("\(Int(currentBook.readingProgress * 100))%")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(.inkRoomSubheadline)
                     .foregroundStyle(Color.inkRoomPrimary)
             }
 
@@ -224,22 +223,22 @@ struct BookDetailView: View {
             if currentBook.isStarted {
                 HStack {
                     Text("第 \(max(1, currentBook.currentPage)) / \(currentBook.totalPages) 页")
-                        .font(.system(size: 12))
+                        .font(.inkRoomFootnote)
                         .foregroundStyle(Color.inkRoomTextTertiary)
 
                     Spacer()
 
                     if let lastRead = currentBook.lastReadDate {
                         Text(lastRead.formatted(.relative(presentation: .named)))
-                            .font(.system(size: 12))
+                            .font(.inkRoomFootnote)
                             .foregroundStyle(Color.inkRoomTextTertiary)
                     }
                 }
             }
         }
-        .padding(16)
+        .padding(LayoutMetrics.cardPadding)
         .background(Color.inkRoomCard)
-        .clipShape(.rect(cornerRadius: 12))
+        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
     }
 
     private var actionButtons: some View {
@@ -256,12 +255,12 @@ struct BookDetailView: View {
                     Image(systemName: "folder.badge.plus")
                     Text("添加到分类")
                 }
-                .font(.system(size: 14, weight: .medium))
+                .font(.inkRoomBodyEmphasized)
                 .foregroundStyle(Color.inkRoomTextSecondary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
                 .background(Color.inkRoomBackgroundElevated)
-                .clipShape(.rect(cornerRadius: 10))
+                .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusMedium))
             }
             .buttonStyle(.plain)
         }
@@ -270,17 +269,17 @@ struct BookDetailView: View {
     private var detailsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("简介")
-                .font(.system(size: 15, weight: .semibold))
+                .font(.inkRoomHeadline)
                 .foregroundStyle(Color.inkRoomTextPrimary)
 
             if let description = currentBook.bookDescription, !description.isEmpty {
                 Text(description)
-                    .font(.system(size: 14))
+                    .font(.inkRoomBody)
                     .foregroundStyle(Color.inkRoomTextSecondary)
                     .lineSpacing(4)
             } else {
                 Text("暂无简介内容")
-                    .font(.system(size: 14))
+                    .font(.inkRoomBody)
                     .foregroundStyle(Color.inkRoomTextTertiary)
                     .lineSpacing(4)
             }

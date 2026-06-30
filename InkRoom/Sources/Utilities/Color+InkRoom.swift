@@ -2,15 +2,38 @@ import SwiftUI
 
 #if os(iOS)
 import UIKit
+typealias PlatformImage = UIImage
 #elseif os(macOS)
 import AppKit
+typealias PlatformImage = NSImage
 #endif
+
+extension Image {
+    init(platformImage: PlatformImage) {
+        #if os(iOS)
+        self.init(uiImage: platformImage)
+        #elseif os(macOS)
+        self.init(nsImage: platformImage)
+        #endif
+    }
+}
 
 extension Color {
     // MARK: - Brand Colors
     static let inkRoomPrimary = Color(red: 0.769, green: 0.361, blue: 0.290)
-    static let inkRoomPrimaryLight = Color(red: 0.769, green: 0.361, blue: 0.290).opacity(0.12)
-    static let inkRoomPrimaryMuted = Color(red: 0.769, green: 0.361, blue: 0.290).opacity(0.06)
+    static let inkRoomPrimaryLight = adaptiveColor(
+        light: Color(red: 0.769, green: 0.361, blue: 0.290).opacity(0.12),
+        dark: Color(red: 0.769, green: 0.361, blue: 0.290).opacity(0.24)
+    )
+    static let inkRoomPrimaryMuted = adaptiveColor(
+        light: Color(red: 0.769, green: 0.361, blue: 0.290).opacity(0.06),
+        dark: Color(red: 0.769, green: 0.361, blue: 0.290).opacity(0.16)
+    )
+    /// 主色背景上的前景色(白/近白)，自适应暗色模式
+    static let inkRoomOnPrimary = adaptiveColor(
+        light: Color.white,
+        dark: Color(red: 0.98, green: 0.96, blue: 0.94)
+    )
 
     // MARK: - Background Colors (adaptive for dark mode)
     static let inkRoomBackground = adaptiveColor(light: Color(red: 0.961, green: 0.941, blue: 0.910),
@@ -23,12 +46,13 @@ extension Color {
                                             dark: Color(red: 0.180, green: 0.180, blue: 0.180))
 
     // MARK: - Text Colors (adaptive for dark mode)
+    // tertiary 已加深以满足 WCAG AA 对小字号文本的对比度要求
     static let inkRoomTextPrimary = adaptiveColor(light: Color(red: 0.173, green: 0.173, blue: 0.173),
                                                    dark: Color(red: 0.831, green: 0.812, blue: 0.780))
     static let inkRoomTextSecondary = adaptiveColor(light: Color(red: 0.420, green: 0.420, blue: 0.420),
                                                      dark: Color(red: 0.658, green: 0.658, blue: 0.658))
-    static let inkRoomTextTertiary = adaptiveColor(light: Color(red: 0.604, green: 0.604, blue: 0.604),
-                                                    dark: Color(red: 0.501, green: 0.501, blue: 0.501))
+    static let inkRoomTextTertiary = adaptiveColor(light: Color(red: 0.502, green: 0.502, blue: 0.502),
+                                                    dark: Color(red: 0.580, green: 0.580, blue: 0.580))
 
     // MARK: - Reader Theme Colors
     static let readerBackgroundLight = Color(red: 0.961, green: 0.941, blue: 0.910)
@@ -47,14 +71,46 @@ extension Color {
         })
         #endif
     }
+
+    /// 暗色模式下使用更浅的低透明度白，避免黑色阴影不可见
+    static func inkRoomShadow(opacity: Double = 0.05) -> Color {
+        adaptiveColor(
+            light: Color.black.opacity(opacity),
+            dark: Color.white.opacity(opacity * 0.6)
+        )
+    }
 }
 
-// MARK: - State Colors
+// MARK: - State Colors (adaptive for dark mode)
 extension Color {
-    static let stateSuccess = Color(red: 0.290, green: 0.549, blue: 0.435)
-    static let stateWarning = Color(red: 0.769, green: 0.604, blue: 0.290)
-    static let stateError = Color(red: 0.769, green: 0.290, blue: 0.290)
-    static let stateInfo = Color(red: 0.290, green: 0.482, blue: 0.769)
+    static let stateSuccess = adaptiveStateColor(
+        light: Color(red: 0.290, green: 0.549, blue: 0.435),
+        dark: Color(red: 0.376, green: 0.667, blue: 0.533)
+    )
+    static let stateWarning = adaptiveStateColor(
+        light: Color(red: 0.769, green: 0.604, blue: 0.290),
+        dark: Color(red: 0.890, green: 0.722, blue: 0.376)
+    )
+    static let stateError = adaptiveStateColor(
+        light: Color(red: 0.769, green: 0.290, blue: 0.290),
+        dark: Color(red: 0.902, green: 0.451, blue: 0.451)
+    )
+    static let stateInfo = adaptiveStateColor(
+        light: Color(red: 0.290, green: 0.482, blue: 0.769),
+        dark: Color(red: 0.392, green: 0.580, blue: 0.890)
+    )
+
+    private static func adaptiveStateColor(light: Color, dark: Color) -> Color {
+        #if os(iOS)
+        return Color(UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark ? UIColor(dark) : UIColor(light)
+        })
+        #elseif os(macOS)
+        return Color(NSColor(name: nil) { appearance in
+            appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? NSColor(dark) : NSColor(light)
+        })
+        #endif
+    }
 }
 
 // MARK: - Hex Initializer

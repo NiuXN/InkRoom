@@ -37,15 +37,15 @@ struct ReadingSettingsView: View {
 
                         HStack {
                             Text("小")
-                                .font(.system(size: 11))
+                                .font(.inkRoomCaption)
                                 .foregroundStyle(Color.inkRoomTextTertiary)
                             Spacer()
                             Text("当前: \(settingsViewModel.readingFontSize)pt")
-                                .font(.system(size: 11, weight: .medium))
+                                .font(.inkRoomCaptionEmphasized)
                                 .foregroundStyle(Color.inkRoomPrimary)
                             Spacer()
                             Text("大")
-                                .font(.system(size: 11))
+                                .font(.inkRoomCaption)
                                 .foregroundStyle(Color.inkRoomTextTertiary)
                         }
                     }
@@ -69,15 +69,15 @@ struct ReadingSettingsView: View {
 
                         HStack {
                             Text("紧凑")
-                                .font(.system(size: 11))
+                                .font(.inkRoomCaption)
                                 .foregroundStyle(Color.inkRoomTextTertiary)
                             Spacer()
                             Text("当前: \(settingsViewModel.readingLineSpacing)")
-                                .font(.system(size: 11, weight: .medium))
+                                .font(.inkRoomCaptionEmphasized)
                                 .foregroundStyle(Color.inkRoomPrimary)
                             Spacer()
                             Text("宽松")
-                                .font(.system(size: 11))
+                                .font(.inkRoomCaption)
                                 .foregroundStyle(Color.inkRoomTextTertiary)
                         }
                     }
@@ -101,15 +101,15 @@ struct ReadingSettingsView: View {
 
                         HStack {
                             Text("紧凑")
-                                .font(.system(size: 11))
+                                .font(.inkRoomCaption)
                                 .foregroundStyle(Color.inkRoomTextTertiary)
                             Spacer()
                             Text(String(format: "当前: %.1f", settingsViewModel.readingLetterSpacing))
-                                .font(.system(size: 11, weight: .medium))
+                                .font(.inkRoomCaptionEmphasized)
                                 .foregroundStyle(Color.inkRoomPrimary)
                             Spacer()
                             Text("宽松")
-                                .font(.system(size: 11))
+                                .font(.inkRoomCaption)
                                 .foregroundStyle(Color.inkRoomTextTertiary)
                         }
                     }
@@ -140,7 +140,7 @@ struct ReadingSettingsView: View {
                 }
             }
             .padding(16)
-            .padding(.bottom, 100)
+            .padding(.bottom, LayoutMetrics.bottomInsetForTabBar)
         }
         .background(Color.inkRoomBackground)
         .navigationTitle("阅读设置")
@@ -171,10 +171,10 @@ struct ReadingSettingsView: View {
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(bgColor)
-        .clipShape(.rect(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.05), radius: 8, y: 2)
+        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
+        .shadow(color: Color.inkRoomShadow(opacity: 0.05), radius: 8, y: 2)
         .overlay {
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: LayoutMetrics.cornerRadiusCard)
                 .stroke(Color.inkRoomTextTertiary.opacity(0.1), lineWidth: 0.5)
         }
     }
@@ -191,30 +191,30 @@ struct ReadingSettingsView: View {
                     .foregroundStyle(Color.inkRoomPrimary)
 
                 Text(title)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.inkRoomHeadline)
                     .foregroundStyle(Color.inkRoomTextPrimary)
             }
 
             content()
-                .padding(16)
+                .padding(LayoutMetrics.cardPadding)
                 .background(Color.inkRoomCard)
-                .clipShape(.rect(cornerRadius: 12))
+                .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
         }
     }
 
     private func themeButton(_ theme: ReadingSettings.ReaderTheme) -> some View {
         let isSelected = settingsViewModel.readerTheme == theme
-        let bgColor = Color(hex: theme.backgroundColor) ?? .white
+        let bgColor = Color(hex: theme.backgroundColor) ?? .readerBackgroundLight
 
         return Button {
             settingsViewModel.readerTheme = theme
         } label: {
             VStack(spacing: 6) {
-                RoundedRectangle(cornerRadius: 6)
+                RoundedRectangle(cornerRadius: LayoutMetrics.cornerRadiusSmall)
                     .fill(bgColor)
                     .frame(height: 40)
                     .overlay {
-                        RoundedRectangle(cornerRadius: 6)
+                        RoundedRectangle(cornerRadius: LayoutMetrics.cornerRadiusSmall)
                             .stroke(
                                 isSelected ? Color.inkRoomPrimary : Color.inkRoomTextTertiary.opacity(0.3),
                                 lineWidth: isSelected ? 2 : 1
@@ -222,7 +222,7 @@ struct ReadingSettingsView: View {
                     }
 
                 Text(theme.rawValue)
-                    .font(.system(size: 11))
+                    .font(.inkRoomCaption)
                     .foregroundStyle(isSelected ? Color.inkRoomPrimary : Color.inkRoomTextSecondary)
             }
         }
@@ -238,12 +238,12 @@ struct ReadingSettingsView: View {
             settingsViewModel.pageTurnStyle = style
         } label: {
             Text(style.rawValue)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(isSelected ? .white : Color.inkRoomTextSecondary)
+                .font(.inkRoomSubheadline)
+                .foregroundStyle(isSelected ? Color.inkRoomOnPrimary : Color.inkRoomTextSecondary)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(isSelected ? Color.inkRoomPrimary : Color.inkRoomBackgroundElevated)
-                .clipShape(.rect(cornerRadius: 8))
+                .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusMedium))
         }
         .frame(maxWidth: .infinity)
         .accessibilityLabel("\(style.rawValue)翻页方式")

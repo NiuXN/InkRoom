@@ -18,7 +18,7 @@ struct BookCard: View {
             ZStack(alignment: .bottomTrailing) {
                 CoverImageView(coverURL: book.coverImageURL, title: book.title, isGrid: true)
                     .aspectRatio(0.7, contentMode: .fit)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .clipShape(RoundedRectangle(cornerRadius: LayoutMetrics.cornerRadiusMedium))
 
                 if book.isStarted {
                     VStack {
@@ -31,7 +31,7 @@ struct BookCard: View {
 
                 if book.isFavorite {
                     Image(systemName: "heart.fill")
-                        .font(.system(size: 12))
+                        .font(.inkRoomFootnote)
                         .foregroundStyle(Color.inkRoomPrimary)
                         .padding(6)
                         .background(.ultraThinMaterial)
@@ -42,16 +42,18 @@ struct BookCard: View {
 
             // Title
             Text(book.title)
-                .font(.system(size: 13, weight: .medium))
+                .font(.inkRoomSubheadline)
                 .foregroundStyle(Color.inkRoomTextPrimary)
                 .lineLimit(1)
 
             // Author
             Text(book.author)
-                .font(.system(size: 11))
+                .font(.inkRoomCaption)
                 .foregroundStyle(Color.inkRoomTextTertiary)
                 .lineLimit(1)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityValue("进度 \(Int(book.readingProgress * 100))%")
     }
 
     private var listCard: some View {
@@ -59,17 +61,17 @@ struct BookCard: View {
             // Cover
             CoverImageView(coverURL: book.coverImageURL, title: book.title, isGrid: false)
                 .frame(width: 48, height: 64)
-                .clipShape(RoundedRectangle(cornerRadius: 6))
+                .clipShape(RoundedRectangle(cornerRadius: LayoutMetrics.cornerRadiusSmall))
 
             // Info
             VStack(alignment: .leading, spacing: 4) {
                 Text(book.title)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.inkRoomBodyEmphasized)
                     .foregroundStyle(Color.inkRoomTextPrimary)
                     .lineLimit(1)
 
                 Text(book.author)
-                    .font(.system(size: 12))
+                    .font(.inkRoomFootnote)
                     .foregroundStyle(Color.inkRoomTextTertiary)
                     .lineLimit(1)
 
@@ -77,7 +79,7 @@ struct BookCard: View {
                     HStack(spacing: 8) {
                         ProgressBar(progress: book.readingProgress)
                         Text("\(Int(book.readingProgress * 100))%")
-                            .font(.system(size: 10, weight: .medium))
+                            .font(.inkRoomCaptionEmphasized)
                             .foregroundStyle(Color.inkRoomPrimary)
                     }
                 }
@@ -86,12 +88,14 @@ struct BookCard: View {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 14))
+                .font(.inkRoomBody)
                 .foregroundStyle(Color.inkRoomTextTertiary)
         }
-        .padding(12)
+        .padding(LayoutMetrics.cardPaddingCompact)
         .background(Color.inkRoomCard)
-        .clipShape(.rect(cornerRadius: 12))
+        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
+        .accessibilityElement(children: .combine)
+        .accessibilityValue("进度 \(Int(book.readingProgress * 100))%")
     }
 }
 
@@ -115,11 +119,11 @@ struct CoverImageView: View {
                 if isGrid {
                     VStack {
                         Image(systemName: "book.closed.fill")
-                            .font(.system(size: 28))
+                            .font(.inkRoomLargeTitle)
                             .foregroundStyle(Color.inkRoomPrimary.opacity(0.5))
 
                         Text(title)
-                            .font(.system(size: 11, weight: .medium))
+                            .font(.inkRoomCaptionEmphasized)
                             .foregroundStyle(Color.inkRoomTextSecondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 8)

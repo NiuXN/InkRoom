@@ -24,12 +24,12 @@ struct ProUpgradeSection: View {
                     .foregroundStyle(Color.inkRoomPrimary)
 
                 Text("升级墨斋 Pro")
-                    .font(.system(size: 17, weight: .semibold))
+                    .font(.inkRoomTitle)
                     .foregroundStyle(Color.inkRoomTextPrimary)
             }
 
             Text("解锁无限书架、高级字体、完整听书体验")
-                .font(.system(size: 13))
+                .font(.inkRoomSubheadlineRegular)
                 .foregroundStyle(Color.inkRoomTextSecondary)
 
             Button {
@@ -42,11 +42,11 @@ struct ProUpgradeSection: View {
                 }
             } label: {
                 Text(AppConfig.proUpgradeURL != nil ? "前往 App Store" : "了解更多")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.inkRoomBodyEmphasized)
                     .foregroundStyle(Color.inkRoomPrimary)
             }
         }
-        .padding(16)
+        .padding(LayoutMetrics.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             LinearGradient(
@@ -58,9 +58,9 @@ struct ProUpgradeSection: View {
                 endPoint: .bottomTrailing
             )
         )
-        .clipShape(.rect(cornerRadius: 12))
+        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
         .overlay {
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: LayoutMetrics.cornerRadiusCard)
                 .stroke(Color.inkRoomPrimary.opacity(0.15), lineWidth: 0.5)
         }
         .padding(.horizontal, 16)

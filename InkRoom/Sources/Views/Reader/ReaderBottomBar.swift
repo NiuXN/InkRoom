@@ -37,7 +37,7 @@ struct ReaderCompactBottomBar: View {
                         Image(systemName: "chevron.left")
                         Text("上一页")
                     }
-                    .font(.system(size: 14))
+                    .font(.inkRoomBody)
                     .foregroundStyle(currentPage > 1 ? textColor : textColor.opacity(0.3))
                 }
                 .disabled(currentPage <= 1)
@@ -76,7 +76,7 @@ struct ReaderCompactBottomBar: View {
                         Text("下一页")
                         Image(systemName: "chevron.right")
                     }
-                    .font(.system(size: 14))
+                    .font(.inkRoomBody)
                     .foregroundStyle(currentPage < totalPages ? textColor : textColor.opacity(0.3))
                 }
                 .disabled(currentPage >= totalPages)
@@ -113,12 +113,12 @@ struct ReaderExpandedBottomBar: View {
                         Image(systemName: "chevron.left")
                         Text("上一页")
                     }
-                    .font(.system(size: 14))
+                    .font(.inkRoomBody)
                     .foregroundStyle(currentPage > 1 ? textColor : textColor.opacity(0.3))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(textColor.opacity(0.08))
-                    .clipShape(.rect(cornerRadius: 8))
+                    .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusMedium))
                 }
                 .disabled(currentPage <= 1)
                 .accessibilityLabel("上一页")
@@ -126,7 +126,7 @@ struct ReaderExpandedBottomBar: View {
                 Spacer()
 
                 Text("\(currentPage) / \(totalPages)")
-                    .font(.system(size: 13))
+                    .font(.inkRoomSubheadlineRegular)
                     .foregroundStyle(textColor.opacity(0.7))
 
                 Spacer()
@@ -138,12 +138,12 @@ struct ReaderExpandedBottomBar: View {
                         Text("下一页")
                         Image(systemName: "chevron.right")
                     }
-                    .font(.system(size: 14))
+                    .font(.inkRoomBody)
                     .foregroundStyle(currentPage < totalPages ? textColor : textColor.opacity(0.3))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(textColor.opacity(0.08))
-                    .clipShape(.rect(cornerRadius: 8))
+                    .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusMedium))
                 }
                 .disabled(currentPage >= totalPages)
                 .accessibilityLabel("下一页")

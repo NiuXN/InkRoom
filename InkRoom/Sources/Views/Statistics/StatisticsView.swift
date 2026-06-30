@@ -16,8 +16,7 @@ struct StatisticsView: View {
         ScrollView {
                 VStack(spacing: 16) {
                     if isLoading {
-                        ProgressView()
-                            .tint(Color.inkRoomPrimary)
+                        LoadingStateView()
                             .padding(.top, 48)
                     } else {
                         summaryGrid
@@ -90,21 +89,21 @@ struct StatisticsView: View {
             Spacer()
 
             Text(value)
-                .font(.system(size: 22, weight: .semibold))
+                .font(.inkRoomLargeTitle)
                 .foregroundStyle(Color.inkRoomTextPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
 
             Text(title)
-                .font(.system(size: 12))
+                .font(.inkRoomFootnote)
                 .foregroundStyle(Color.inkRoomTextTertiary)
         }
-        .padding(14)
+        .padding(LayoutMetrics.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(height: sizeClass == .compact ? 104 : 112)
         .background(Color.inkRoomCard)
-        .clipShape(.rect(cornerRadius: 14))
-        .shadow(color: Color.black.opacity(0.03), radius: 4, x: 0, y: 2)
+        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
+        .shadow(color: Color.inkRoomShadow(opacity: 0.03), radius: 4, x: 0, y: 2)
     }
 
     // MARK: - Recent Books
@@ -112,13 +111,13 @@ struct StatisticsView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Text("最近阅读")
-                    .font(.system(size: 17, weight: .semibold))
+                    .font(.inkRoomTitle)
                     .foregroundStyle(Color.inkRoomTextPrimary)
 
                 Spacer()
 
                 Text("\(statistics.recentBookStats.count) 本")
-                    .font(.system(size: 13))
+                    .font(.inkRoomSubheadlineRegular)
                     .foregroundStyle(Color.inkRoomTextTertiary)
             }
             .padding(.horizontal, 4)
@@ -137,28 +136,16 @@ struct StatisticsView: View {
                     }
                 }
                 .background(Color.inkRoomCard)
-                .clipShape(.rect(cornerRadius: 14))
-                .shadow(color: Color.black.opacity(0.03), radius: 4, x: 0, y: 2)
+                .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
+                .shadow(color: Color.inkRoomShadow(opacity: 0.03), radius: 4, x: 0, y: 2)
             }
         }
     }
 
     private var emptyRecentView: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "book.closed")
-                .font(.system(size: 32))
-                .foregroundStyle(Color.inkRoomTextTertiary)
-            Text("还没有阅读记录")
-                .font(.system(size: 14))
-                .foregroundStyle(Color.inkRoomTextTertiary)
-            Text("开始阅读后，这里会展示你的阅读统计")
-                .font(.system(size: 12))
-                .foregroundStyle(Color.inkRoomTextTertiary.opacity(0.8))
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 40)
-        .background(Color.inkRoomCard)
-        .clipShape(.rect(cornerRadius: 14))
+        EmptyStateView(icon: "book.closed", iconSize: 32, title: "还没有阅读记录", message: "开始阅读后，这里会展示你的阅读统计")
+            .background(Color.inkRoomCard)
+            .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
     }
 
     private func bookRow(_ stat: BookReadingStat) -> some View {
@@ -175,19 +162,19 @@ struct StatisticsView: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(stat.title)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.inkRoomHeadline)
                     .foregroundStyle(Color.inkRoomTextPrimary)
                     .lineLimit(1)
 
                 Text(DurationFormatter.relativeText(from: stat.lastRead))
-                    .font(.system(size: 11))
+                    .font(.inkRoomCaption)
                     .foregroundStyle(Color.inkRoomTextTertiary)
             }
 
             Spacer()
 
             Text(DurationFormatter.secondsText(stat.totalDuration))
-                .font(.system(size: 13, weight: .medium))
+                .font(.inkRoomSubheadline)
                 .foregroundStyle(Color.inkRoomPrimary)
         }
         .padding(.horizontal, 14)

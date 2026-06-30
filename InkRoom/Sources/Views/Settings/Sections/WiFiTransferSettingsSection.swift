@@ -17,22 +17,14 @@ struct WiFiTransferSettingsSection: View {
                 }
             )) {
                 HStack(spacing: 12) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.inkRoomPrimaryLight)
-                            .frame(width: 32, height: 32)
-
-                        Image(systemName: "wifi")
-                            .font(.system(size: 14))
-                            .foregroundStyle(Color.inkRoomPrimary)
-                    }
+                    IconBadgeView(icon: "wifi", iconSize: 14)
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Wi-Fi 传书")
 
                         if settingsViewModel.wifiTransferEnabled && !wifiService.ipAddress.isEmpty {
                             Text(wifiService.ipAddress)
-                                .font(.system(size: 11))
+                                .font(.inkRoomCaption)
                                 .foregroundStyle(Color.stateSuccess)
                         }
                     }
@@ -69,15 +61,7 @@ struct WiFiTransferSettingsSection: View {
         value: String?
     ) -> some View {
         HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(Color.inkRoomPrimaryLight)
-                    .frame(width: 32, height: 32)
-
-                Image(systemName: icon)
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color.inkRoomPrimary)
-            }
+            IconBadgeView(icon: icon, iconSize: 14)
 
             Text(title)
 
@@ -132,19 +116,12 @@ struct WiFiTransferDetailView: View {
 
             Section {
                 if wifiService.uploadedFiles.isEmpty {
-                    HStack {
-                        Spacer()
-                        VStack(spacing: 8) {
-                            Image(systemName: "tray")
-                                .font(.system(size: 32))
-                                .foregroundStyle(Color.inkRoomTextTertiary)
-                            Text("暂无上传记录")
-                                .font(.system(size: 14))
-                                .foregroundStyle(Color.inkRoomTextTertiary)
-                        }
-                        .padding(.vertical, 24)
-                        Spacer()
-                    }
+                    EmptyStateView(
+                        icon: "tray",
+                        iconSize: 32,
+                        title: "暂无上传记录",
+                        message: "通过 Wi-Fi 传书上传的文件将显示在这里"
+                    )
                 } else {
                     ForEach(wifiService.uploadedFiles) { file in
                         UploadedFileRow(file: file)
@@ -175,24 +152,16 @@ struct UploadedFileRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(Color.inkRoomPrimaryLight)
-                    .frame(width: 36, height: 36)
-
-                Image(systemName: "doc")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color.inkRoomPrimary)
-            }
+            IconBadgeView(icon: "doc", iconSize: 14, badgeSize: 36)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(file.fileName)
-                    .font(.system(size: 14))
+                    .font(.inkRoomBody)
                     .foregroundStyle(Color.inkRoomTextPrimary)
                     .lineLimit(1)
 
                 Text("\(ByteCountFormatter.string(fromByteCount: file.size, countStyle: .file)) · \(file.uploadedAt.formatted(.dateTime.hour().minute()))")
-                    .font(.system(size: 11))
+                    .font(.inkRoomCaption)
                     .foregroundStyle(Color.inkRoomTextTertiary)
             }
 

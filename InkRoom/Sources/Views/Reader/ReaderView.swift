@@ -250,7 +250,7 @@ struct ReaderView: View {
             VStack(spacing: 0) {
                 HStack {
                     Text("目录")
-                        .font(.system(size: 17, weight: .semibold))
+                        .font(.inkRoomTitle)
                         .foregroundStyle(Color.inkRoomTextPrimary)
 
                     Spacer()
@@ -263,7 +263,7 @@ struct ReaderView: View {
                         Image(systemName: "xmark")
                             .font(.system(size: 14))
                             .foregroundStyle(Color.inkRoomTextTertiary)
-                            .frame(width: 44, height: 44)
+                            .frame(width: LayoutMetrics.minTouchTarget, height: LayoutMetrics.minTouchTarget)
                     }
                     .accessibilityLabel("关闭目录")
                 }

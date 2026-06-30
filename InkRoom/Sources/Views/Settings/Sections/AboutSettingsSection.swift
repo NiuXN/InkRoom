@@ -26,15 +26,7 @@ struct AboutSettingsSection: View {
                 }
             } label: {
                 HStack(spacing: 12) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.inkRoomPrimaryLight)
-                            .frame(width: 32, height: 32)
-
-                        Image(systemName: "arrow.down.circle")
-                            .font(.system(size: 14))
-                            .foregroundStyle(Color.inkRoomPrimary)
-                    }
+                    IconBadgeView(icon: "arrow.down.circle", iconSize: 14)
 
                     Text("检查 App Store 更新")
 
@@ -42,7 +34,7 @@ struct AboutSettingsSection: View {
 
                     if updateService.pendingUpdate != nil {
                         Text("有新版本")
-                            .font(.system(size: 12, weight: .medium))
+                            .font(.inkRoomFootnoteEmphasized)
                             .foregroundStyle(Color.inkRoomPrimary)
                     }
                 }
@@ -67,7 +59,7 @@ struct AboutSettingsSection: View {
         } footer: {
             Text("自动检查更新每 24 小时最多执行一次，仅在发现新版本时弹出提醒。")
                 .textCase(nil)
-                .font(.system(size: 12))
+                .font(.inkRoomFootnote)
         }
         .listRowBackground(Color.inkRoomCard)
     }
@@ -79,11 +71,11 @@ struct PrivacyPolicyView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 Text("隐私政策")
-                    .font(.system(size: 22, weight: .bold))
+                    .font(.inkRoomLargeTitle)
                     .foregroundStyle(Color.inkRoomTextPrimary)
 
                 Text("更新日期：2026年6月")
-                    .font(.system(size: 12))
+                    .font(.inkRoomFootnote)
                     .foregroundStyle(Color.inkRoomTextTertiary)
 
                 infoBlock(
@@ -113,18 +105,18 @@ struct PrivacyPolicyView: View {
     private func infoBlock(title: String, content: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
-                .font(.system(size: 16, weight: .semibold))
+                .font(.inkRoomHeadline)
                 .foregroundStyle(Color.inkRoomTextPrimary)
 
             Text(content)
-                .font(.system(size: 14))
+                .font(.inkRoomBody)
                 .foregroundStyle(Color.inkRoomTextSecondary)
                 .lineSpacing(4)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
+        .padding(LayoutMetrics.cardPadding)
         .background(Color.inkRoomCard)
-        .clipShape(.rect(cornerRadius: 12))
+        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
     }
 }
 
@@ -134,11 +126,11 @@ struct ThanksView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 Text("感谢")
-                    .font(.system(size: 22, weight: .bold))
+                    .font(.inkRoomLargeTitle)
                     .foregroundStyle(Color.inkRoomTextPrimary)
 
                 Text("墨斋的成长离不开开源社区的支持。感谢以下优秀的开源项目：")
-                    .font(.system(size: 14))
+                    .font(.inkRoomBody)
                     .foregroundStyle(Color.inkRoomTextSecondary)
                     .lineSpacing(4)
 
@@ -161,7 +153,7 @@ struct ThanksView: View {
                 }
 
                 Text("感谢每一位使用墨斋的读者，是你们让这款应用有了意义。")
-                    .font(.system(size: 14))
+                    .font(.inkRoomBody)
                     .foregroundStyle(Color.inkRoomTextSecondary)
                     .lineSpacing(4)
             }
@@ -176,30 +168,22 @@ struct ThanksView: View {
 
     private func thanksItem(name: String, description: String, icon: String) -> some View {
         HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(Color.inkRoomPrimaryLight)
-                    .frame(width: 36, height: 36)
-
-                Image(systemName: icon)
-                    .font(.system(size: 16))
-                    .foregroundStyle(Color.inkRoomPrimary)
-            }
+            IconBadgeView(icon: icon, iconSize: 16, badgeSize: 36)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(name)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.inkRoomHeadline)
                     .foregroundStyle(Color.inkRoomTextPrimary)
 
                 Text(description)
-                    .font(.system(size: 12))
+                    .font(.inkRoomFootnote)
                     .foregroundStyle(Color.inkRoomTextTertiary)
             }
 
             Spacer()
         }
-        .padding(14)
+        .padding(LayoutMetrics.cardPadding)
         .background(Color.inkRoomCard)
-        .clipShape(.rect(cornerRadius: 12))
+        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
     }
 }

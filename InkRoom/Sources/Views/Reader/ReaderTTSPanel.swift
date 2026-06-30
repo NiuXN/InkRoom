@@ -28,9 +28,9 @@ struct ReaderTTSCompactPanel: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: LayoutMetrics.cornerRadiusCard)
                 .fill(Color.inkRoomCard)
-                .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: -2)
+                .shadow(color: Color.inkRoomShadow(opacity: 0.08), radius: 8, x: 0, y: -2)
         )
         .padding(.horizontal, 12)
         .padding(.bottom, 4)
@@ -90,12 +90,12 @@ struct ReaderTTSCompactPanel: View {
             
             VStack(alignment: .trailing, spacing: 2) {
                 Text("听书")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.inkRoomSubheadline)
                     .foregroundStyle(textColor)
-                
+
                 if ttsService.remainingTime > 0 {
                     Text(timeString(from: ttsService.remainingTime))
-                        .font(.system(size: 11))
+                        .font(.inkRoomCaption)
                         .foregroundStyle(Color.inkRoomPrimary)
                 }
             }
@@ -127,7 +127,7 @@ struct ReaderTTSCompactPanel: View {
     private var rateSlider: some View {
         HStack(spacing: 12) {
             Text("语速")
-                .font(.system(size: 13))
+                .font(.inkRoomSubheadlineRegular)
                 .foregroundStyle(textColor.opacity(0.7))
                 .frame(width: 40, alignment: .leading)
             
@@ -150,7 +150,7 @@ struct ReaderTTSCompactPanel: View {
             }
             
             Text(String(format: "%.0f%%", settingsViewModel.ttsRate * 200))
-                .font(.system(size: 12))
+                .font(.inkRoomFootnote)
                 .foregroundStyle(textColor.opacity(0.7))
                 .frame(width: 40)
         }
@@ -159,11 +159,12 @@ struct ReaderTTSCompactPanel: View {
     private var timerButtons: some View {
         HStack(spacing: 8) {
             Text("定时")
-                .font(.system(size: 13))
+                .font(.inkRoomSubheadlineRegular)
                 .foregroundStyle(textColor.opacity(0.7))
                 .frame(width: 40, alignment: .leading)
-            
+
             ForEach([0, 15, 30, 60], id: \.self) { minutes in
+                let isSelected = settingsViewModel.ttsTimerMinutes == minutes
                 Button {
                     settingsViewModel.ttsTimerMinutes = minutes
                     if minutes > 0 && (ttsService.isSpeaking || ttsService.isPaused) {
@@ -173,22 +174,24 @@ struct ReaderTTSCompactPanel: View {
                     }
                 } label: {
                     Text(minutes == 0 ? "不定时" : "\(minutes)分钟")
-                        .font(.system(size: 12))
+                        .font(.inkRoomFootnote)
                         .foregroundStyle(
-                            settingsViewModel.ttsTimerMinutes == minutes ?
-                            .white : textColor.opacity(0.7)
+                            isSelected ?
+                            Color.inkRoomOnPrimary : textColor.opacity(0.7)
                         )
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
                         .background(
-                            settingsViewModel.ttsTimerMinutes == minutes ?
+                            isSelected ?
                             Color.inkRoomPrimary : textColor.opacity(0.08)
                         )
-                        .clipShape(.rect(cornerRadius: 6))
+                        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusSmall))
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(minutes == 0 ? "不定时" : "\(minutes)分钟定时")
+                .accessibilityAddTraits(isSelected ? .isSelected : [])
             }
-            
+
             Spacer()
         }
     }
@@ -200,7 +203,7 @@ struct ReaderTTSCompactPanel: View {
                 set: { settingsViewModel.ttsHighlightEnabled = $0 }
             )) {
                 Text("朗读高亮")
-                    .font(.system(size: 13))
+                    .font(.inkRoomSubheadlineRegular)
                     .foregroundStyle(textColor.opacity(0.7))
             }
             .tint(Color.inkRoomPrimary)
@@ -243,7 +246,7 @@ struct ReaderTTSExpandedPanel: View {
                 Image(systemName: "backward.end.fill")
                     .font(.system(size: 16))
                     .foregroundStyle(textColor)
-                    .frame(width: 36, height: 36)
+                    .frame(width: LayoutMetrics.compactTouchTarget, height: LayoutMetrics.compactTouchTarget)
             }
             .accessibilityLabel("上一页")
             
@@ -274,18 +277,18 @@ struct ReaderTTSExpandedPanel: View {
                 Image(systemName: "forward.end.fill")
                     .font(.system(size: 16))
                     .foregroundStyle(textColor)
-                    .frame(width: 36, height: 36)
+                    .frame(width: LayoutMetrics.compactTouchTarget, height: LayoutMetrics.compactTouchTarget)
             }
             .accessibilityLabel("下一页")
             
             Text("听书")
-                .font(.system(size: 13, weight: .medium))
+                .font(.inkRoomSubheadline)
                 .foregroundStyle(textColor)
                 .padding(.leading, 4)
-            
+
             if ttsService.remainingTime > 0 {
                 Text(timeString(from: ttsService.remainingTime))
-                    .font(.system(size: 12))
+                    .font(.inkRoomFootnote)
                     .foregroundStyle(Color.inkRoomPrimary)
             }
             
@@ -303,7 +306,7 @@ struct ReaderTTSExpandedPanel: View {
     private var rateControl: some View {
         HStack(spacing: 4) {
             Text("语速")
-                .font(.system(size: 12))
+                .font(.inkRoomFootnote)
                 .foregroundStyle(textColor.opacity(0.6))
             
             Slider(
@@ -349,7 +352,7 @@ struct ReaderTTSExpandedPanel: View {
             Image(systemName: "timer")
                 .font(.system(size: 16))
                 .foregroundStyle(textColor)
-                .frame(width: 36, height: 36)
+                .frame(width: LayoutMetrics.compactTouchTarget, height: LayoutMetrics.compactTouchTarget)
         }
         .accessibilityLabel("定时停止")
     }

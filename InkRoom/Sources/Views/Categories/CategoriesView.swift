@@ -17,7 +17,7 @@ struct CategoriesView: View {
         ScrollView {
             VStack(spacing: 16) {
                     Text("共 \(viewModel.books.count) 本书 · \(viewModel.categories.count) 个分类")
-                        .font(.system(size: 12))
+                        .font(.inkRoomFootnote)
                         .foregroundStyle(Color.inkRoomTextTertiary)
                         .padding(.top, 8)
 
@@ -56,8 +56,9 @@ struct CategoriesView: View {
                                         Image(systemName: "minus.circle.fill")
                                             .font(.system(size: 22))
                                             .symbolRenderingMode(.palette)
-                                            .foregroundStyle(.white, .red)
+                                            .foregroundStyle(Color.inkRoomOnPrimary, .red)
                                     }
+                                    .accessibilityLabel("删除分类")
                                     .offset(x: 6, y: -6)
                                 }
                             }
@@ -72,7 +73,7 @@ struct CategoriesView: View {
 
                     uncategorizedSection
             }
-            .padding(.bottom, 100)
+            .padding(.bottom, LayoutMetrics.bottomInsetForTabBar)
             .readWidth($contentWidth)
         }
         .refreshable {
@@ -92,7 +93,6 @@ struct CategoriesView: View {
                                 isEditingCategories.toggle()
                             }
                         }
-                        .font(.system(size: 15))
                     }
                 }
 
@@ -171,17 +171,17 @@ struct CategoriesView: View {
             }
 
             Text("新建分类")
-                .font(.system(size: 14, weight: .medium))
+                .font(.inkRoomBodyEmphasized)
                 .foregroundStyle(Color.inkRoomTextTertiary)
 
             Spacer()
         }
-        .padding(14)
+        .padding(LayoutMetrics.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.inkRoomCard.opacity(0.5))
-        .clipShape(.rect(cornerRadius: 12))
+        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
         .overlay {
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: LayoutMetrics.cornerRadiusCard)
                 .stroke(style: StrokeStyle(lineWidth: 1, dash: [6, 4]))
                 .fill(Color.inkRoomTextTertiary.opacity(0.2))
         }
@@ -201,7 +201,7 @@ struct CategoriesView: View {
     private var uncategorizedSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("未分类")
-                .font(.system(size: 13, weight: .medium))
+                .font(.inkRoomSubheadline)
                 .foregroundStyle(Color.inkRoomTextSecondary)
                 .padding(.horizontal, contentPadding)
 
@@ -213,10 +213,13 @@ struct CategoriesView: View {
             }
 
             if uncategorizedBooks.isEmpty {
-                Text("暂无未分类书籍")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color.inkRoomTextTertiary)
-                    .padding(.horizontal, contentPadding)
+                EmptyStateView(
+                    icon: "tray",
+                    iconSize: 40,
+                    title: "暂无未分类书籍",
+                    message: ""
+                )
+                .padding(.horizontal, contentPadding)
             } else {
                 ScrollView(.horizontal) {
                     HStack(spacing: 12) {
@@ -227,10 +230,10 @@ struct CategoriesView: View {
                                 VStack(alignment: .leading, spacing: 6) {
                                     CoverImageView(coverURL: book.coverImageURL, title: book.title, isGrid: true)
                                         .frame(width: 80, height: 110)
-                                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                                        .clipShape(RoundedRectangle(cornerRadius: LayoutMetrics.cornerRadiusSmall))
 
                                     Text(book.title)
-                                        .font(.system(size: 12, weight: .medium))
+                                        .font(.inkRoomFootnoteEmphasized)
                                         .foregroundStyle(Color.inkRoomTextPrimary)
                                         .lineLimit(1)
                                 }
@@ -256,24 +259,22 @@ struct CategoryCard: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(categoryColor.opacity(0.15))
-                    .frame(width: 40, height: 40)
-
-                Image(safeSystemName: category.iconName)
-                    .font(.system(size: 18))
-                    .foregroundStyle(categoryColor)
-            }
+            IconBadgeView(
+                icon: category.iconName,
+                iconSize: 18,
+                badgeSize: 40,
+                color: categoryColor,
+                background: categoryColor.opacity(0.15)
+            )
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(category.name)
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.inkRoomBodyEmphasized)
                     .foregroundStyle(Color.inkRoomTextPrimary)
                     .lineLimit(1)
 
                 Text("\(category.bookIds.count)本")
-                    .font(.system(size: 11))
+                    .font(.inkRoomCaption)
                     .foregroundStyle(categoryColor)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
@@ -287,10 +288,10 @@ struct CategoryCard: View {
                 .font(.system(size: 14))
                 .foregroundStyle(Color.inkRoomTextTertiary)
         }
-        .padding(14)
+        .padding(LayoutMetrics.cardPadding)
         .background(Color.inkRoomCard)
-        .clipShape(.rect(cornerRadius: 12))
-        .shadow(color: .black.opacity(0.03), radius: 2, y: 1)
+        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
+        .shadow(color: Color.inkRoomShadow(opacity: 0.03), radius: 2, y: 1)
     }
 }
 
@@ -314,23 +315,21 @@ struct CategoryDetailView: View {
         ScrollView {
             VStack(spacing: 16) {
                 HStack(spacing: 16) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(hex: liveCategory.colorHex)?.opacity(0.15) ?? Color.inkRoomPrimaryLight)
-                            .frame(width: 56, height: 56)
-
-                        Image(safeSystemName: liveCategory.iconName)
-                            .font(.system(size: 24))
-                            .foregroundStyle(Color(hex: liveCategory.colorHex) ?? Color.inkRoomPrimary)
-                    }
+                    IconBadgeView(
+                        icon: liveCategory.iconName,
+                        iconSize: 24,
+                        badgeSize: 56,
+                        color: Color(hex: liveCategory.colorHex) ?? Color.inkRoomPrimary,
+                        background: Color(hex: liveCategory.colorHex)?.opacity(0.15) ?? Color.inkRoomPrimaryLight
+                    )
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(liveCategory.name)
-                            .font(.system(size: 20, weight: .bold))
+                            .font(.inkRoomLargeTitle)
                             .foregroundStyle(Color.inkRoomTextPrimary)
 
                         Text("\(categoryBooks.count) 本书")
-                            .font(.system(size: 13))
+                            .font(.inkRoomSubheadlineRegular)
                             .foregroundStyle(Color.inkRoomTextTertiary)
                     }
 
@@ -340,22 +339,12 @@ struct CategoryDetailView: View {
                 .padding(.top, 8)
 
                 if categoryBooks.isEmpty {
-                    VStack(spacing: 12) {
-                        Image(systemName: "books.vertical")
-                            .font(.system(size: 40))
-                            .foregroundStyle(Color.inkRoomTextTertiary)
-
-                        Text("该分类暂无书籍")
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundStyle(Color.inkRoomTextSecondary)
-
-                        Text("在书籍详情页可将书籍加入此分类")
-                            .font(.system(size: 13))
-                            .foregroundStyle(Color.inkRoomTextTertiary)
-                            .multilineTextAlignment(.center)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 48)
+                    EmptyStateView(
+                        icon: "books.vertical",
+                        iconSize: 40,
+                        title: "该分类暂无书籍",
+                        message: "在书籍详情页可将书籍加入此分类"
+                    )
                     .padding(.horizontal, contentPadding)
                 } else {
                     LazyVStack(spacing: 8) {
@@ -371,7 +360,7 @@ struct CategoryDetailView: View {
                     .padding(.horizontal, contentPadding)
                 }
             }
-            .padding(.bottom, 100)
+            .padding(.bottom, LayoutMetrics.bottomInsetForTabBar)
             .frame(maxWidth: detailMaxWidth)
             .frame(maxWidth: .infinity)
         }

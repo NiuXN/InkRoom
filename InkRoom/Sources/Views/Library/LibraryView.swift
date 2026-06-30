@@ -117,16 +117,7 @@ struct LibraryView: View {
     }
 
     private var searchBar: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(Color.inkRoomTextTertiary)
-            TextField("搜索书名或作者", text: $viewModel.searchText)
-                .font(.system(size: 14))
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        .background(Color.inkRoomBackgroundElevated)
-        .clipShape(.rect(cornerRadius: 10))
+        InkRoomSearchBar(text: $viewModel.searchText, placeholder: "搜索书名或作者")
     }
 
     private var groupTabs: some View {
@@ -140,13 +131,13 @@ struct LibraryView: View {
                     } label: {
                         HStack(spacing: 10) {
                             Image(systemName: groupIcon(for: group))
-                                .font(.system(size: 14))
+                                .font(.inkRoomBody)
                                 .frame(width: 22)
                             Text(group.rawValue)
-                                .font(.system(size: 14, weight: .medium))
+                                .font(.inkRoomBodyEmphasized)
                             Spacer()
                             Text("\(bookCount(for: group))")
-                                .font(.system(size: 12))
+                                .font(.inkRoomFootnote)
                                 .foregroundStyle(Color.inkRoomTextTertiary)
                         }
                         .foregroundStyle(viewModel.selectedGroup == group ? Color.inkRoomPrimary : Color.inkRoomTextSecondary)
@@ -156,7 +147,7 @@ struct LibraryView: View {
                             viewModel.selectedGroup == group ?
                             Color.inkRoomPrimary.opacity(0.12) : Color.clear
                         )
-                        .clipShape(.rect(cornerRadius: 8))
+                        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusMedium))
                     }
                     .buttonStyle(.plain)
                 }
@@ -164,21 +155,14 @@ struct LibraryView: View {
                 ScrollView(.horizontal) {
                     HStack(spacing: 8) {
                         ForEach(BookGroup.allCases) { group in
-                            Button {
+                            InkRoomChipButton(
+                                title: group.rawValue,
+                                isSelected: viewModel.selectedGroup == group,
+                                accessibilityLabel: group.rawValue
+                            ) {
                                 withAnimation {
                                     viewModel.selectedGroup = group
                                 }
-                            } label: {
-                                Text(group.rawValue)
-                                    .font(.system(size: 13, weight: .medium))
-                                    .foregroundStyle(viewModel.selectedGroup == group ? .white : Color.inkRoomTextSecondary)
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 7)
-                                    .background(
-                                        viewModel.selectedGroup == group ?
-                                        Color.inkRoomPrimary : Color.inkRoomBackgroundElevated
-                                    )
-                                    .clipShape(.rect(cornerRadius: 8))
                             }
                         }
                     }
@@ -310,86 +294,33 @@ struct LibraryView: View {
     }
 
     private var noResultsState: some View {
-        VStack(spacing: 16) {
-            Spacer()
-
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 48))
-                .foregroundStyle(Color.inkRoomTextTertiary)
-
-            Text("没有匹配的书籍")
-                .font(.system(size: 17, weight: .medium))
-                .foregroundStyle(Color.inkRoomTextPrimary)
-
-            Text("试试调整搜索词或切换分组")
-                .font(.system(size: 14))
-                .foregroundStyle(Color.inkRoomTextTertiary)
-
-            if !viewModel.searchText.isEmpty {
-                Button("清除搜索") {
-                    viewModel.searchText = ""
-                }
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(Color.inkRoomPrimary)
-                .padding(.top, 4)
-            }
-
-            Spacer()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        EmptyStateView(
+            icon: "magnifyingglass",
+            iconSize: 48,
+            title: "没有匹配的书籍",
+            message: "试试调整搜索词或切换分组",
+            actionTitle: viewModel.searchText.isEmpty ? nil : "清除搜索",
+            action: viewModel.searchText.isEmpty ? nil : { viewModel.searchText = "" }
+        )
     }
 
     private var loadingState: some View {
-        VStack(spacing: 12) {
-            Spacer()
-
-            ProgressView()
-                .tint(Color.inkRoomPrimary)
-                .scaleEffect(1.2)
-
-            Text("正在加载书架...")
-                .font(.system(size: 14))
-                .foregroundStyle(Color.inkRoomTextTertiary)
-
-            Spacer()
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        LoadingStateView(text: "正在加载书架...")
     }
 
+    @ViewBuilder
     private var emptyState: some View {
-        VStack(spacing: 16) {
-            Spacer()
-
-            Image(systemName: "books.vertical")
-                .font(.system(size: sizeClass == .compact ? 48 : 64))
-                .foregroundStyle(Color.inkRoomPrimary.opacity(0.5))
-
-            Text("书架空空如也")
-                .font(.system(size: sizeClass == .compact ? 17 : 20, weight: .medium))
-                .foregroundStyle(Color.inkRoomTextPrimary)
-
-            Text("开启你的阅读之旅")
-                .font(.system(size: sizeClass == .compact ? 14 : 15))
-                .foregroundStyle(Color.inkRoomTextTertiary)
-
-            if viewModel.isImporting {
-                VStack(spacing: 8) {
-                    ProgressView()
-                        .tint(Color.inkRoomPrimary)
-                        .scaleEffect(1.2)
-                    Text("正在导入...")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Color.inkRoomTextTertiary)
-                }
-                .padding(.top, 8)
-            } else {
-                InkRoomButton("导入书籍", icon: "plus") {
-                    showImport = true
-                }
-                .padding(.top, 8)
-            }
-
-            Spacer()
+        if viewModel.isImporting {
+            LoadingStateView(text: "正在导入...")
+        } else {
+            EmptyStateView(
+                icon: "books.vertical",
+                iconSize: sizeClass == .compact ? 48 : 64,
+                title: "书架空空如也",
+                message: "开启你的阅读之旅",
+                actionTitle: "导入书籍",
+                action: { showImport = true }
+            )
         }
     }
 
@@ -435,9 +366,9 @@ struct LibraryView: View {
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: "arrow.up.arrow.down")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.inkRoomSubheadline)
                 Text(viewModel.sortOption.rawValue)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.inkRoomSubheadline)
                 Image(systemName: viewModel.sortAscending ? "chevron.up" : "chevron.down")
                     .font(.system(size: 10, weight: .semibold))
             }
@@ -445,7 +376,7 @@ struct LibraryView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(Color.inkRoomBackgroundElevated)
-            .clipShape(.rect(cornerRadius: 8))
+            .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusMedium))
         }
     }
 
@@ -478,7 +409,7 @@ struct LibraryView: View {
             .accessibilityAddTraits(viewModel.viewMode == .list ? .isSelected : [])
         }
         .background(Color.inkRoomBackgroundElevated)
-        .clipShape(.rect(cornerRadius: 8))
+        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusMedium))
     }
 
     private var adaptiveGridView: some View {

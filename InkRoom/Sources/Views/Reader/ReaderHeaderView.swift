@@ -7,12 +7,12 @@ struct ReaderCompactHeader: View {
     let isBookmarked: Bool
     let textColor: Color
     let backgroundColor: Color
-    
+
     @Environment(\.dismiss) private var dismiss
-    
+
     var onToggleBookmark: () -> Void
     var onShowToc: () -> Void
-    
+
     private var safeAreaTop: CGFloat {
         #if os(iOS)
         return (UIApplication.shared.connectedScenes
@@ -22,7 +22,7 @@ struct ReaderCompactHeader: View {
         return 0
         #endif
     }
-    
+
     var body: some View {
         VStack(spacing: 0) {
             HStack {
@@ -32,7 +32,7 @@ struct ReaderCompactHeader: View {
                     Image(systemName: "xmark")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(textColor)
-                        .frame(width: 44, height: 44)
+                        .frame(width: LayoutMetrics.minTouchTarget, height: LayoutMetrics.minTouchTarget)
                 }
                 .accessibilityLabel("关闭阅读器")
 
@@ -40,11 +40,11 @@ struct ReaderCompactHeader: View {
 
                 VStack(spacing: 2) {
                     Text(book.title)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.inkRoomHeadline)
                         .foregroundStyle(textColor)
 
                     Text("第 \(currentPage) / \(totalPages) 页")
-                        .font(.system(size: 11))
+                        .font(.inkRoomCaption)
                         .foregroundStyle(textColor.opacity(0.6))
                 }
 
@@ -56,7 +56,7 @@ struct ReaderCompactHeader: View {
                     Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(isBookmarked ? Color.inkRoomPrimary : textColor)
-                        .frame(width: 44, height: 44)
+                        .frame(width: LayoutMetrics.minTouchTarget, height: LayoutMetrics.minTouchTarget)
                 }
                 .accessibilityLabel(isBookmarked ? "取消书签" : "添加书签")
 
@@ -66,7 +66,7 @@ struct ReaderCompactHeader: View {
                     Image(systemName: "list.bullet")
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(textColor)
-                        .frame(width: 44, height: 44)
+                        .frame(width: LayoutMetrics.minTouchTarget, height: LayoutMetrics.minTouchTarget)
                 }
                 .accessibilityLabel("打开目录")
             }
@@ -92,13 +92,13 @@ struct ReaderExpandedToolbar: View {
     let isBookmarked: Bool
     let isSpeaking: Bool
     let textColor: Color
-    
+
     @Environment(\.dismiss) private var dismiss
     @Binding var showSettings: Bool
-    
+
     var onToggleBookmark: () -> Void
     var onToggleTTS: () -> Void
-    
+
     var body: some View {
         HStack(spacing: 4) {
             Button {
@@ -107,7 +107,7 @@ struct ReaderExpandedToolbar: View {
                 Image(systemName: "chevron.left")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(textColor)
-                    .frame(width: 40, height: 40)
+                    .frame(width: LayoutMetrics.minTouchTarget, height: LayoutMetrics.minTouchTarget)
             }
             .accessibilityLabel("返回书架")
 
@@ -115,11 +115,11 @@ struct ReaderExpandedToolbar: View {
 
             VStack(spacing: 2) {
                 Text(book.title)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.inkRoomHeadline)
                     .foregroundStyle(textColor)
 
                 Text("第 \(currentPage) / \(totalPages) 页")
-                    .font(.system(size: 11))
+                    .font(.inkRoomCaption)
                     .foregroundStyle(textColor.opacity(0.6))
             }
 
@@ -131,7 +131,7 @@ struct ReaderExpandedToolbar: View {
                 Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(isBookmarked ? Color.inkRoomPrimary : textColor)
-                    .frame(width: 40, height: 40)
+                    .frame(width: LayoutMetrics.minTouchTarget, height: LayoutMetrics.minTouchTarget)
             }
             .accessibilityLabel(isBookmarked ? "取消书签" : "添加书签")
 
@@ -141,7 +141,7 @@ struct ReaderExpandedToolbar: View {
                 Image(systemName: isSpeaking ? "headphones.circle.fill" : "headphones")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(isSpeaking ? Color.inkRoomPrimary : textColor)
-                    .frame(width: 40, height: 40)
+                    .frame(width: LayoutMetrics.minTouchTarget, height: LayoutMetrics.minTouchTarget)
             }
             .accessibilityLabel(isSpeaking ? "停止听书" : "开始听书")
 
@@ -155,7 +155,7 @@ struct ReaderExpandedToolbar: View {
                 Image(systemName: "ellipsis.circle")
                     .font(.system(size: 18))
                     .foregroundStyle(textColor)
-                    .frame(width: 40, height: 40)
+                    .frame(width: LayoutMetrics.minTouchTarget, height: LayoutMetrics.minTouchTarget)
             }
             .popover(isPresented: $showSettings, arrowEdge: .bottom) {
                 ReaderSettingsPopover()

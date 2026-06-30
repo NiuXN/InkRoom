@@ -29,7 +29,7 @@ struct AppearanceSettingsSection: View {
             if settingsViewModel.followSystemTheme {
                 Text("开启跟随系统后，将自动使用系统当前的外观设置")
                     .textCase(nil)
-                    .font(.system(size: 12))
+                    .font(.inkRoomFootnote)
             }
         }
         .listRowBackground(Color.inkRoomCard)
@@ -43,17 +43,16 @@ struct AppearanceSettingsSection: View {
     ) -> some View {
         Toggle(isOn: isOn) {
             HStack(spacing: 12) {
-                ZStack {
-                    Circle()
-                        .fill(color.opacity(0.15))
-                        .frame(width: 32, height: 32)
-
-                    Image(systemName: icon)
-                        .font(.system(size: 14))
-                        .foregroundStyle(color)
-                }
+                IconBadgeView(
+                    icon: icon,
+                    iconSize: 14,
+                    badgeSize: LayoutMetrics.iconBadgeSize,
+                    color: color,
+                    background: color.opacity(0.15)
+                )
 
                 Text(title)
+                    .font(.inkRoomBody)
             }
         }
         .tint(Color.inkRoomPrimary)
