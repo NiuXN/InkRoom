@@ -204,11 +204,6 @@ struct ReaderTTSCompactPanel: View {
                     .foregroundStyle(textColor.opacity(0.7))
             }
             .tint(Color.inkRoomPrimary)
-            .labelsHidden()
-            
-            Text("朗读高亮")
-                .font(.system(size: 13))
-                .foregroundStyle(textColor.opacity(0.7))
             
             Spacer()
         }

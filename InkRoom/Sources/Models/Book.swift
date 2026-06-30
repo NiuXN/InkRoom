@@ -1,6 +1,6 @@
 import Foundation
 
-struct Book: Identifiable, Codable, Equatable, Hashable {
+struct Book: Identifiable, Codable, Equatable, Hashable, Sendable {
     let id: UUID
     var title: String
     var author: String
@@ -58,7 +58,7 @@ struct Book: Identifiable, Codable, Equatable, Hashable {
     }
 }
 
-struct Category: Identifiable, Codable, Equatable, Hashable {
+struct Category: Identifiable, Codable, Equatable, Hashable, Sendable {
     let id: UUID
     var name: String
     var iconName: String
@@ -80,7 +80,7 @@ struct Category: Identifiable, Codable, Equatable, Hashable {
     }
 }
 
-struct Chapter: Identifiable, Codable {
+struct Chapter: Identifiable, Codable, Sendable {
     let id: UUID
     var title: String
     var startPage: Int

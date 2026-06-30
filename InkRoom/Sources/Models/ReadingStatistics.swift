@@ -1,13 +1,13 @@
 import Foundation
 
-struct BookReadingStat: Identifiable {
+struct BookReadingStat: Identifiable, Sendable {
     let id: UUID
     let title: String
     let totalDuration: TimeInterval
     let lastRead: Date
 }
 
-struct ReadingStatistics {
+struct ReadingStatistics: Sendable {
     let todayMinutes: Int
     let weekMinutes: Int
     let totalMinutes: Int

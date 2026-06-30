@@ -257,7 +257,10 @@ actor DatabaseService {
 
         if let filePath = book.filePath {
             try? FileManager.default.removeItem(atPath: filePath)
-            BookParserService.shared.clearCache(for: filePath)
+            // Clean up cache in background to avoid blocking actor
+            Task.detached {
+                BookParserService.shared.clearCache(for: filePath)
+            }
         }
         if let coverURL = book.coverImageURL {
             CoverImageCache.shared.remove(for: coverURL.path)

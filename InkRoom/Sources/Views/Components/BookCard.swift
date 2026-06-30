@@ -32,7 +32,7 @@ struct BookCard: View {
                 if book.isFavorite {
                     Image(systemName: "heart.fill")
                         .font(.system(size: 12))
-                        .foregroundColor(.inkRoomPrimary)
+                        .foregroundStyle(Color.inkRoomPrimary)
                         .padding(6)
                         .background(.ultraThinMaterial)
                         .clipShape(Circle())
@@ -43,13 +43,13 @@ struct BookCard: View {
             // Title
             Text(book.title)
                 .font(.system(size: 13, weight: .medium))
-                .foregroundColor(.inkRoomTextPrimary)
+                .foregroundStyle(Color.inkRoomTextPrimary)
                 .lineLimit(1)
 
             // Author
             Text(book.author)
                 .font(.system(size: 11))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
                 .lineLimit(1)
         }
     }
@@ -65,12 +65,12 @@ struct BookCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(book.title)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.inkRoomTextPrimary)
+                    .foregroundStyle(Color.inkRoomTextPrimary)
                     .lineLimit(1)
 
                 Text(book.author)
                     .font(.system(size: 12))
-                    .foregroundColor(.inkRoomTextTertiary)
+                    .foregroundStyle(Color.inkRoomTextTertiary)
                     .lineLimit(1)
 
                 if book.isStarted {
@@ -78,7 +78,7 @@ struct BookCard: View {
                         ProgressBar(progress: book.readingProgress)
                         Text("\(Int(book.readingProgress * 100))%")
                             .font(.system(size: 10, weight: .medium))
-                            .foregroundColor(.inkRoomPrimary)
+                            .foregroundStyle(Color.inkRoomPrimary)
                     }
                 }
             }
@@ -87,7 +87,7 @@ struct BookCard: View {
 
             Image(systemName: "chevron.right")
                 .font(.system(size: 14))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
         }
         .padding(12)
         .background(Color.inkRoomCard)
@@ -116,18 +116,18 @@ struct CoverImageView: View {
                     VStack {
                         Image(systemName: "book.closed.fill")
                             .font(.system(size: 28))
-                            .foregroundColor(.inkRoomPrimary.opacity(0.5))
+                            .foregroundStyle(Color.inkRoomPrimary.opacity(0.5))
 
                         Text(title)
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(.inkRoomTextSecondary)
+                            .foregroundStyle(Color.inkRoomTextSecondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 8)
                     }
                     .padding(8)
                 } else {
                     Image(systemName: "book.closed")
-                        .foregroundColor(.inkRoomPrimary.opacity(0.5))
+                        .foregroundStyle(Color.inkRoomPrimary.opacity(0.5))
                 }
             }
         }
@@ -138,8 +138,13 @@ struct CoverImageView: View {
                 imageData = cached
                 return
             }
+            // Decode image in background to avoid blocking main thread
             let data = await Task.detached(priority: .utility) {
-                try? Data(contentsOf: URL(fileURLWithPath: path))
+                guard let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
+                      let _ = PlatformImage(data: data) else {
+                    return nil as Data?
+                }
+                return data
             }.value
             if let data {
                 CoverImageCache.shared.store(data, for: path)

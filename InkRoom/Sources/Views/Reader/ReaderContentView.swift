@@ -104,7 +104,7 @@ struct ReaderContentView: View {
                             .progressViewStyle(.circular)
                             .frame(maxWidth: .infinity, minHeight: 300)
                     } else {
-                        ForEach(Array(readerVM.chapters.enumerated()), id: \.offset) { index, chapter in
+                        ForEach(Array(readerVM.chapters.enumerated()), id: \.element.id) { index, chapter in
                             VStack(alignment: .leading, spacing: CGFloat(settingsViewModel.readingLineSpacing)) {
                                 Text(chapter.title)
                                     .font(.system(size: CGFloat(settingsViewModel.readingFontSize) * 1.2, weight: .bold))

@@ -1,6 +1,6 @@
 import Foundation
 
-struct ReadingSession: Identifiable, Codable {
+struct ReadingSession: Identifiable, Codable, Sendable {
     let id: UUID
     let bookId: UUID
     let bookTitle: String

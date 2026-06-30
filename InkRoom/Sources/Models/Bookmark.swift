@@ -1,6 +1,6 @@
 import Foundation
 
-struct Bookmark: Identifiable, Codable, Hashable {
+struct Bookmark: Identifiable, Codable, Hashable, Sendable {
     let id: UUID
     let bookId: UUID
     let page: Int

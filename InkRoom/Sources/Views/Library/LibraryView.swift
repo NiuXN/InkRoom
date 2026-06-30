@@ -246,15 +246,16 @@ struct LibraryView: View {
 
             List {
                 ForEach(viewModel.filteredBooks) { book in
-                    BookCard(book: book, viewMode: .list)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            selectedBook = book
-                        }
-                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                        .listRowSeparator(.hidden)
-                        .listRowBackground(Color.clear)
-                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button {
+                        selectedBook = book
+                    } label: {
+                        BookCard(book: book, viewMode: .list)
+                    }
+                    .buttonStyle(.plain)
+                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button(role: .destructive) {
                                 bookToDelete = book
                                 showDeleteConfirmation = true
@@ -484,14 +485,15 @@ struct LibraryView: View {
         let columns = cachedColumnCount
         return LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: columns), spacing: 16) {
             ForEach(viewModel.filteredBooks) { book in
-                BookCard(book: book, viewMode: .grid)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        selectedBook = book
-                    }
-                    .contextMenu {
-                        bookContextMenu(for: book)
-                    }
+                Button {
+                    selectedBook = book
+                } label: {
+                    BookCard(book: book, viewMode: .grid)
+                }
+                .buttonStyle(.plain)
+                .contextMenu {
+                    bookContextMenu(for: book)
+                }
             }
         }
         .padding(.horizontal, sizeClass == .expanded ? 24 : 16)
