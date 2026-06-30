@@ -9,10 +9,12 @@ struct BookDetailView: View {
     @State private var showCategoryPicker = false
     @State private var isFavorite: Bool
     @State private var showDeleteConfirmation = false
+    @State private var currentBook: Book
 
     init(book: Book) {
         self.book = book
         _isFavorite = State(initialValue: book.isFavorite)
+        _currentBook = State(initialValue: book)
     }
 
     var body: some View {
@@ -28,6 +30,7 @@ struct BookDetailView: View {
         .onChange(of: viewModel.books) { _, books in
             if let updated = books.first(where: { $0.id == book.id }) {
                 isFavorite = updated.isFavorite
+                currentBook = updated
             } else {
                 dismiss()
             }
@@ -331,10 +334,6 @@ struct BookDetailView: View {
             }
         }
         .frame(minWidth: 320, minHeight: 400)
-    }
-
-    private var currentBook: Book {
-        viewModel.books.first(where: { $0.id == book.id }) ?? book
     }
 
     private var wordCountText: String {

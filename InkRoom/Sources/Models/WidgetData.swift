@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct WidgetBookData: Codable, Identifiable, Hashable {
+struct WidgetBookData: Codable, Identifiable, Hashable, Sendable {
     let id: String
     let title: String
     let author: String
@@ -28,7 +28,7 @@ struct WidgetBookData: Codable, Identifiable, Hashable {
     }
 }
 
-struct WidgetData: Codable {
+struct WidgetData: Codable, Sendable {
     let currentBook: WidgetBookData?
     let recentBooks: [WidgetBookData]
     let totalBooks: Int

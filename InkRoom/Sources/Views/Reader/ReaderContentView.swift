@@ -74,12 +74,7 @@ struct ReaderContentView: View {
                 if ttsService.isSpeaking && settingsViewModel.ttsHighlightEnabled,
                    let range = ttsService.currentSentenceRange,
                    let textRange = Range(range, in: readerVM.pageText) {
-                    Text(readerVM.pageText[readerVM.pageText.startIndex..<textRange.lowerBound])
-                        .foregroundStyle(textColor)
-                    + Text(readerVM.pageText[textRange])
-                        .foregroundStyle(Color.inkRoomPrimary)
-                        .fontWeight(.semibold)
-                    + Text(readerVM.pageText[textRange.upperBound..<readerVM.pageText.endIndex])
+                    Text(highlightedText(original: readerVM.pageText, range: textRange))
                         .foregroundStyle(textColor)
                 } else {
                     Text(readerVM.pageText)
@@ -173,5 +168,15 @@ struct ReaderContentView: View {
     private func shouldTrackFrame(for chapterIndex: Int) -> Bool {
         let currentIndex = readerVM.currentChapterIndex
         return abs(chapterIndex - currentIndex) <= 2
+    }
+    
+    private func highlightedText(original: String, range: Range<String.Index>) -> AttributedString {
+        var attributed = AttributedString(original)
+        if let attrRange = attributed.range(of: String(original[range])) {
+            var highlightColor = Color.inkRoomPrimary
+            attributed[attrRange].foregroundColor = highlightColor
+            attributed[attrRange].font = .system(size: CGFloat(settingsViewModel.readingFontSize), weight: .semibold)
+        }
+        return attributed
     }
 }

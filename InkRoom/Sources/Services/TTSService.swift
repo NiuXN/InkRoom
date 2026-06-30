@@ -227,7 +227,7 @@ class TTSService: NSObject, ObservableObject {
     }
 }
 
-extension TTSService: AVSpeechSynthesizerDelegate {
+extension TTSService: @preconcurrency AVSpeechSynthesizerDelegate {
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didStart utterance: AVSpeechUtterance) {
         Task { @MainActor in
             self.isSpeaking = true

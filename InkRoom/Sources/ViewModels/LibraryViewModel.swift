@@ -295,26 +295,27 @@ class LibraryViewModel: ObservableObject {
                 .sorted { ($0.lastReadDate ?? .distantPast) > ($1.lastReadDate ?? .distantPast) }
                 .prefix(5)
         )
+        let totalBooks = books.count
 
-        let widgetBooks = recentBooks.map { book -> WidgetBookData in
-            WidgetBookData(
-                id: book.id.uuidString,
-                title: book.title,
-                author: book.author,
-                currentPage: book.currentPage,
-                totalPages: book.totalPages,
-                lastReadDate: book.lastReadDate ?? book.addedDate,
-                coverData: nil,
-                currentChapterTitle: ""
-            )
-        }
+        Task.detached(priority: .utility) {
+            let widgetBooks = recentBooks.map { book -> WidgetBookData in
+                WidgetBookData(
+                    id: book.id.uuidString,
+                    title: book.title,
+                    author: book.author,
+                    currentPage: book.currentPage,
+                    totalPages: book.totalPages,
+                    lastReadDate: book.lastReadDate ?? book.addedDate,
+                    coverData: nil,
+                    currentChapterTitle: ""
+                )
+            }
 
-        Task {
-            let totalMinutes = await database.fetchTotalReadingMinutes()
+            let totalMinutes = await self.database.fetchTotalReadingMinutes()
             let widgetData = WidgetData(
                 currentBook: widgetBooks.first,
                 recentBooks: widgetBooks,
-                totalBooks: books.count,
+                totalBooks: totalBooks,
                 totalReadingMinutes: totalMinutes
             )
             WidgetDataManager.saveWidgetData(widgetData)
