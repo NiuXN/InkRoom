@@ -51,8 +51,8 @@ final class ReaderViewModel: ObservableObject {
             } else {
                 await loadPageContent()
             }
-            loadBookmarks()
-            checkCurrentPageBookmark()
+            await loadBookmarks()
+            await checkCurrentPageBookmark()
         }
     }
 
@@ -71,7 +71,7 @@ final class ReaderViewModel: ObservableObject {
         } else {
             schedulePageLoad()
         }
-        checkCurrentPageBookmark()
+        Task { await checkCurrentPageBookmark() }
         return true
     }
 
@@ -85,7 +85,7 @@ final class ReaderViewModel: ObservableObject {
         } else {
             schedulePageLoad()
         }
-        checkCurrentPageBookmark()
+        Task { await checkCurrentPageBookmark() }
         return true
     }
 
@@ -97,7 +97,7 @@ final class ReaderViewModel: ObservableObject {
         if isScrollMode {
             pendingScrollToPage = page
             updateChapterMetadata(for: page)
-            checkCurrentPageBookmark()
+            Task { await checkCurrentPageBookmark() }
         } else {
             schedulePageLoad()
         }
@@ -113,7 +113,7 @@ final class ReaderViewModel: ObservableObject {
             currentPage = page
             updateChapterMetadata(for: page)
             schedulePageTextRefresh()
-            checkCurrentPageBookmark()
+            await checkCurrentPageBookmark()
             scheduleScrollProgressSave()
         }
     }
@@ -133,21 +133,21 @@ final class ReaderViewModel: ObservableObject {
         }
     }
 
-    func loadBookmarks() {
+    func loadBookmarks() async {
         guard let libraryViewModel else { return }
-        bookmarks = libraryViewModel.getBookmarks(for: activeBook)
+        bookmarks = await libraryViewModel.getBookmarks(for: activeBook)
     }
 
-    func checkCurrentPageBookmark() {
+    func checkCurrentPageBookmark() async {
         guard let libraryViewModel else { return }
-        isCurrentPageBookmarked = libraryViewModel.isBookmarked(activeBook, page: currentPage)
+        isCurrentPageBookmarked = await libraryViewModel.isBookmarked(activeBook, page: currentPage)
     }
 
-    func toggleBookmark(pageText: String, chapterTitle: String) {
+    func toggleBookmark(pageText: String, chapterTitle: String) async {
         guard let libraryViewModel else { return }
         if isCurrentPageBookmarked {
             if let bookmark = bookmarks.first(where: { $0.page == currentPage }) {
-                libraryViewModel.removeBookmark(bookmark)
+                await libraryViewModel.removeBookmark(bookmark)
             }
         } else {
             let bookmark = Bookmark(
@@ -156,10 +156,10 @@ final class ReaderViewModel: ObservableObject {
                 chapterTitle: chapterTitle,
                 content: String(pageText.prefix(80))
             )
-            libraryViewModel.addBookmark(bookmark)
+            await libraryViewModel.addBookmark(bookmark)
         }
-        loadBookmarks()
-        checkCurrentPageBookmark()
+        await loadBookmarks()
+        await checkCurrentPageBookmark()
     }
 
     func ensureChapterTextLoaded(at index: Int) async {
@@ -203,7 +203,7 @@ final class ReaderViewModel: ObservableObject {
         pageLoadTask?.cancel()
         pageLoadTask = Task {
             await loadPageContent()
-            checkCurrentPageBookmark()
+            await checkCurrentPageBookmark()
         }
     }
 
@@ -221,7 +221,7 @@ final class ReaderViewModel: ObservableObject {
 
     private func loadChapters() async {
         guard let libraryViewModel else { return }
-        let stored = libraryViewModel.getChapters(for: activeBook)
+        let stored = await libraryViewModel.getChapters(for: activeBook)
         if !stored.isEmpty {
             chapters = stored
             buildPageToChapterIndexCache()
@@ -231,7 +231,7 @@ final class ReaderViewModel: ObservableObject {
         if activeBook.filePath != nil {
             chapters = await BookParserService.shared.getChapters(for: activeBook)
             if !chapters.isEmpty {
-                try? DatabaseService.shared.insertChapters(chapters, forBookId: activeBook.id)
+                try? await DatabaseService.shared.insertChapters(chapters, forBookId: activeBook.id)
             }
             buildPageToChapterIndexCache()
         } else if chapters.isEmpty {
@@ -346,7 +346,9 @@ final class ReaderViewModel: ObservableObject {
         guard let libraryViewModel else { return }
         let baselinePage = max(1, activeBook.currentPage)
         guard pagesReadInSession > 0 || currentPage != baselinePage else { return }
-        libraryViewModel.updateReadingProgress(for: activeBook, to: currentPage)
+        Task {
+            await libraryViewModel.updateReadingProgress(for: activeBook, to: currentPage)
+        }
     }
 
     private func saveReadingSession() {
@@ -366,7 +368,9 @@ final class ReaderViewModel: ObservableObject {
             duration: duration,
             pagesRead: pagesReadInSession
         )
-        try? DatabaseService.shared.insertReadingSession(session)
+        Task {
+            try? await DatabaseService.shared.insertReadingSession(session)
+        }
         readingSessionStart = nil
     }
 

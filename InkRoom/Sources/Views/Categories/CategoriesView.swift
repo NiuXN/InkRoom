@@ -18,7 +18,7 @@ struct CategoriesView: View {
             VStack(spacing: 16) {
                     Text("共 \(viewModel.books.count) 本书 · \(viewModel.categories.count) 个分类")
                         .font(.system(size: 12))
-                        .foregroundColor(.inkRoomTextTertiary)
+                        .foregroundStyle(Color.inkRoomTextTertiary)
                         .padding(.top, 8)
 
                     let columns = GridLayoutHelper.columnCount(
@@ -103,11 +103,14 @@ struct CategoriesView: View {
                         Image(systemName: "plus")
                             .font(.system(size: 16, weight: .medium))
                     }
+                    .accessibilityLabel("新建分类")
                 }
             }
             .sheet(isPresented: $showAddCategory) {
                 AddCategoryView { newCategory in
-                    viewModel.addCategory(newCategory)
+                    Task {
+                        await viewModel.addCategory(newCategory)
+                    }
                 }
             }
             .alert("删除分类", isPresented: $showDeleteConfirmation) {
@@ -117,7 +120,9 @@ struct CategoriesView: View {
                 Button("删除", role: .destructive) {
                     if let category = categoryToDelete {
                         deleteTrigger += 1
-                        viewModel.deleteCategory(category)
+                        Task {
+                            await viewModel.deleteCategory(category)
+                        }
                         categoryToDelete = nil
                         if isEditingCategories, viewModel.categories.isEmpty {
                             isEditingCategories = false
@@ -162,12 +167,12 @@ struct CategoriesView: View {
 
                 Image(systemName: "plus")
                     .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(.inkRoomTextTertiary)
+                    .foregroundStyle(Color.inkRoomTextTertiary)
             }
 
             Text("新建分类")
                 .font(.system(size: 14, weight: .medium))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
 
             Spacer()
         }
@@ -197,7 +202,7 @@ struct CategoriesView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("未分类")
                 .font(.system(size: 13, weight: .medium))
-                .foregroundColor(.inkRoomTextSecondary)
+                .foregroundStyle(Color.inkRoomTextSecondary)
                 .padding(.horizontal, contentPadding)
 
             // Books with no categories OR books whose categories were deleted
@@ -210,7 +215,7 @@ struct CategoriesView: View {
             if uncategorizedBooks.isEmpty {
                 Text("暂无未分类书籍")
                     .font(.system(size: 13))
-                    .foregroundColor(.inkRoomTextTertiary)
+                    .foregroundStyle(Color.inkRoomTextTertiary)
                     .padding(.horizontal, contentPadding)
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -226,7 +231,7 @@ struct CategoriesView: View {
 
                                     Text(book.title)
                                         .font(.system(size: 12, weight: .medium))
-                                        .foregroundColor(.inkRoomTextPrimary)
+                                        .foregroundStyle(Color.inkRoomTextPrimary)
                                         .lineLimit(1)
                                 }
                                 .frame(width: 80)
@@ -245,7 +250,7 @@ struct CategoryCard: View {
     let category: Category
 
     var categoryColor: Color {
-        Color(hex: category.colorHex) ?? .inkRoomPrimary
+        Color(hex: category.colorHex) ?? Color.inkRoomPrimary
     }
 
     var body: some View {
@@ -257,18 +262,18 @@ struct CategoryCard: View {
 
                 Image(safeSystemName: category.iconName)
                     .font(.system(size: 18))
-                    .foregroundColor(categoryColor)
+                    .foregroundStyle(categoryColor)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(category.name)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.inkRoomTextPrimary)
+                    .foregroundStyle(Color.inkRoomTextPrimary)
                     .lineLimit(1)
 
                 Text("\(category.bookIds.count)本")
                     .font(.system(size: 11))
-                    .foregroundColor(categoryColor)
+                    .foregroundStyle(categoryColor)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
                     .background(categoryColor.opacity(0.1))
@@ -279,7 +284,7 @@ struct CategoryCard: View {
 
             Image(systemName: "chevron.right")
                 .font(.system(size: 14))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
         }
         .padding(14)
         .background(Color.inkRoomCard)
@@ -315,17 +320,17 @@ struct CategoryDetailView: View {
 
                         Image(safeSystemName: liveCategory.iconName)
                             .font(.system(size: 24))
-                            .foregroundColor(Color(hex: liveCategory.colorHex) ?? .inkRoomPrimary)
+                            .foregroundStyle(Color(hex: liveCategory.colorHex) ?? Color.inkRoomPrimary)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(liveCategory.name)
                             .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.inkRoomTextPrimary)
+                            .foregroundStyle(Color.inkRoomTextPrimary)
 
                         Text("\(categoryBooks.count) 本书")
                             .font(.system(size: 13))
-                            .foregroundColor(.inkRoomTextTertiary)
+                            .foregroundStyle(Color.inkRoomTextTertiary)
                     }
 
                     Spacer()
@@ -337,15 +342,15 @@ struct CategoryDetailView: View {
                     VStack(spacing: 12) {
                         Image(systemName: "books.vertical")
                             .font(.system(size: 40))
-                            .foregroundColor(.inkRoomTextTertiary)
+                            .foregroundStyle(Color.inkRoomTextTertiary)
 
                         Text("该分类暂无书籍")
                             .font(.system(size: 15, weight: .medium))
-                            .foregroundColor(.inkRoomTextSecondary)
+                            .foregroundStyle(Color.inkRoomTextSecondary)
 
                         Text("在书籍详情页可将书籍加入此分类")
                             .font(.system(size: 13))
-                            .foregroundColor(.inkRoomTextTertiary)
+                            .foregroundStyle(Color.inkRoomTextTertiary)
                             .multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity)
@@ -382,12 +387,15 @@ struct CategoryDetailView: View {
                     Image(systemName: "trash")
                         .font(.system(size: 16, weight: .medium))
                 }
+                .accessibilityLabel("删除分类")
             }
         }
         .alert("删除分类", isPresented: $showDeleteConfirmation) {
             Button("取消", role: .cancel) {}
             Button("删除", role: .destructive) {
-                viewModel.deleteCategory(liveCategory)
+                Task {
+                    await viewModel.deleteCategory(liveCategory)
+                }
                 dismiss()
             }
         } message: {

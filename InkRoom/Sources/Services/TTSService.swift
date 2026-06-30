@@ -18,9 +18,10 @@ class TTSService: NSObject, ObservableObject {
     @Published var currentSentenceRange: NSRange?
     @Published var currentBookTitle: String = ""
     @Published var currentChapterTitle: String = ""
+    @Published var remainingTime: TimeInterval = 0
     
-    // Retain current utterance for lock screen progress scrubbing
     private var currentUtterance: AVSpeechUtterance?
+    private var timerTask: Task<Void, Never>?
     
     var onSentenceChange: ((NSRange, String) -> Void)?
     var onSpeechFinish: (() -> Void)?
@@ -148,6 +149,7 @@ class TTSService: NSObject, ObservableObject {
     }
     
     func stop() {
+        stopTimer()
         if synthesizer.isSpeaking {
             synthesizer.stopSpeaking(at: .immediate)
         }
@@ -156,6 +158,28 @@ class TTSService: NSObject, ObservableObject {
         currentSentenceRange = nil
         currentUtterance = nil
         clearNowPlayingInfo()
+    }
+    
+    func startTimer(minutes: Int) {
+        stopTimer()
+        remainingTime = TimeInterval(minutes * 60)
+        timerTask = Task {
+            while remainingTime > 0 && !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(1))
+                guard !Task.isCancelled else { break }
+                remainingTime -= 1
+                if remainingTime <= 0 {
+                    stop()
+                    break
+                }
+            }
+        }
+    }
+    
+    func stopTimer() {
+        timerTask?.cancel()
+        timerTask = nil
+        remainingTime = 0
     }
     
     func setBookInfo(title: String, chapter: String) {

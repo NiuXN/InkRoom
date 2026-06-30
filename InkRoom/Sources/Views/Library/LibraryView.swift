@@ -44,6 +44,7 @@ struct LibraryView: View {
                     Image(systemName: "plus")
                         .font(.system(size: 16, weight: .medium))
                 }
+                .accessibilityLabel("导入书籍")
             }
         }
         .sheet(isPresented: $showImport) {
@@ -59,7 +60,9 @@ struct LibraryView: View {
             Button("删除", role: .destructive) {
                 if let book = bookToDelete {
                     deleteTrigger += 1
-                    viewModel.deleteBook(book)
+                    Task {
+                        await viewModel.deleteBook(book)
+                    }
                     if selectedBook?.id == book.id {
                         selectedBook = nil
                     }
@@ -116,7 +119,7 @@ struct LibraryView: View {
     private var searchBar: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
             TextField("搜索书名或作者", text: $viewModel.searchText)
                 .font(.system(size: 14))
         }
@@ -144,9 +147,9 @@ struct LibraryView: View {
                             Spacer()
                             Text("\(bookCount(for: group))")
                                 .font(.system(size: 12))
-                                .foregroundColor(.inkRoomTextTertiary)
+                                .foregroundStyle(Color.inkRoomTextTertiary)
                         }
-                        .foregroundColor(viewModel.selectedGroup == group ? .inkRoomPrimary : .inkRoomTextSecondary)
+                        .foregroundStyle(viewModel.selectedGroup == group ? Color.inkRoomPrimary : Color.inkRoomTextSecondary)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
                         .background(
@@ -168,7 +171,7 @@ struct LibraryView: View {
                             } label: {
                                 Text(group.rawValue)
                                     .font(.system(size: 13, weight: .medium))
-                                    .foregroundColor(viewModel.selectedGroup == group ? .white : .inkRoomTextSecondary)
+                                    .foregroundStyle(viewModel.selectedGroup == group ? .white : Color.inkRoomTextSecondary)
                                     .padding(.horizontal, 14)
                                     .padding(.vertical, 7)
                                     .background(
@@ -261,11 +264,13 @@ struct LibraryView: View {
 
                             Button {
                                 favoriteTrigger += 1
-                                viewModel.toggleFavorite(for: book)
+                                Task {
+                                    await viewModel.toggleFavorite(for: book)
+                                }
                             } label: {
                                 Label(book.isFavorite ? "取消收藏" : "收藏", systemImage: book.isFavorite ? "heart.slash" : "heart")
                             }
-                            .tint(.inkRoomPrimary)
+                            .tint(Color.inkRoomPrimary)
                         }
                 }
             }
@@ -282,7 +287,9 @@ struct LibraryView: View {
         Button {
             ContextMenuDismiss.run {
                 favoriteTrigger += 1
-                viewModel.toggleFavorite(for: book)
+                Task {
+                    await viewModel.toggleFavorite(for: book)
+                }
             }
         } label: {
             Label(book.isFavorite ? "取消收藏" : "收藏", systemImage: book.isFavorite ? "heart.slash" : "heart")
@@ -306,22 +313,22 @@ struct LibraryView: View {
 
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 48))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
 
             Text("没有匹配的书籍")
                 .font(.system(size: 17, weight: .medium))
-                .foregroundColor(.inkRoomTextPrimary)
+                .foregroundStyle(Color.inkRoomTextPrimary)
 
             Text("试试调整搜索词或切换分组")
                 .font(.system(size: 14))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
 
             if !viewModel.searchText.isEmpty {
                 Button("清除搜索") {
                     viewModel.searchText = ""
                 }
                 .font(.system(size: 14, weight: .medium))
-                .foregroundColor(.inkRoomPrimary)
+                .foregroundStyle(Color.inkRoomPrimary)
                 .padding(.top, 4)
             }
 
@@ -335,12 +342,12 @@ struct LibraryView: View {
             Spacer()
 
             ProgressView()
-                .tint(.inkRoomPrimary)
+                .tint(Color.inkRoomPrimary)
                 .scaleEffect(1.2)
 
             Text("正在加载书架...")
                 .font(.system(size: 14))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
 
             Spacer()
         }
@@ -353,24 +360,24 @@ struct LibraryView: View {
 
             Image(systemName: "books.vertical")
                 .font(.system(size: sizeClass == .compact ? 48 : 64))
-                .foregroundColor(.inkRoomPrimary.opacity(0.5))
+                .foregroundStyle(Color.inkRoomPrimary.opacity(0.5))
 
             Text("书架空空如也")
                 .font(.system(size: sizeClass == .compact ? 17 : 20, weight: .medium))
-                .foregroundColor(.inkRoomTextPrimary)
+                .foregroundStyle(Color.inkRoomTextPrimary)
 
             Text("开启你的阅读之旅")
                 .font(.system(size: sizeClass == .compact ? 14 : 15))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
 
             if viewModel.isImporting {
                 VStack(spacing: 8) {
                     ProgressView()
-                        .tint(.inkRoomPrimary)
+                        .tint(Color.inkRoomPrimary)
                         .scaleEffect(1.2)
                     Text("正在导入...")
                         .font(.system(size: 13))
-                        .foregroundColor(.inkRoomTextTertiary)
+                        .foregroundStyle(Color.inkRoomTextTertiary)
                 }
                 .padding(.top, 8)
             } else {
@@ -432,7 +439,7 @@ struct LibraryView: View {
                 Image(systemName: viewModel.sortAscending ? "chevron.up" : "chevron.down")
                     .font(.system(size: 10, weight: .semibold))
             }
-            .foregroundColor(.inkRoomTextSecondary)
+            .foregroundStyle(Color.inkRoomTextSecondary)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(Color.inkRoomBackgroundElevated)
@@ -449,9 +456,11 @@ struct LibraryView: View {
             } label: {
                 Image(systemName: "square.grid.2x2")
                     .font(.system(size: 16))
-                    .foregroundColor(viewModel.viewMode == .grid ? .inkRoomPrimary : .inkRoomTextTertiary)
+                    .foregroundStyle(viewModel.viewMode == .grid ? Color.inkRoomPrimary : Color.inkRoomTextTertiary)
                     .padding(8)
             }
+            .accessibilityLabel("网格视图")
+            .accessibilityAddTraits(viewModel.viewMode == .grid ? .isSelected : [])
 
             Button {
                 withAnimation {
@@ -460,9 +469,11 @@ struct LibraryView: View {
             } label: {
                 Image(systemName: "list.bullet")
                     .font(.system(size: 16))
-                    .foregroundColor(viewModel.viewMode == .list ? .inkRoomPrimary : .inkRoomTextTertiary)
+                    .foregroundStyle(viewModel.viewMode == .list ? Color.inkRoomPrimary : Color.inkRoomTextTertiary)
                     .padding(8)
             }
+            .accessibilityLabel("列表视图")
+            .accessibilityAddTraits(viewModel.viewMode == .list ? .isSelected : [])
         }
         .background(Color.inkRoomBackgroundElevated)
         .cornerRadius(8)

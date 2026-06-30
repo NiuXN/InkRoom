@@ -1,17 +1,10 @@
 import Foundation
 import SQLite
 
-final class DatabaseService {
+actor DatabaseService {
     static let shared = DatabaseService()
 
     private var db: Connection?
-    private let dbLock = NSRecursiveLock()
-
-    private func synchronized<T>(_ block: () throws -> T) rethrows -> T {
-        dbLock.lock()
-        defer { dbLock.unlock() }
-        return try block()
-    }
 
     // MARK: - Tables
     let books = Table("books")
@@ -90,7 +83,6 @@ final class DatabaseService {
         guard let db = db else { return }
 
         do {
-            // Books table
             try db.run(books.create(ifNotExists: true) { t in
                 t.column(bookId, primaryKey: true)
                 t.column(bookTitle)
@@ -104,7 +96,6 @@ final class DatabaseService {
                 t.column(bookAddedDate)
             })
 
-            // Categories table
             try db.run(categories.create(ifNotExists: true) { t in
                 t.column(categoryId, primaryKey: true)
                 t.column(categoryName)
@@ -112,7 +103,6 @@ final class DatabaseService {
                 t.column(categoryColorHex)
             })
 
-            // Chapters table
             try db.run(chapters.create(ifNotExists: true) { t in
                 t.column(chapterId, primaryKey: true)
                 t.column(chapterBookId)
@@ -122,7 +112,6 @@ final class DatabaseService {
                 t.column(chapterOrder)
             })
 
-            // Book-Category relation table
             try db.run("""
                 CREATE TABLE IF NOT EXISTS book_category_relations (
                     book_id TEXT NOT NULL,
@@ -131,7 +120,6 @@ final class DatabaseService {
                 )
             """)
 
-            // Bookmarks table
             try db.run(bookmarks.create(ifNotExists: true) { t in
                 t.column(bookmarkId, primaryKey: true)
                 t.column(bookmarkBookId)
@@ -141,7 +129,6 @@ final class DatabaseService {
                 t.column(bookmarkCreatedAt)
             })
 
-            // Reading sessions table
             try db.run(readingSessions.create(ifNotExists: true) { t in
                 t.column(sessionId, primaryKey: true)
                 t.column(sessionBookId)
@@ -152,7 +139,6 @@ final class DatabaseService {
                 t.column(sessionPagesRead)
             })
 
-            // Create indexes for better query performance
             try db.run("CREATE INDEX IF NOT EXISTS idx_books_last_read ON books(last_read_date DESC)")
             try db.run("CREATE INDEX IF NOT EXISTS idx_books_added_date ON books(added_date DESC)")
             try db.run("CREATE INDEX IF NOT EXISTS idx_chapters_book_id ON chapters(book_id, order_index)")
@@ -174,13 +160,8 @@ final class DatabaseService {
     }
 
     // MARK: - Book Operations
-    func insertBook(_ book: Book) throws {
-        try synchronized {
-            try insertBookUnsafe(book)
-        }
-    }
 
-    private func insertBookUnsafe(_ book: Book) throws {
+    func insertBook(_ book: Book) throws {
         guard let db = db else { return }
 
         let insert = books.insert(
@@ -203,17 +184,10 @@ final class DatabaseService {
     }
 
     func fetchAllBooks() -> [Book] {
-        synchronized {
-            fetchAllBooksUnsafe()
-        }
-    }
-
-    private func fetchAllBooksUnsafe() -> [Book] {
         guard let db = db else { return [] }
 
         var results: [Book] = []
         do {
-            // 一次性查询所有 book-category 关联关系，在内存中按 book_id 分组，避免 N+1 查询
             var bookCategoryMap: [String: [UUID]] = [:]
             for row in try db.prepare("SELECT book_id, category_id FROM book_category_relations") {
                 if let bookIdStr = row[0] as? String, let categoryIdStr = row[1] as? String,
@@ -247,30 +221,22 @@ final class DatabaseService {
     }
 
     func updateBook(_ book: Book) throws {
-        try synchronized {
-            guard let db = db else { return }
+        guard let db = db else { return }
 
-            let target = books.filter(bookId == book.id.uuidString)
-            try db.run(target.update(
-                bookTitle <- book.title,
-                bookAuthor <- book.author,
-                bookCoverPath <- book.coverImageName,
-                bookFilePath <- book.filePath,
-                bookTotalPages <- book.totalPages,
-                bookCurrentPage <- book.currentPage,
-                bookLastReadDate <- book.lastReadDate?.timeIntervalSince1970,
-                bookIsFavorite <- book.isFavorite
-            ))
-        }
+        let target = books.filter(bookId == book.id.uuidString)
+        try db.run(target.update(
+            bookTitle <- book.title,
+            bookAuthor <- book.author,
+            bookCoverPath <- book.coverImageName,
+            bookFilePath <- book.filePath,
+            bookTotalPages <- book.totalPages,
+            bookCurrentPage <- book.currentPage,
+            bookLastReadDate <- book.lastReadDate?.timeIntervalSince1970,
+            bookIsFavorite <- book.isFavorite
+        ))
     }
 
     func deleteBook(_ book: Book) throws {
-        try synchronized {
-            try deleteBookUnsafe(book)
-        }
-    }
-
-    private func deleteBookUnsafe(_ book: Book) throws {
         guard let db = db else { return }
 
         let bookIdStr = book.id.uuidString
@@ -300,198 +266,199 @@ final class DatabaseService {
     }
 
     func updateReadingProgress(bookId id: UUID, page: Int) throws {
-        try synchronized {
-            guard let db = db else { return }
+        guard let db = db else { return }
 
-            let target = books.filter(bookId == id.uuidString)
-            try db.run(target.update(
-                bookCurrentPage <- page,
-                bookLastReadDate <- Date().timeIntervalSince1970
-            ))
-        }
+        let target = books.filter(bookId == id.uuidString)
+        try db.run(target.update(
+            bookCurrentPage <- page,
+            bookLastReadDate <- Date().timeIntervalSince1970
+        ))
     }
 
     func toggleFavorite(bookId id: UUID, isFavorite: Bool) throws {
-        try synchronized {
-            guard let db = db else { return }
+        guard let db = db else { return }
 
-            let target = books.filter(bookId == id.uuidString)
-            try db.run(target.update(bookIsFavorite <- isFavorite))
-        }
+        let target = books.filter(bookId == id.uuidString)
+        try db.run(target.update(bookIsFavorite <- isFavorite))
     }
 
     // MARK: - Category Operations
-    func insertCategory(_ category: Category) throws {
-        try synchronized {
-            guard let db = db else { return }
 
-            let insert = categories.insert(
-                categoryId <- category.id.uuidString,
-                categoryName <- category.name,
-                categoryIconName <- category.iconName,
-                categoryColorHex <- category.colorHex
-            )
-            try db.run(insert)
-        }
+    func insertCategory(_ category: Category) throws {
+        guard let db = db else { return }
+
+        let insert = categories.insert(
+            categoryId <- category.id.uuidString,
+            categoryName <- category.name,
+            categoryIconName <- category.iconName,
+            categoryColorHex <- category.colorHex
+        )
+        try db.run(insert)
     }
 
     func fetchAllCategories() -> [Category] {
-        synchronized {
-            fetchAllCategoriesUnsafe()
+        guard let db = db else { return [] }
+
+        var results: [Category] = []
+        do {
+            var categoryBookMap: [String: [UUID]] = [:]
+            for row in try db.prepare("SELECT category_id, book_id FROM book_category_relations") {
+                if let categoryIdStr = row[0] as? String, let bookIdStr = row[1] as? String,
+                   let bookUUID = parseUUID(bookIdStr, context: "book_category_relations.book_id") {
+                    categoryBookMap[categoryIdStr, default: []].append(bookUUID)
+                }
+            }
+
+            for row in try db.prepare(categories) {
+                let categoryIdStr = row[categoryId]
+                guard let categoryUUID = parseUUID(categoryIdStr, context: "categories.id") else { continue }
+                let category = Category(
+                    id: categoryUUID,
+                    name: row[categoryName],
+                    iconName: row[categoryIconName],
+                    colorHex: row[categoryColorHex],
+                    bookIds: categoryBookMap[categoryIdStr] ?? []
+                )
+                results.append(category)
+            }
+        } catch {
+            print("Fetch categories failed: \(error)")
         }
+        return results
     }
 
     func deleteCategory(_ category: Category) throws {
-        try synchronized {
-            guard let db = db else { return }
+        guard let db = db else { return }
 
-            let target = categories.filter(categoryId == category.id.uuidString)
-            try db.run(target.delete())
+        let target = categories.filter(categoryId == category.id.uuidString)
+        try db.run(target.delete())
 
-            try db.run("DELETE FROM book_category_relations WHERE category_id = ?", category.id.uuidString)
-        }
+        try db.run("DELETE FROM book_category_relations WHERE category_id = ?", category.id.uuidString)
     }
 
     // MARK: - Chapter Operations
+
     func insertChapters(_ chaptersList: [Chapter], forBookId bookIdValue: UUID) throws {
-        try synchronized {
-            guard let db = db else { return }
+        guard let db = db else { return }
 
-            let existing = chapters.filter(chapterBookId == bookIdValue.uuidString)
-            try db.run(existing.delete())
+        let existing = chapters.filter(chapterBookId == bookIdValue.uuidString)
+        try db.run(existing.delete())
 
-            try db.transaction {
-                for (index, chapter) in chaptersList.enumerated() {
-                    let insert = chapters.insert(
-                        chapterId <- chapter.id.uuidString,
-                        chapterBookId <- bookIdValue.uuidString,
-                        chapterTitle <- chapter.title,
-                        chapterStartPage <- chapter.startPage,
-                        chapterEndPage <- chapter.endPage,
-                        chapterOrder <- index
-                    )
-                    try db.run(insert)
-                }
+        try db.transaction {
+            for (index, chapter) in chaptersList.enumerated() {
+                let insert = chapters.insert(
+                    chapterId <- chapter.id.uuidString,
+                    chapterBookId <- bookIdValue.uuidString,
+                    chapterTitle <- chapter.title,
+                    chapterStartPage <- chapter.startPage,
+                    chapterEndPage <- chapter.endPage,
+                    chapterOrder <- index
+                )
+                try db.run(insert)
             }
         }
     }
 
     func fetchChapters(forBookId bookIdValue: UUID) -> [Chapter] {
-        synchronized {
-            guard let db = db else { return [] }
+        guard let db = db else { return [] }
 
-            var results: [Chapter] = []
-            do {
-                let query = chapters.filter(chapterBookId == bookIdValue.uuidString)
-                                   .order(chapterOrder)
-                for row in try db.prepare(query) {
-                    guard let chapterUUID = parseUUID(row[chapterId], context: "chapters.id") else { continue }
-                    let chapter = Chapter(
-                        id: chapterUUID,
-                        title: row[chapterTitle],
-                        startPage: row[chapterStartPage],
-                        endPage: row[chapterEndPage]
-                    )
-                    results.append(chapter)
-                }
-            } catch {
-                print("Fetch chapters failed: \(error)")
+        var results: [Chapter] = []
+        do {
+            let query = chapters.filter(chapterBookId == bookIdValue.uuidString)
+                               .order(chapterOrder)
+            for row in try db.prepare(query) {
+                guard let chapterUUID = parseUUID(row[chapterId], context: "chapters.id") else { continue }
+                let chapter = Chapter(
+                    id: chapterUUID,
+                    title: row[chapterTitle],
+                    startPage: row[chapterStartPage],
+                    endPage: row[chapterEndPage]
+                )
+                results.append(chapter)
             }
-            return results
+        } catch {
+            print("Fetch chapters failed: \(error)")
         }
+        return results
     }
 
     // MARK: - Bookmark Operations
-    func addBookmark(_ bookmark: Bookmark) throws {
-        try synchronized {
-            guard let db = db else { return }
 
-            let insert = bookmarks.insert(
-                bookmarkId <- bookmark.id.uuidString,
-                bookmarkBookId <- bookmark.bookId.uuidString,
-                bookmarkPage <- bookmark.page,
-                bookmarkChapterTitle <- bookmark.chapterTitle,
-                bookmarkContent <- bookmark.content,
-                bookmarkCreatedAt <- bookmark.createdAt.timeIntervalSince1970
-            )
-            try db.run(insert)
-        }
+    func addBookmark(_ bookmark: Bookmark) throws {
+        guard let db = db else { return }
+
+        let insert = bookmarks.insert(
+            bookmarkId <- bookmark.id.uuidString,
+            bookmarkBookId <- bookmark.bookId.uuidString,
+            bookmarkPage <- bookmark.page,
+            bookmarkChapterTitle <- bookmark.chapterTitle,
+            bookmarkContent <- bookmark.content,
+            bookmarkCreatedAt <- bookmark.createdAt.timeIntervalSince1970
+        )
+        try db.run(insert)
     }
 
     func removeBookmark(_ bookmark: Bookmark) throws {
-        try synchronized {
-            guard let db = db else { return }
+        guard let db = db else { return }
 
-            let target = bookmarks.filter(bookmarkId == bookmark.id.uuidString)
-            try db.run(target.delete())
-        }
+        let target = bookmarks.filter(bookmarkId == bookmark.id.uuidString)
+        try db.run(target.delete())
     }
 
     func fetchBookmarks(forBookId bookIdValue: UUID) -> [Bookmark] {
-        synchronized {
-            guard let db = db else { return [] }
+        guard let db = db else { return [] }
 
-            var results: [Bookmark] = []
-            do {
-                let query = bookmarks.filter(bookmarkBookId == bookIdValue.uuidString)
-                                   .order(bookmarkPage)
-                for row in try db.prepare(query) {
-                    guard let bookmarkUUID = parseUUID(row[bookmarkId], context: "bookmarks.id") else { continue }
-                    let bookmark = Bookmark(
-                        id: bookmarkUUID,
-                        bookId: bookIdValue,
-                        page: row[bookmarkPage],
-                        chapterTitle: row[bookmarkChapterTitle],
-                        content: row[bookmarkContent],
-                        createdAt: Date(timeIntervalSince1970: row[bookmarkCreatedAt])
-                    )
-                    results.append(bookmark)
-                }
-            } catch {
-                print("Fetch bookmarks failed: \(error)")
+        var results: [Bookmark] = []
+        do {
+            let query = bookmarks.filter(bookmarkBookId == bookIdValue.uuidString)
+                               .order(bookmarkPage)
+            for row in try db.prepare(query) {
+                guard let bookmarkUUID = parseUUID(row[bookmarkId], context: "bookmarks.id") else { continue }
+                let bookmark = Bookmark(
+                    id: bookmarkUUID,
+                    bookId: bookIdValue,
+                    page: row[bookmarkPage],
+                    chapterTitle: row[bookmarkChapterTitle],
+                    content: row[bookmarkContent],
+                    createdAt: Date(timeIntervalSince1970: row[bookmarkCreatedAt])
+                )
+                results.append(bookmark)
             }
-            return results
+        } catch {
+            print("Fetch bookmarks failed: \(error)")
         }
+        return results
     }
 
     func isBookmarked(bookId: UUID, page: Int) -> Bool {
-        synchronized {
-            guard let db = db else { return false }
+        guard let db = db else { return false }
 
-            do {
-                let query = bookmarks.filter(bookmarkBookId == bookId.uuidString && bookmarkPage == page)
-                return try db.scalar(query.count) > 0
-            } catch {
-                return false
-            }
+        do {
+            let query = bookmarks.filter(bookmarkBookId == bookId.uuidString && bookmarkPage == page)
+            return try db.scalar(query.count) > 0
+        } catch {
+            return false
         }
     }
 
     // MARK: - Reading Session Operations
-    func insertReadingSession(_ session: ReadingSession) throws {
-        try synchronized {
-            guard let db = db else { return }
 
-            let insert = readingSessions.insert(
-                sessionId <- session.id.uuidString,
-                sessionBookId <- session.bookId.uuidString,
-                sessionBookTitle <- session.bookTitle,
-                sessionStartTime <- session.startTime.timeIntervalSince1970,
-                sessionEndTime <- session.endTime.timeIntervalSince1970,
-                sessionDuration <- session.duration,
-                sessionPagesRead <- session.pagesRead
-            )
-            try db.run(insert)
-        }
+    func insertReadingSession(_ session: ReadingSession) throws {
+        guard let db = db else { return }
+
+        let insert = readingSessions.insert(
+            sessionId <- session.id.uuidString,
+            sessionBookId <- session.bookId.uuidString,
+            sessionBookTitle <- session.bookTitle,
+            sessionStartTime <- session.startTime.timeIntervalSince1970,
+            sessionEndTime <- session.endTime.timeIntervalSince1970,
+            sessionDuration <- session.duration,
+            sessionPagesRead <- session.pagesRead
+        )
+        try db.run(insert)
     }
 
     func fetchAllSessions() -> [ReadingSession] {
-        synchronized {
-            fetchAllSessionsUnsafe()
-        }
-    }
-
-    private func fetchAllSessionsUnsafe() -> [ReadingSession] {
         guard let db = db else { return [] }
 
         var results: [ReadingSession] = []
@@ -508,21 +475,17 @@ final class DatabaseService {
     }
 
     func fetchSessionsForToday() -> [ReadingSession] {
-        synchronized {
-            let calendar = Calendar.current
-            let startOfDay = calendar.startOfDay(for: Date()).timeIntervalSince1970
-            let endOfDay = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: Date()))!.timeIntervalSince1970
-            return fetchSessions(from: startOfDay, to: endOfDay)
-        }
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: Date()).timeIntervalSince1970
+        let endOfDay = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: Date()))!.timeIntervalSince1970
+        return fetchSessions(from: startOfDay, to: endOfDay)
     }
 
     func fetchSessionsForWeek() -> [ReadingSession] {
-        synchronized {
-            let calendar = Calendar.current
-            let startOfWeek = calendar.startOfDay(for: calendar.date(byAdding: .day, value: -6, to: Date())!).timeIntervalSince1970
-            let endOfDay = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: Date()))!.timeIntervalSince1970
-            return fetchSessions(from: startOfWeek, to: endOfDay)
-        }
+        let calendar = Calendar.current
+        let startOfWeek = calendar.startOfDay(for: calendar.date(byAdding: .day, value: -6, to: Date())!).timeIntervalSince1970
+        let endOfDay = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: Date()))!.timeIntervalSince1970
+        return fetchSessions(from: startOfWeek, to: endOfDay)
     }
 
     private func fetchSessions(from start: Double, to end: Double) -> [ReadingSession] {
@@ -561,12 +524,6 @@ final class DatabaseService {
     }
 
     func fetchTotalReadingMinutes() -> Int {
-        synchronized {
-            fetchTotalReadingMinutesUnsafe()
-        }
-    }
-
-    private func fetchTotalReadingMinutesUnsafe() -> Int {
         guard let db = db else { return 0 }
 
         do {
@@ -579,13 +536,7 @@ final class DatabaseService {
     }
 
     func fetchReadingStatistics() -> ReadingStatistics {
-        synchronized {
-            fetchReadingStatisticsUnsafe()
-        }
-    }
-
-    private func fetchReadingStatisticsUnsafe() -> ReadingStatistics {
-        let allSessions = fetchAllSessionsUnsafe()
+        let allSessions = fetchAllSessions()
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: Date()).timeIntervalSince1970
         let endOfDay = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: Date()))!.timeIntervalSince1970
@@ -607,7 +558,7 @@ final class DatabaseService {
         return ReadingStatistics(
             todayMinutes: Int(todayDuration / 60),
             weekMinutes: Int(weekDuration / 60),
-            totalMinutes: fetchTotalReadingMinutesUnsafe(),
+            totalMinutes: fetchTotalReadingMinutes(),
             streakDays: computeStreakDays(from: allSessions),
             recentBookStats: computeBookStats(from: allSessions)
         )
@@ -659,45 +610,41 @@ final class DatabaseService {
     }
 
     // MARK: - Relations
-    func addBookToCategory(bookId bookIdValue: UUID, categoryId catId: UUID) throws {
-        try synchronized {
-            guard let db = db else { return }
 
-            try db.run("INSERT OR IGNORE INTO book_category_relations (book_id, category_id) VALUES (?, ?)",
-                       bookIdValue.uuidString, catId.uuidString)
-        }
+    func addBookToCategory(bookId bookIdValue: UUID, categoryId catId: UUID) throws {
+        guard let db = db else { return }
+
+        try db.run("INSERT OR IGNORE INTO book_category_relations (book_id, category_id) VALUES (?, ?)",
+                   bookIdValue.uuidString, catId.uuidString)
     }
 
     func removeBookFromCategory(bookId bookIdValue: UUID, categoryId catId: UUID) throws {
-        try synchronized {
-            guard let db = db else { return }
+        guard let db = db else { return }
 
-            try db.run("DELETE FROM book_category_relations WHERE book_id = ? AND category_id = ?",
-                       bookIdValue.uuidString, catId.uuidString)
-        }
+        try db.run("DELETE FROM book_category_relations WHERE book_id = ? AND category_id = ?",
+                   bookIdValue.uuidString, catId.uuidString)
     }
 
     // MARK: - Default Categories
+
     func setupDefaultCategoriesIfNeeded() {
-        synchronized {
-            let existingCategories = fetchAllCategoriesUnsafe()
-            if existingCategories.isEmpty {
-                let defaults = [
-                    Category(name: "中国古典", iconName: "book.fill", colorHex: "#C45C4A"),
-                    Category(name: "现代文学", iconName: "pencil", colorHex: "#4A7BC4"),
-                    Category(name: "外国名著", iconName: "globe", colorHex: "#4A8C6F"),
-                    Category(name: "诗词歌赋", iconName: "music.note", colorHex: "#C49A4A")
-                ]
-                for category in defaults {
-                    try? insertCategoryUnsafe(category)
-                }
-            } else {
-                migrateLegacyCategoryIconsUnsafe()
+        let existingCategories = fetchAllCategories()
+        if existingCategories.isEmpty {
+            let defaults = [
+                Category(name: "中国古典", iconName: "book.fill", colorHex: "#C45C4A"),
+                Category(name: "现代文学", iconName: "pencil", colorHex: "#4A7BC4"),
+                Category(name: "外国名著", iconName: "globe", colorHex: "#4A8C6F"),
+                Category(name: "诗词歌赋", iconName: "music.note", colorHex: "#C49A4A")
+            ]
+            for category in defaults {
+                try? insertCategory(category)
             }
+        } else {
+            migrateLegacyCategoryIcons()
         }
     }
 
-    private func migrateLegacyCategoryIconsUnsafe() {
+    private func migrateLegacyCategoryIcons() {
         guard let db = db else { return }
 
         let legacyIcons: [(old: String, new: String)] = [
@@ -712,48 +659,5 @@ final class DatabaseService {
                     .update(categoryIconName <- mapping.new)
             )
         }
-    }
-
-    private func fetchAllCategoriesUnsafe() -> [Category] {
-        guard let db = db else { return [] }
-
-        var results: [Category] = []
-        do {
-            var categoryBookMap: [String: [UUID]] = [:]
-            for row in try db.prepare("SELECT category_id, book_id FROM book_category_relations") {
-                if let categoryIdStr = row[0] as? String, let bookIdStr = row[1] as? String,
-                   let bookUUID = parseUUID(bookIdStr, context: "book_category_relations.book_id") {
-                    categoryBookMap[categoryIdStr, default: []].append(bookUUID)
-                }
-            }
-
-            for row in try db.prepare(categories) {
-                let categoryIdStr = row[categoryId]
-                guard let categoryUUID = parseUUID(categoryIdStr, context: "categories.id") else { continue }
-                let category = Category(
-                    id: categoryUUID,
-                    name: row[categoryName],
-                    iconName: row[categoryIconName],
-                    colorHex: row[categoryColorHex],
-                    bookIds: categoryBookMap[categoryIdStr] ?? []
-                )
-                results.append(category)
-            }
-        } catch {
-            print("Fetch categories failed: \(error)")
-        }
-        return results
-    }
-
-    private func insertCategoryUnsafe(_ category: Category) throws {
-        guard let db = db else { return }
-
-        let insert = categories.insert(
-            categoryId <- category.id.uuidString,
-            categoryName <- category.name,
-            categoryIconName <- category.iconName,
-            categoryColorHex <- category.colorHex
-        )
-        try db.run(insert)
     }
 }

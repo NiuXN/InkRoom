@@ -50,7 +50,7 @@ struct InkRoomButton: View {
                 Text(title)
                     .font(.system(size: 14, weight: .medium))
             }
-            .foregroundColor(style.foregroundColor)
+            .foregroundStyle(style.foregroundColor)
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .background(style.backgroundColor)
@@ -62,11 +62,13 @@ struct InkRoomButton: View {
 struct InkRoomIconButton: View {
     let icon: String
     let size: CGFloat
+    let accessibilityLabel: String?
     let action: () -> Void
 
-    init(_ icon: String, size: CGFloat = 20, action: @escaping () -> Void) {
+    init(_ icon: String, size: CGFloat = 20, accessibilityLabel: String? = nil, action: @escaping () -> Void) {
         self.icon = icon
         self.size = size
+        self.accessibilityLabel = accessibilityLabel
         self.action = action
     }
 
@@ -74,9 +76,10 @@ struct InkRoomIconButton: View {
         Button(action: action) {
             Image(safeSystemName: icon)
                 .font(.system(size: size, weight: .medium))
-                .foregroundColor(.inkRoomTextPrimary)
+                .foregroundStyle(Color.inkRoomTextPrimary)
                 .frame(width: 44, height: 44)
         }
+        .accessibilityLabel(accessibilityLabel ?? "")
     }
 }
 

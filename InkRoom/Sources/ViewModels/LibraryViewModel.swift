@@ -29,8 +29,8 @@ class LibraryViewModel: ObservableObject {
     private static let sortOptionKey = "librarySortOption"
     private static let sortAscendingKey = "librarySortAscending"
 
-    private let database: DatabaseService
-    private let bookParser: BookParserService
+    private let database: any DatabaseServiceProtocol
+    private let bookParser: BookParserServiceProtocol
     private var cancellables = Set<AnyCancellable>()
 
     init(dependencies: AppDependencies = .shared) {
@@ -70,9 +70,9 @@ class LibraryViewModel: ObservableObject {
             .assign(to: &$groupBookCounts)
 
         NotificationCenter.default.publisher(for: .bookImportedNotification)
-            .receive(on: DispatchQueue.main)
+            .receive(on: RunLoop.main)
             .sink { [weak self] _ in
-                self?.reloadAllData()
+                Task { await self?.reloadAllData() }
             }
             .store(in: &cancellables)
 
@@ -81,27 +81,20 @@ class LibraryViewModel: ObservableObject {
 
     func loadData() async {
         isLoading = true
+        defer { isLoading = false }
 
-        let database = self.database
-        var loaded = await Task.detached(priority: .userInitiated) {
-            database.setupDefaultCategoriesIfNeeded()
-            let books = database.fetchAllBooks()
-            let categories = database.fetchAllCategories()
-            return (books, categories)
-        }.value
+        await database.setupDefaultCategoriesIfNeeded()
+        books = await database.fetchAllBooks()
+        categories = await database.fetchAllCategories()
 
         #if DEBUG
-        if loaded.0.isEmpty {
-            loadSampleData()
-            loaded = await Task.detached(priority: .userInitiated) {
-                (database.fetchAllBooks(), database.fetchAllCategories())
-            }.value
+        if books.isEmpty {
+            await loadSampleData()
+            books = await database.fetchAllBooks()
+            categories = await database.fetchAllCategories()
         }
         #endif
 
-        books = loaded.0
-        categories = loaded.1
-        isLoading = false
         updateWidgetData()
     }
 
@@ -120,26 +113,26 @@ class LibraryViewModel: ObservableObject {
         sortAscending ? "升序" : "降序"
     }
 
-    private func reloadBooks() {
-        books = database.fetchAllBooks()
-        categories = database.fetchAllCategories()
+    private func reloadBooks() async {
+        books = await database.fetchAllBooks()
+        categories = await database.fetchAllCategories()
         updateWidgetData()
     }
 
-    private func reloadCategories() {
-        categories = database.fetchAllCategories()
+    private func reloadCategories() async {
+        categories = await database.fetchAllCategories()
     }
 
-    private func reloadAllData() {
-        books = database.fetchAllBooks()
-        categories = database.fetchAllCategories()
+    private func reloadAllData() async {
+        books = await database.fetchAllBooks()
+        categories = await database.fetchAllCategories()
         updateWidgetData()
     }
 
     @discardableResult
-    private func perform(_ operation: () throws -> Void) -> Bool {
+    private func perform(_ operation: () async throws -> Void) async -> Bool {
         do {
-            try operation()
+            try await operation()
             return true
         } catch {
             errorMessage = InkRoomErrorMessage.friendly(for: error)
@@ -148,7 +141,7 @@ class LibraryViewModel: ObservableObject {
     }
 
     #if DEBUG
-    func loadSampleData() {
+    func loadSampleData() async {
         let sampleBooks = [
             Book(
                 title: "人间草木",
@@ -183,50 +176,48 @@ class LibraryViewModel: ObservableObject {
         ]
 
         for book in sampleBooks {
-            try? database.insertBook(book)
+            try? await database.insertBook(book)
         }
 
-        books = database.fetchAllBooks()
+        books = await database.fetchAllBooks()
     }
     #endif
 
     func importBook(from url: URL) async {
         isImporting = true
         errorMessage = nil
+        defer { isImporting = false }
 
         do {
-            let book = try await bookParser.importBook(from: url)
-            try database.insertBook(book)
+            let book = try await bookParser.importBook(from: url, copyFile: true)
+            try await database.insertBook(book)
             let chapters = await bookParser.getChapters(for: book)
             if !chapters.isEmpty {
-                try database.insertChapters(chapters, forBookId: book.id)
+                try await database.insertChapters(chapters, forBookId: book.id)
             }
-            // Batch update: reload once at the end to avoid multiple UI updates
-            reloadBooks()
+            await reloadBooks()
         } catch {
             errorMessage = InkRoomErrorMessage.friendly(for: error)
         }
-
-        isImporting = false
     }
 
-    func addBook(_ book: Book) {
-        perform {
-            try database.insertBook(book)
-            reloadBooks()
+    func addBook(_ book: Book) async {
+        await perform {
+            try await database.insertBook(book)
+            await reloadBooks()
         }
     }
 
-    func deleteBook(_ book: Book) {
-        perform {
-            try database.deleteBook(book)
-            reloadBooks()
+    func deleteBook(_ book: Book) async {
+        await perform {
+            try await database.deleteBook(book)
+            await reloadBooks()
         }
     }
 
-    func updateReadingProgress(for book: Book, to page: Int) {
-        perform {
-            try database.updateReadingProgress(bookId: book.id, page: page)
+    func updateReadingProgress(for book: Book, to page: Int) async {
+        await perform {
+            try await database.updateReadingProgress(bookId: book.id, page: page)
             if let index = books.firstIndex(where: { $0.id == book.id }) {
                 books[index].currentPage = page
                 books[index].lastReadDate = Date()
@@ -235,63 +226,63 @@ class LibraryViewModel: ObservableObject {
         }
     }
 
-    func toggleFavorite(for book: Book) {
+    func toggleFavorite(for book: Book) async {
         guard let index = books.firstIndex(where: { $0.id == book.id }) else { return }
         let newValue = !books[index].isFavorite
-        perform {
-            try database.toggleFavorite(bookId: book.id, isFavorite: newValue)
+        await perform {
+            try await database.toggleFavorite(bookId: book.id, isFavorite: newValue)
             books[index].isFavorite = newValue
         }
     }
 
-    func addBookToCategory(_ book: Book, category: Category) {
-        perform {
-            try database.addBookToCategory(bookId: book.id, categoryId: category.id)
-            reloadAllData()
+    func addBookToCategory(_ book: Book, category: Category) async {
+        await perform {
+            try await database.addBookToCategory(bookId: book.id, categoryId: category.id)
+            await reloadAllData()
         }
     }
 
-    func removeBookFromCategory(_ book: Book, category: Category) {
-        perform {
-            try database.removeBookFromCategory(bookId: book.id, categoryId: category.id)
-            reloadAllData()
+    func removeBookFromCategory(_ book: Book, category: Category) async {
+        await perform {
+            try await database.removeBookFromCategory(bookId: book.id, categoryId: category.id)
+            await reloadAllData()
         }
     }
 
-    func getChapters(for book: Book) -> [Chapter] {
-        database.fetchChapters(forBookId: book.id)
+    func getChapters(for book: Book) async -> [Chapter] {
+        await database.fetchChapters(forBookId: book.id)
     }
 
-    func addBookmark(_ bookmark: Bookmark) {
-        perform { try database.addBookmark(bookmark) }
+    func addBookmark(_ bookmark: Bookmark) async {
+        await perform { try await database.addBookmark(bookmark) }
     }
 
-    func removeBookmark(_ bookmark: Bookmark) {
-        perform { try database.removeBookmark(bookmark) }
+    func removeBookmark(_ bookmark: Bookmark) async {
+        await perform { try await database.removeBookmark(bookmark) }
     }
 
-    func getBookmarks(for book: Book) -> [Bookmark] {
-        database.fetchBookmarks(forBookId: book.id)
+    func getBookmarks(for book: Book) async -> [Bookmark] {
+        await database.fetchBookmarks(forBookId: book.id)
     }
 
-    func isBookmarked(_ book: Book, page: Int) -> Bool {
-        database.isBookmarked(bookId: book.id, page: page)
+    func isBookmarked(_ book: Book, page: Int) async -> Bool {
+        await database.isBookmarked(bookId: book.id, page: page)
     }
 
-    func addCategory(_ category: Category) {
-        perform {
-            try database.insertCategory(category)
-            reloadCategories()
+    func addCategory(_ category: Category) async {
+        await perform {
+            try await database.insertCategory(category)
+            await reloadCategories()
         }
     }
 
-    func deleteCategory(_ category: Category) {
-        perform {
-            try database.deleteCategory(category)
+    func deleteCategory(_ category: Category) async {
+        await perform {
+            try await database.deleteCategory(category)
             for index in books.indices {
                 books[index].categoryIds.removeAll { $0 == category.id }
             }
-            reloadCategories()
+            await reloadCategories()
         }
     }
 
@@ -318,17 +309,19 @@ class LibraryViewModel: ObservableObject {
             )
         }
 
-        let widgetData = WidgetData(
-            currentBook: widgetBooks.first,
-            recentBooks: widgetBooks,
-            totalBooks: books.count,
-            totalReadingMinutes: database.fetchTotalReadingMinutes()
-        )
+        Task {
+            let totalMinutes = await database.fetchTotalReadingMinutes()
+            let widgetData = WidgetData(
+                currentBook: widgetBooks.first,
+                recentBooks: widgetBooks,
+                totalBooks: books.count,
+                totalReadingMinutes: totalMinutes
+            )
+            WidgetDataManager.saveWidgetData(widgetData)
 
-        WidgetDataManager.saveWidgetData(widgetData)
-
-        #if canImport(WidgetKit)
-        WidgetCenter.shared.reloadAllTimelines()
-        #endif
+            #if canImport(WidgetKit)
+            WidgetCenter.shared.reloadAllTimelines()
+            #endif
+        }
     }
 }

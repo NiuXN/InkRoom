@@ -40,12 +40,15 @@ struct BookDetailView: View {
             ToolbarItem(placement: .automatic) {
                 Button {
                     isFavorite.toggle()
-                    viewModel.toggleFavorite(for: currentBook)
+                    Task {
+                        await viewModel.toggleFavorite(for: currentBook)
+                    }
                 } label: {
                     Image(systemName: isFavorite ? "heart.fill" : "heart")
                         .font(.system(size: 18))
-                        .foregroundColor(isFavorite ? .inkRoomPrimary : .inkRoomTextTertiary)
+                        .foregroundStyle(isFavorite ? Color.inkRoomPrimary : Color.inkRoomTextTertiary)
                 }
+                .accessibilityLabel(isFavorite ? "取消收藏" : "添加收藏")
             }
 
             ToolbarItem(placement: .automatic) {
@@ -66,8 +69,9 @@ struct BookDetailView: View {
                 } label: {
                     Image(systemName: "ellipsis.circle")
                         .font(.system(size: 18))
-                        .foregroundColor(.inkRoomTextTertiary)
+                        .foregroundStyle(Color.inkRoomTextTertiary)
                 }
+                .accessibilityLabel("更多选项")
             }
         }
         .sheet(isPresented: $showCategoryPicker) {
@@ -76,8 +80,10 @@ struct BookDetailView: View {
         .alert("删除书籍", isPresented: $showDeleteConfirmation) {
             Button("取消", role: .cancel) {}
             Button("删除", role: .destructive) {
-                viewModel.deleteBook(currentBook)
-                dismiss()
+                Task {
+                    await viewModel.deleteBook(currentBook)
+                    dismiss()
+                }
             }
         } message: {
             Text("确定要删除《\(book.title)》吗？此操作不可撤销。")
@@ -146,7 +152,7 @@ struct BookDetailView: View {
 
             Text(currentBook.author)
                 .font(.system(size: 15))
-                .foregroundColor(.inkRoomTextSecondary)
+                .foregroundStyle(Color.inkRoomTextSecondary)
         }
     }
 
@@ -157,7 +163,7 @@ struct BookDetailView: View {
 
             Text(currentBook.author)
                 .font(.system(size: 16))
-                .foregroundColor(.inkRoomTextSecondary)
+                .foregroundStyle(Color.inkRoomTextSecondary)
         }
     }
 
@@ -165,7 +171,7 @@ struct BookDetailView: View {
         VStack(spacing: 8) {
             Text(currentBook.title)
                 .font(.system(size: 22, weight: .bold))
-                .foregroundColor(.inkRoomTextPrimary)
+                .foregroundStyle(Color.inkRoomTextPrimary)
                 .multilineTextAlignment(.center)
 
             HStack(spacing: 16) {
@@ -173,7 +179,7 @@ struct BookDetailView: View {
                 Label(wordCountText, systemImage: "character")
             }
             .font(.system(size: 13))
-            .foregroundColor(.inkRoomTextTertiary)
+            .foregroundStyle(Color.inkRoomTextTertiary)
         }
     }
 
@@ -181,18 +187,18 @@ struct BookDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(currentBook.title)
                 .font(.system(size: 28, weight: .bold))
-                .foregroundColor(.inkRoomTextPrimary)
+                .foregroundStyle(Color.inkRoomTextPrimary)
 
             Text(currentBook.author)
                 .font(.system(size: 16))
-                .foregroundColor(.inkRoomTextSecondary)
+                .foregroundStyle(Color.inkRoomTextSecondary)
 
             HStack(spacing: 20) {
                 Label("\(currentBook.totalPages) 页", systemImage: "doc.text")
                 Label(wordCountText, systemImage: "character")
             }
             .font(.system(size: 14))
-            .foregroundColor(.inkRoomTextTertiary)
+            .foregroundStyle(Color.inkRoomTextTertiary)
         }
     }
 
@@ -201,13 +207,13 @@ struct BookDetailView: View {
             HStack {
                 Text("阅读进度")
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.inkRoomTextSecondary)
+                    .foregroundStyle(Color.inkRoomTextSecondary)
 
                 Spacer()
 
                 Text("\(Int(currentBook.readingProgress * 100))%")
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.inkRoomPrimary)
+                    .foregroundStyle(Color.inkRoomPrimary)
             }
 
             ProgressBar(progress: currentBook.readingProgress, height: 4)
@@ -216,14 +222,14 @@ struct BookDetailView: View {
                 HStack {
                     Text("第 \(max(1, currentBook.currentPage)) / \(currentBook.totalPages) 页")
                         .font(.system(size: 12))
-                        .foregroundColor(.inkRoomTextTertiary)
+                        .foregroundStyle(Color.inkRoomTextTertiary)
 
                     Spacer()
 
                     if let lastRead = currentBook.lastReadDate {
                         Text(lastRead.formatted(.relative(presentation: .named)))
                             .font(.system(size: 12))
-                            .foregroundColor(.inkRoomTextTertiary)
+                            .foregroundStyle(Color.inkRoomTextTertiary)
                     }
                 }
             }
@@ -248,7 +254,7 @@ struct BookDetailView: View {
                     Text("添加到分类")
                 }
                 .font(.system(size: 14, weight: .medium))
-                .foregroundColor(.inkRoomTextSecondary)
+                .foregroundStyle(Color.inkRoomTextSecondary)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
                 .background(Color.inkRoomBackgroundElevated)
@@ -262,17 +268,17 @@ struct BookDetailView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("简介")
                 .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(.inkRoomTextPrimary)
+                .foregroundStyle(Color.inkRoomTextPrimary)
 
             if let description = currentBook.bookDescription, !description.isEmpty {
                 Text(description)
                     .font(.system(size: 14))
-                    .foregroundColor(.inkRoomTextSecondary)
+                    .foregroundStyle(Color.inkRoomTextSecondary)
                     .lineSpacing(4)
             } else {
                 Text("暂无简介内容")
                     .font(.system(size: 14))
-                    .foregroundColor(.inkRoomTextTertiary)
+                    .foregroundStyle(Color.inkRoomTextTertiary)
                     .lineSpacing(4)
             }
         }
@@ -292,17 +298,17 @@ struct BookDetailView: View {
                                 Text(category.name)
                             } icon: {
                                 Image(safeSystemName: category.iconName)
-                                    .foregroundColor(Color(hex: category.colorHex) ?? .inkRoomPrimary)
+                                    .foregroundStyle(Color(hex: category.colorHex) ?? Color.inkRoomPrimary)
                             }
 
                             Spacer()
 
                             if isBookInCategory(category) {
                                 Image(systemName: "checkmark")
-                                    .foregroundColor(.inkRoomPrimary)
+                                    .foregroundStyle(Color.inkRoomPrimary)
                             }
                         }
-                        .foregroundColor(.inkRoomTextPrimary)
+                        .foregroundStyle(Color.inkRoomTextPrimary)
                     }
                     .buttonStyle(.plain)
                 }
@@ -346,9 +352,13 @@ struct BookDetailView: View {
 
     private func toggleCategory(_ category: Category) {
         if isBookInCategory(category) {
-            viewModel.removeBookFromCategory(currentBook, category: category)
+            Task {
+                await viewModel.removeBookFromCategory(currentBook, category: category)
+            }
         } else {
-            viewModel.addBookToCategory(currentBook, category: category)
+            Task {
+                await viewModel.addBookToCategory(currentBook, category: category)
+            }
         }
     }
 }
