@@ -12,6 +12,7 @@ struct Book: Identifiable, Codable, Equatable, Hashable {
     var categoryIds: [UUID]
     var isFavorite: Bool
     var addedDate: Date
+    var bookDescription: String?
 
     var readingProgress: Double {
         guard totalPages > 0 else { return 0 }
@@ -39,7 +40,8 @@ struct Book: Identifiable, Codable, Equatable, Hashable {
         lastReadDate: Date? = nil,
         categoryIds: [UUID] = [],
         isFavorite: Bool = false,
-        addedDate: Date = Date()
+        addedDate: Date = Date(),
+        bookDescription: String? = nil
     ) {
         self.id = id
         self.title = title
@@ -52,6 +54,7 @@ struct Book: Identifiable, Codable, Equatable, Hashable {
         self.categoryIds = categoryIds
         self.isFavorite = isFavorite
         self.addedDate = addedDate
+        self.bookDescription = bookDescription
     }
 }
 

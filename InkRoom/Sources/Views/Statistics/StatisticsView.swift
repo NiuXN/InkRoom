@@ -13,8 +13,7 @@ struct StatisticsView: View {
     @State private var isLoading = true
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
+        ScrollView {
                 VStack(spacing: 16) {
                     if isLoading {
                         ProgressView()
@@ -36,12 +35,9 @@ struct StatisticsView: View {
             #if os(iOS)
             .navigationBarTitleDisplayMode(.large)
             #endif
-            .refreshable {
-                await loadStatistics()
-            }
+.refreshable {
+            await loadStatistics()
         }
-        .frame(maxWidth: contentMaxWidth)
-        .frame(maxWidth: .infinity)
         .task {
             await loadStatistics()
         }
@@ -83,7 +79,7 @@ struct StatisticsView: View {
                         .fill(iconColor.opacity(0.15))
                         .frame(width: 32, height: 32)
 
-                    Image(systemName: icon)
+                    Image(safeSystemName: icon)
                         .font(.system(size: 14))
                         .foregroundColor(iconColor)
                 }
@@ -149,7 +145,7 @@ struct StatisticsView: View {
 
     private var emptyRecentView: some View {
         VStack(spacing: 8) {
-            Image(systemName: "chart.bar.xaxis")
+            Image(systemName: "book.closed")
                 .font(.system(size: 32))
                 .foregroundColor(.inkRoomTextTertiary)
             Text("还没有阅读记录")
@@ -172,7 +168,7 @@ struct StatisticsView: View {
                     .fill(Color.inkRoomPrimaryLight)
                     .frame(width: 36, height: 36)
 
-                Image(systemName: "book.open")
+                Image(safeSystemName: "book.fill")
                     .font(.system(size: 14))
                     .foregroundColor(.inkRoomPrimary)
             }
@@ -221,8 +217,11 @@ struct StatisticsView: View {
 
     // MARK: - Data Loading
     private func loadStatistics() async {
-        isLoading = statistics.recentBookStats.isEmpty && statistics.totalMinutes == 0
-        statistics = DatabaseService.shared.fetchReadingStatistics()
+        isLoading = true
+        let stats = await Task.detached(priority: .utility) {
+            DatabaseService.shared.fetchReadingStatistics()
+        }.value
+        statistics = stats
         isLoading = false
     }
 }

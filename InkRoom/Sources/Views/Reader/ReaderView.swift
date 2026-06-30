@@ -124,15 +124,15 @@ struct ReaderView: View {
         #endif
         .contentShape(Rectangle())
         .gesture(
+            settingsViewModel.pageTurnStyle == .swipe ?
             DragGesture(minimumDistance: 50)
                 .onEnded { value in
-                    guard settingsViewModel.pageTurnStyle == .swipe else { return }
                     if value.translation.width < -50 {
                         nextPage()
                     } else if value.translation.width > 50 {
                         prevPage()
                     }
-                }
+                } : nil
         )
     }
 
@@ -543,30 +543,32 @@ struct ReaderView: View {
                     pageContentView(maxWidth: maxWidth)
                 }
 
-                HStack(spacing: 0) {
-                    Color.clear
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            if settingsViewModel.pageTurnStyle == .tap || settingsViewModel.pageTurnStyle == .swipe {
-                                prevPage()
+                if settingsViewModel.pageTurnStyle != .scroll {
+                    HStack(spacing: 0) {
+                        Color.clear
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if settingsViewModel.pageTurnStyle == .tap || settingsViewModel.pageTurnStyle == .swipe {
+                                    prevPage()
+                                }
                             }
-                        }
 
-                    Color.clear
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                showHeader.toggle()
+                        Color.clear
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    showHeader.toggle()
+                                }
                             }
-                        }
 
-                    Color.clear
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            if settingsViewModel.pageTurnStyle == .tap || settingsViewModel.pageTurnStyle == .swipe {
-                                nextPage()
+                        Color.clear
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if settingsViewModel.pageTurnStyle == .tap || settingsViewModel.pageTurnStyle == .swipe {
+                                    nextPage()
+                                }
                             }
-                        }
+                    }
                 }
             }
         }
@@ -635,11 +637,17 @@ struct ReaderView: View {
                             }
                             .id("chapter-\(index)")
                             .background(
-                                GeometryReader { geo in
-                                    Color.clear.preference(
-                                        key: ChapterFramePreferenceKey.self,
-                                        value: [index: geo.frame(in: .named("readerScroll"))]
-                                    )
+                                // Only track frames for chapters near the current reading position
+                                // This reduces layout passes significantly for large books
+                                Group {
+                                    if shouldTrackFrame(for: index) {
+                                        GeometryReader { geo in
+                                            Color.clear.preference(
+                                                key: ChapterFramePreferenceKey.self,
+                                                value: [index: geo.frame(in: .named("readerScroll"))]
+                                            )
+                                        }
+                                    }
                                 }
                             )
                             .task(id: index) {
@@ -846,7 +854,8 @@ struct ReaderView: View {
     }
 
     private func tocRow(_ chapter: Chapter) -> some View {
-        Button {
+        let isCurrentChapter = readerVM.currentPage >= chapter.startPage && readerVM.currentPage <= chapter.endPage
+        return Button {
             navigateToPage(chapter.startPage)
             withAnimation {
                 showToc = false
@@ -856,10 +865,11 @@ struct ReaderView: View {
                 Text(chapter.title)
                     .font(.system(size: 15))
                     .foregroundColor(.inkRoomTextPrimary)
+                    .fontWeight(isCurrentChapter ? .semibold : .regular)
 
                 Spacer()
 
-                if readerVM.currentPage >= chapter.startPage && readerVM.currentPage <= chapter.endPage {
+                if isCurrentChapter {
                     Image(systemName: "checkmark")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(.inkRoomPrimary)
@@ -871,9 +881,10 @@ struct ReaderView: View {
         }
         .buttonStyle(.plain)
         .background(
-            (readerVM.currentPage >= chapter.startPage && readerVM.currentPage <= chapter.endPage) ?
+            isCurrentChapter ?
             Color.inkRoomPrimary.opacity(0.08) : Color.clear
         )
+        .id("toc-chapter-\(chapter.id)")
     }
 
     private func bookmarkRow(_ bookmark: Bookmark) -> some View {
@@ -1069,7 +1080,7 @@ struct ReaderView: View {
         await MainActor.run { isSearching = true }
 
         var results: [SearchResult] = []
-        let charsPerPage = 500
+        let charsPerPage = AppConfig.charsPerPage
         let maxResults = 200
 
         if let filePath = readerVM.activeBook.filePath {
@@ -1077,12 +1088,17 @@ struct ReaderView: View {
                 let fileURL = URL(fileURLWithPath: filePath)
                 let parsedBook = try await BookParserService.shared.parseBook(from: fileURL)
 
-                var precedingCharCount = 0
+                // Use chapter's startPage from the chapters array for accurate page mapping
+                // This ensures search results jump to the correct page even if chapter order differs
+                let chapterStartPages = readerVM.chapters.map { $0.startPage }
 
                 for (index, chapter) in parsedBook.chapters.enumerated() {
                     if Task.isCancelled { break }
                     let content = chapter.content
                     var searchRange = content.startIndex..<content.endIndex
+
+                    // Get the start page for this chapter (default to 1 if not found)
+                    let chapterStartPage = index < chapterStartPages.count ? chapterStartPages[index] : 1
 
                     while let range = content.range(of: query, options: .caseInsensitive, range: searchRange) {
                         let lowerBound = content.index(
@@ -1102,8 +1118,9 @@ struct ReaderView: View {
                         if lowerBound != content.startIndex { context = "…" + context }
                         if upperBound != content.endIndex { context += "…" }
 
+                        // Calculate page based on chapter's start page + offset within chapter
                         let offsetInChapter = content.distance(from: content.startIndex, to: range.lowerBound)
-                        let page = (precedingCharCount + offsetInChapter) / charsPerPage + 1
+                        let page = chapterStartPage + (offsetInChapter / charsPerPage)
 
                         results.append(SearchResult(
                             chapterIndex: index,
@@ -1115,8 +1132,6 @@ struct ReaderView: View {
                         if results.count >= maxResults { break }
                         searchRange = range.upperBound..<content.endIndex
                     }
-
-                    precedingCharCount += content.count
 
                     if results.count >= maxResults { break }
                 }
@@ -1612,6 +1627,14 @@ struct ReaderView: View {
         let minutes = Int(timeInterval) / 60
         let seconds = Int(timeInterval) % 60
         return String(format: "%02d:%02d", minutes, seconds)
+    }
+
+    /// Only track frames for chapters near the current reading position.
+    /// This significantly reduces layout passes for large books with many chapters.
+    private func shouldTrackFrame(for chapterIndex: Int) -> Bool {
+        let currentIndex = readerVM.currentChapterIndex
+        // Track current chapter and ±2 neighbors
+        return abs(chapterIndex - currentIndex) <= 2
     }
 
     private var sampleText: String {

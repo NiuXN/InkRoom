@@ -25,9 +25,11 @@ struct BookDetailView: View {
         }
         .sensoryFeedback(.selection, trigger: isFavorite)
         .background(Color.inkRoomBackground)
-        .onChange(of: viewModel.books) { _, _ in
-            if let updated = viewModel.books.first(where: { $0.id == book.id }) {
+        .onChange(of: viewModel.books) { _, books in
+            if let updated = books.first(where: { $0.id == book.id }) {
                 isFavorite = updated.isFavorite
+            } else {
+                dismiss()
             }
         }
         .navigationTitle("")
@@ -168,7 +170,7 @@ struct BookDetailView: View {
 
             HStack(spacing: 16) {
                 Label("\(currentBook.totalPages) 页", systemImage: "doc.text")
-                Label(wordCountText, systemImage: "text.word.spacing")
+                Label(wordCountText, systemImage: "character")
             }
             .font(.system(size: 13))
             .foregroundColor(.inkRoomTextTertiary)
@@ -187,7 +189,7 @@ struct BookDetailView: View {
 
             HStack(spacing: 20) {
                 Label("\(currentBook.totalPages) 页", systemImage: "doc.text")
-                Label(wordCountText, systemImage: "text.word.spacing")
+                Label(wordCountText, systemImage: "character")
             }
             .font(.system(size: 14))
             .foregroundColor(.inkRoomTextTertiary)
@@ -233,7 +235,7 @@ struct BookDetailView: View {
 
     private var actionButtons: some View {
         VStack(spacing: 10) {
-            InkRoomButton(currentBook.isStarted ? "继续阅读" : "开始阅读", icon: "book.open") {
+            InkRoomButton(currentBook.isStarted ? "继续阅读" : "开始阅读", icon: "book.fill") {
                 showReader = true
             }
             .frame(maxWidth: .infinity)
@@ -262,10 +264,17 @@ struct BookDetailView: View {
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundColor(.inkRoomTextPrimary)
 
-            Text("暂无简介内容")
-                .font(.system(size: 14))
-                .foregroundColor(.inkRoomTextTertiary)
-                .lineSpacing(4)
+            if let description = currentBook.bookDescription, !description.isEmpty {
+                Text(description)
+                    .font(.system(size: 14))
+                    .foregroundColor(.inkRoomTextSecondary)
+                    .lineSpacing(4)
+            } else {
+                Text("暂无简介内容")
+                    .font(.system(size: 14))
+                    .foregroundColor(.inkRoomTextTertiary)
+                    .lineSpacing(4)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -282,7 +291,7 @@ struct BookDetailView: View {
                             Label {
                                 Text(category.name)
                             } icon: {
-                                Image(systemName: category.iconName)
+                                Image(safeSystemName: category.iconName)
                                     .foregroundColor(Color(hex: category.colorHex) ?? .inkRoomPrimary)
                             }
 
@@ -323,7 +332,7 @@ struct BookDetailView: View {
     }
 
     private var wordCountText: String {
-        let totalWords = currentBook.totalPages * 500
+        let totalWords = currentBook.totalPages * AppConfig.charsPerPage
         let wanZi = Double(totalWords) / 10000.0
         let formatted = wanZi.truncatingRemainder(dividingBy: 1) == 0
             ? String(format: "%.0f", wanZi)

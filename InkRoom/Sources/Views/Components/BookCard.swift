@@ -134,10 +134,17 @@ struct CoverImageView: View {
         .task(id: coverURL?.path) {
             guard let coverURL else { return }
             let path = coverURL.path
+            if let cached = CoverImageCache.shared.data(for: path) {
+                imageData = cached
+                return
+            }
             let data = await Task.detached(priority: .utility) {
                 try? Data(contentsOf: URL(fileURLWithPath: path))
             }.value
-            imageData = data
+            if let data {
+                CoverImageCache.shared.store(data, for: path)
+                imageData = data
+            }
         }
     }
 }

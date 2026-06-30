@@ -86,7 +86,7 @@ struct ReadingSettingsView: View {
                 // Letter Spacing
                 settingsSection(
                     title: "字距",
-                    icon: "textformat.letterSpacing"
+                    icon: "character"
                 ) {
                     VStack(spacing: 12) {
                         Slider(
@@ -172,6 +172,10 @@ struct ReadingSettingsView: View {
         .background(bgColor)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 8, y: 2)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.inkRoomTextTertiary.opacity(0.1), lineWidth: 0.5)
+        )
     }
 
     private func settingsSection<Content: View>(
@@ -181,7 +185,7 @@ struct ReadingSettingsView: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
-                Image(systemName: icon)
+                Image(safeSystemName: icon)
                     .font(.system(size: 14))
                     .foregroundColor(.inkRoomPrimary)
 

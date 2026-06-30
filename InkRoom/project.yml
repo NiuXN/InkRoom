@@ -7,6 +7,31 @@ options:
   xcodeVersion: "16.0"
   generateEmptyDirectories: true
   groupSortPosition: top
+  createIntermediateGroups: true
+
+schemeTemplates:
+  App:
+    build:
+      targets:
+        InkRoom_iOS: all
+        InkRoom_macOS: all
+        InkRoomWidget_iOS: all
+        InkRoomWidget_macOS: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+
+schemes:
+  InkRoom:
+    templates:
+      - App
 
 settings:
   base:

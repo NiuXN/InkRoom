@@ -24,6 +24,9 @@ final class ReaderViewModel: ObservableObject {
     private var pageLoadTask: Task<Void, Never>?
     private var scrollUpdateTask: Task<Void, Never>?
 
+    // Cache: page -> chapterIndex (built once when chapters load)
+    private var pageToChapterIndex: [Int: Int] = [:]
+
     var activeBook: Book {
         libraryViewModel?.books.first(where: { $0.id == book.id }) ?? book
     }
@@ -111,6 +114,22 @@ final class ReaderViewModel: ObservableObject {
             updateChapterMetadata(for: page)
             schedulePageTextRefresh()
             checkCurrentPageBookmark()
+            scheduleScrollProgressSave()
+        }
+    }
+
+    private var scrollSaveTask: Task<Void, Never>?
+
+    private func scheduleScrollProgressSave() {
+        scrollSaveTask?.cancel()
+        scrollSaveTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(1.5))
+            guard !Task.isCancelled else { return }
+            // Always save the latest position, even if user is still scrolling
+            // This ensures we don't lose progress during fast scrolling
+            await MainActor.run {
+                self?.saveProgress()
+            }
         }
     }
 
@@ -154,6 +173,18 @@ final class ReaderViewModel: ObservableObject {
             charsPerPage: 10000
         ) {
             chapterTexts[index] = content
+            // Evict distant chapters to save memory
+            evictDistantChapterTexts(keeping: index)
+        }
+    }
+
+    /// Evict chapter texts that are far from the current reading position to save memory.
+    /// Keeps current chapter ±2 neighbors loaded.
+    private func evictDistantChapterTexts(keeping currentIndex: Int) {
+        let keepRange = (currentIndex - 2)...(currentIndex + 2)
+        let keysToRemove = chapterTexts.keys.filter { !keepRange.contains($0) }
+        for key in keysToRemove {
+            chapterTexts.removeValue(forKey: key)
         }
     }
 
@@ -193,6 +224,7 @@ final class ReaderViewModel: ObservableObject {
         let stored = libraryViewModel.getChapters(for: activeBook)
         if !stored.isEmpty {
             chapters = stored
+            buildPageToChapterIndexCache()
             return
         }
 
@@ -201,8 +233,20 @@ final class ReaderViewModel: ObservableObject {
             if !chapters.isEmpty {
                 try? DatabaseService.shared.insertChapters(chapters, forBookId: activeBook.id)
             }
+            buildPageToChapterIndexCache()
         } else if chapters.isEmpty {
             chapters = Self.demoChapters
+            buildPageToChapterIndexCache()
+        }
+    }
+
+    /// Build O(1) page -> chapterIndex lookup cache
+    private func buildPageToChapterIndexCache() {
+        pageToChapterIndex.removeAll()
+        for (index, chapter) in chapters.enumerated() {
+            for page in chapter.startPage...chapter.endPage {
+                pageToChapterIndex[page] = index
+            }
         }
     }
 
@@ -227,12 +271,43 @@ final class ReaderViewModel: ObservableObject {
         isLoading = true
 
         if activeBook.filePath != nil {
-            if let content = await BookParserService.shared.getChapterContent(for: activeBook, page: currentPage) {
-                guard generation == pageLoadGeneration else { return }
-                pageText = content
+            // Use cached chapter text if available, otherwise load it
+            let chapterIndex = findChapterIndex(for: currentPage)
+            if chapterIndex >= 0 && chapterIndex < chapters.count {
+                await ensureChapterTextLoaded(at: chapterIndex)
+                if let chapterContent = chapterTexts[chapterIndex] {
+                    let pageInChapter = currentPage - chapters[chapterIndex].startPage
+                    let charsPerPage = AppConfig.charsPerPage
+                    let startIdx = pageInChapter * charsPerPage
+                    let endIdx = min(startIdx + charsPerPage, chapterContent.count)
+                    if startIdx < chapterContent.count {
+                        let start = chapterContent.index(chapterContent.startIndex, offsetBy: startIdx)
+                        let end = chapterContent.index(chapterContent.startIndex, offsetBy: endIdx)
+                        guard generation == pageLoadGeneration else { return }
+                        pageText = String(chapterContent[start..<end])
+                    } else {
+                        guard generation == pageLoadGeneration else { return }
+                        pageText = ""
+                    }
+                } else {
+                    // Fallback to parser if cache miss
+                    if let content = await BookParserService.shared.getChapterContent(for: activeBook, page: currentPage) {
+                        guard generation == pageLoadGeneration else { return }
+                        pageText = content
+                    } else {
+                        guard generation == pageLoadGeneration else { return }
+                        pageText = "无法加载页面内容"
+                    }
+                }
             } else {
-                guard generation == pageLoadGeneration else { return }
-                pageText = "无法加载页面内容"
+                // Fallback to parser
+                if let content = await BookParserService.shared.getChapterContent(for: activeBook, page: currentPage) {
+                    guard generation == pageLoadGeneration else { return }
+                    pageText = content
+                } else {
+                    guard generation == pageLoadGeneration else { return }
+                    pageText = "无法加载页面内容"
+                }
             }
         }
 
@@ -244,8 +319,20 @@ final class ReaderViewModel: ObservableObject {
 
     private func refreshPageTextOnly() async {
         guard activeBook.filePath != nil else { return }
-        if let content = await BookParserService.shared.getChapterContent(for: activeBook, page: currentPage) {
-            pageText = content
+        let chapterIndex = findChapterIndex(for: currentPage)
+        if chapterIndex >= 0 && chapterIndex < chapters.count {
+            await ensureChapterTextLoaded(at: chapterIndex)
+            if let chapterContent = chapterTexts[chapterIndex] {
+                let pageInChapter = currentPage - chapters[chapterIndex].startPage
+                let charsPerPage = AppConfig.charsPerPage
+                let startIdx = pageInChapter * charsPerPage
+                let endIdx = min(startIdx + charsPerPage, chapterContent.count)
+                if startIdx < chapterContent.count {
+                    let start = chapterContent.index(chapterContent.startIndex, offsetBy: startIdx)
+                    let end = chapterContent.index(chapterContent.startIndex, offsetBy: endIdx)
+                    pageText = String(chapterContent[start..<end])
+                }
+            }
         }
     }
 
@@ -283,16 +370,32 @@ final class ReaderViewModel: ObservableObject {
         readingSessionStart = nil
     }
 
+    /// Binary search for chapter index (chapters are sorted by startPage)
     private func findChapterIndex(for page: Int) -> Int {
-        ScrollReadingPosition.chapterIndex(for: page, in: chapters)
+        // Fast O(1) cache lookup
+        if let cached = pageToChapterIndex[page] {
+            return cached
+        }
+        // Fallback binary search
+        var low = 0
+        var high = chapters.count - 1
+        while low <= high {
+            let mid = (low + high) / 2
+            let chapter = chapters[mid]
+            if page < chapter.startPage {
+                high = mid - 1
+            } else if page > chapter.endPage {
+                low = mid + 1
+            } else {
+                return mid
+            }
+        }
+        return 0
     }
 
     private func findChapterTitle(for page: Int) -> String {
-        for chapter in chapters {
-            if page >= chapter.startPage && page <= chapter.endPage {
-                return chapter.title
-            }
-        }
-        return ""
+        let index = findChapterIndex(for: page)
+        guard index >= 0 && index < chapters.count else { return "" }
+        return chapters[index].title
     }
 }

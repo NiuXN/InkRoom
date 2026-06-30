@@ -11,6 +11,10 @@ struct ChapterFramePreferenceKey: PreferenceKey {
 
 enum ScrollReadingPosition {
     /// 根据章节在滚动视图中的 frame，估算当前阅读页码。
+    /// - Parameters:
+    ///   - frames: 章节索引 -> frame 映射
+    ///   - chapters: 章节列表
+    ///   - anchorY: 视口锚点 Y 坐标（通常为安全区顶部 + 导航栏高度 + 一点偏移）
     static func estimatePage(
         frames: [Int: CGRect],
         chapters: [Chapter],
@@ -39,11 +43,20 @@ enum ScrollReadingPosition {
     }
 
     static func chapterIndex(for page: Int, in chapters: [Chapter]) -> Int {
-        for (index, chapter) in chapters.enumerated() {
-            if page >= chapter.startPage && page <= chapter.endPage {
-                return index
+        // Binary search since chapters are sorted by startPage
+        var low = 0
+        var high = chapters.count - 1
+        while low <= high {
+            let mid = (low + high) / 2
+            let chapter = chapters[mid]
+            if page < chapter.startPage {
+                high = mid - 1
+            } else if page > chapter.endPage {
+                low = mid + 1
+            } else {
+                return mid
             }
         }
-        return 0
+        return max(0, min(low, chapters.count - 1))
     }
 }

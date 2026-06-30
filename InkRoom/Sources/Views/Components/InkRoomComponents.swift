@@ -44,7 +44,7 @@ struct InkRoomButton: View {
         Button(action: action) {
             HStack(spacing: 6) {
                 if let icon = icon {
-                    Image(systemName: icon)
+                    Image(safeSystemName: icon)
                         .font(.system(size: 14, weight: .medium))
                 }
                 Text(title)
@@ -72,7 +72,7 @@ struct InkRoomIconButton: View {
 
     var body: some View {
         Button(action: action) {
-            Image(systemName: icon)
+            Image(safeSystemName: icon)
                 .font(.system(size: size, weight: .medium))
                 .foregroundColor(.inkRoomTextPrimary)
                 .frame(width: 44, height: 44)
@@ -101,7 +101,7 @@ struct ProgressBar: View {
 
 #Preview {
     VStack(spacing: 20) {
-        InkRoomButton("开始阅读", icon: "book.open") {}
+        InkRoomButton("开始阅读", icon: "book.fill") {}
         InkRoomButton("导入书籍", icon: "plus", style: .secondary) {}
         InkRoomButton("取消", style: .ghost) {}
 

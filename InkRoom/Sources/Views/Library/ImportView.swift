@@ -185,7 +185,32 @@ struct ImportView: View {
                     .foregroundColor(.inkRoomTextTertiary.opacity(0.5))
             )
         }
+        .buttonStyle(.plain)
+        #if os(iOS) || os(macOS)
+        .onDrop(of: [.fileURL], isTargeted: nil) { providers in
+            handleDrop(providers: providers)
+        }
+        #endif
     }
+    
+    #if os(iOS) || os(macOS)
+    private func handleDrop(providers: [NSItemProvider]) -> Bool {
+        var handled = false
+        for provider in providers {
+            if provider.canLoadObject(ofClass: URL.self) {
+                _ = provider.loadObject(ofClass: URL.self) { url, _ in
+                    if let url = url {
+                        Task { @MainActor in
+                            await importFile(url: url, taskId: UUID())
+                        }
+                    }
+                }
+                handled = true
+            }
+        }
+        return handled
+    }
+    #endif
 
     private var uploadTaskList: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -444,7 +469,7 @@ struct ImportView: View {
     private func importFile(url: URL, taskId: UUID) async {
         if let index = uploadTasks.firstIndex(where: { $0.id == taskId }) {
             uploadTasks[index].status = .uploading
-            uploadTasks[index].progress = 0.1
+            uploadTasks[index].progress = 0.05
         }
 
         let needsSecurityScope = url.startAccessingSecurityScopedResource()
@@ -454,12 +479,39 @@ struct ImportView: View {
             }
         }
 
+        // Stage 1: File access (10%)
         if let index = uploadTasks.firstIndex(where: { $0.id == taskId }) {
-            uploadTasks[index].progress = 0.3
+            uploadTasks[index].progress = 0.1
+        }
+
+        // Stage 2: Copy file (20%)
+        if let index = uploadTasks.firstIndex(where: { $0.id == taskId }) {
+            uploadTasks[index].progress = 0.2
+        }
+
+        // Stage 3: Parse book (30% -> 80%)
+        // Simulate progress during parsing since BookParserService doesn't expose progress yet
+        let progressTask = Task {
+            while !Task.isCancelled {
+                if let index = uploadTasks.firstIndex(where: { $0.id == taskId }) {
+                    if uploadTasks[index].progress < 0.8 {
+                        uploadTasks[index].progress += 0.02
+                    }
+                }
+                try? await Task.sleep(for: .milliseconds(200))
+            }
         }
 
         await viewModel.importBook(from: url)
 
+        progressTask.cancel()
+
+        // Stage 4: Save to database (90%)
+        if let index = uploadTasks.firstIndex(where: { $0.id == taskId }) {
+            uploadTasks[index].progress = 0.9
+        }
+
+        // Stage 5: Complete (100%)
         if let index = uploadTasks.firstIndex(where: { $0.id == taskId }) {
             if viewModel.errorMessage == nil {
                 uploadTasks[index].status = .success

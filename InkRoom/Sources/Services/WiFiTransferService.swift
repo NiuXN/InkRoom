@@ -197,109 +197,99 @@ final class WiFiTransferService: ObservableObject {
     private func parseMultipartData(_ data: Data, boundary: String) -> [(name: String, part: MultipartPart)] {
         var result: [(name: String, part: MultipartPart)] = []
 
-        let boundaryData = "--\(boundary)".data(using: .utf8)!
+        // Convert to string for more reliable parsing
+        // Multipart bodies are typically ASCII-safe
+        guard let bodyString = String(data: data, encoding: .utf8) ?? String(data: data, encoding: .isoLatin1) else {
+            return result
+        }
 
-        var searchRange = data.startIndex..<data.endIndex
+        let boundaryMarker = "--\(boundary)"
+        let crlf = "\r\n"
 
-        while true {
-            guard let boundaryRange = data.range(of: boundaryData, options: [], in: searchRange) else {
-                break
-            }
+        // Split by boundary
+        let parts = bodyString.components(separatedBy: boundaryMarker)
 
-            let partStart = boundaryRange.upperBound
-
-            guard let nextBoundaryRange = data.range(of: boundaryData, options: [], in: partStart..<data.endIndex) else {
-                break
-            }
-
-            let partEnd = nextBoundaryRange.lowerBound
-
-            // Skip past \r\n after boundary
-            var headersEnd = partStart
-            if data[partStart] == UInt8(ascii: "\r") {
-                guard let safe = data.index(partStart, offsetBy: 2, limitedBy: data.endIndex), safe <= partEnd else { break }
-                headersEnd = safe
-            } else if data[partStart] == UInt8(ascii: "\n") {
-                guard let safe = data.index(partStart, offsetBy: 1, limitedBy: data.endIndex), safe <= partEnd else { break }
-                headersEnd = safe
-            }
-
-            // Find end of headers (empty line)
-            var headerDataEnd = headersEnd
-            while headerDataEnd < partEnd {
-                if data[headerDataEnd] == UInt8(ascii: "\r"),
-                   headerDataEnd < data.index(before: partEnd),
-                   data[data.index(after: headerDataEnd)] == UInt8(ascii: "\n") {
-                    guard let nextLineStart = data.index(headerDataEnd, offsetBy: 2, limitedBy: partEnd) else { break }
-                    if nextLineStart < partEnd,
-                       data[nextLineStart] == UInt8(ascii: "\r"),
-                       nextLineStart < data.index(before: partEnd),
-                       data[data.index(after: nextLineStart)] == UInt8(ascii: "\n") {
-                        headerDataEnd = nextLineStart
-                        break
-                    }
-                    headerDataEnd = nextLineStart
-                } else {
-                    break
-                }
-            }
-
-            let headerData = data[headersEnd..<headerDataEnd]
-            guard let bodyStart = data.index(headerDataEnd, offsetBy: 2, limitedBy: partEnd) else {
-                searchRange = nextBoundaryRange.upperBound..<data.endIndex
-                continue
-            }
-            let bodyEnd = partEnd
-
-            guard bodyStart < bodyEnd else {
-                searchRange = nextBoundaryRange.upperBound..<data.endIndex
+        for part in parts {
+            // Skip empty parts and the closing boundary
+            let trimmed = part.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.isEmpty || trimmed == "--" {
                 continue
             }
 
-            var bodyData = data[bodyStart..<bodyEnd]
-
-            // Remove trailing \r\n
-            if bodyData.last == UInt8(ascii: "\n") {
-                bodyData = bodyData.dropLast()
-                if bodyData.last == UInt8(ascii: "\r") {
-                    bodyData = bodyData.dropLast()
+            // Each part starts with \r\n after the boundary, then headers, then \r\n\r\n, then body
+            // Find the header/body separator (double CRLF)
+            let separator = "\r\n\r\n"
+            guard let separatorRange = part.range(of: separator) else {
+                // Try with just \n\n as fallback
+                guard let altRange = part.range(of: "\n\n") else { continue }
+                let headerSection = String(part[part.startIndex..<altRange.lowerBound])
+                var bodySection = String(part[altRange.upperBound...])
+                // Remove trailing \r\n before next boundary
+                if bodySection.hasSuffix("\r\n") {
+                    bodySection = String(bodySection.dropLast(2))
+                } else if bodySection.hasSuffix("\n") {
+                    bodySection = String(bodySection.dropLast())
                 }
+                if let parsed = parsePartHeadersAndBody(headers: headerSection, body: bodySection) {
+                    result.append(parsed)
+                }
+                continue
             }
 
-            // Parse headers
-            let headerString = String(data: headerData, encoding: .utf8) ?? ""
-            var part = MultipartPart(data: Data(bodyData), filename: nil, contentType: nil)
-            var partName = ""
-
-            // Extract name and filename from Content-Disposition
-            let namePattern = #"name=\"([^\"]+)\""#
-            if let regex = try? NSRegularExpression(pattern: namePattern),
-               let match = regex.firstMatch(in: headerString, range: NSRange(headerString.startIndex..., in: headerString)),
-               let range = Range(match.range(at: 1), in: headerString) {
-                partName = String(headerString[range])
+            let headerSection = String(part[part.startIndex..<separatorRange.lowerBound])
+            var bodySection = String(part[separatorRange.upperBound...])
+            // Remove trailing \r\n before next boundary
+            if bodySection.hasSuffix("\r\n") {
+                bodySection = String(bodySection.dropLast(2))
+            } else if bodySection.hasSuffix("\n") {
+                bodySection = String(bodySection.dropLast())
             }
 
-            let filenamePattern = #"filename=\"([^\"]+)\""#
-            if let regex = try? NSRegularExpression(pattern: filenamePattern),
-               let match = regex.firstMatch(in: headerString, range: NSRange(headerString.startIndex..., in: headerString)),
-               let range = Range(match.range(at: 1), in: headerString) {
-                part.filename = String(headerString[range])
+            if let parsed = parsePartHeadersAndBody(headers: headerSection, body: bodySection) {
+                result.append(parsed)
             }
-
-            // Extract content type
-            let contentTypePattern = #"Content-Type:\s*([^\r\n]+)"#
-            if let regex = try? NSRegularExpression(pattern: contentTypePattern, options: .caseInsensitive),
-               let match = regex.firstMatch(in: headerString, range: NSRange(headerString.startIndex..., in: headerString)),
-               let range = Range(match.range(at: 1), in: headerString) {
-                part.contentType = String(headerString[range]).trimmingCharacters(in: .whitespaces)
-            }
-
-            result.append((name: partName, part: part))
-
-            searchRange = nextBoundaryRange.upperBound..<data.endIndex
         }
 
         return result
+    }
+
+    /// Parse headers and body of a single multipart part
+    private func parsePartHeadersAndBody(headers: String, body: String) -> (name: String, part: MultipartPart)? {
+        // Extract name from Content-Disposition
+        var partName = ""
+        let namePattern = #"name="([^"]+)""#
+        if let regex = try? NSRegularExpression(pattern: namePattern),
+           let match = regex.firstMatch(in: headers, range: NSRange(headers.startIndex..., in: headers)),
+           let range = Range(match.range(at: 1), in: headers) {
+            partName = String(headers[range])
+        }
+
+        // Extract filename from Content-Disposition
+        var filename: String?
+        let filenamePattern = #"filename="([^"]+)""#
+        if let regex = try? NSRegularExpression(pattern: filenamePattern),
+           let match = regex.firstMatch(in: headers, range: NSRange(headers.startIndex..., in: headers)),
+           let range = Range(match.range(at: 1), in: headers) {
+            filename = String(headers[range])
+        }
+
+        // Extract content type
+        var contentType: String?
+        let contentTypePattern = #"Content-Type:\s*([^\r\n]+)"#
+        if let regex = try? NSRegularExpression(pattern: contentTypePattern, options: .caseInsensitive),
+           let match = regex.firstMatch(in: headers, range: NSRange(headers.startIndex..., in: headers)),
+           let range = Range(match.range(at: 1), in: headers) {
+            contentType = String(headers[range]).trimmingCharacters(in: .whitespaces)
+        }
+
+        // Only include parts with a filename (file uploads)
+        guard let filename = filename, !filename.isEmpty else {
+            return nil
+        }
+
+        let bodyData = body.data(using: .utf8) ?? Data()
+        let part = MultipartPart(data: bodyData, filename: filename, contentType: contentType)
+        return (name: partName, part: part)
     }
 
     // MARK: - WiFi Address

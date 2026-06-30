@@ -11,8 +11,7 @@ struct SettingsView: View {
     @State private var showUpdateStatus = false
 
     var body: some View {
-        NavigationStack {
-            List {
+        List {
                 // Appearance Section
                 Section {
                     appearanceToggle(
@@ -242,7 +241,6 @@ struct SettingsView: View {
             #if os(iOS)
             .navigationBarTitleDisplayMode(.large)
             #endif
-        }
         .frame(maxWidth: settingsMaxWidth)
         .frame(maxWidth: .infinity)
         .task {
@@ -360,6 +358,8 @@ struct SettingsView: View {
             Button {
                 if AppConfig.proUpgradeURL != nil {
                     updateService.openProUpgradePage()
+                } else if AppConfig.appStoreFallbackURL != nil {
+                    updateService.openAppStore()
                 } else {
                     showProAlert = true
                 }

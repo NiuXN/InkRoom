@@ -13,4 +13,7 @@ enum AppConfig {
 
     /// iTunes Lookup 国家/地区代码。
     static let appStoreCountryCode = "cn"
+
+    /// 每页估算字符数（用于 TXT/EPUB 章节分页估算）。
+    static let charsPerPage = 500
 }

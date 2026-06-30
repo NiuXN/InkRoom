@@ -7,13 +7,15 @@ struct CategoriesView: View {
     @State private var showAddCategory = false
     @State private var categoryToDelete: Category?
     @State private var showDeleteConfirmation = false
+    @State private var isEditingCategories = false
     @State private var selectedBook: Book?
     @State private var contentWidth: CGFloat = 0
+    @State private var showError = false
+    @State private var deleteTrigger = 0
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
+        ScrollView {
+            VStack(spacing: 16) {
                     Text("共 \(viewModel.books.count) 本书 · \(viewModel.categories.count) 个分类")
                         .font(.system(size: 12))
                         .foregroundColor(.inkRoomTextTertiary)
@@ -29,18 +31,36 @@ struct CategoriesView: View {
                     )
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: columns), spacing: 12) {
                         ForEach(viewModel.categories) { category in
-                            CategoryCard(category: category)
-                                .onTapGesture {
+                            ZStack(alignment: .topTrailing) {
+                                Button {
+                                    guard !isEditingCategories else { return }
                                     selectedCategory = category
+                                } label: {
+                                    CategoryCard(category: category)
                                 }
+                                .buttonStyle(.plain)
                                 .contextMenu {
                                     Button(role: .destructive) {
-                                        categoryToDelete = category
-                                        showDeleteConfirmation = true
+                                        ContextMenuDismiss.run {
+                                            confirmDelete(category)
+                                        }
                                     } label: {
                                         Label("删除分类", systemImage: "trash")
                                     }
                                 }
+
+                                if isEditingCategories {
+                                    Button {
+                                        confirmDelete(category)
+                                    } label: {
+                                        Image(systemName: "minus.circle.fill")
+                                            .font(.system(size: 22))
+                                            .symbolRenderingMode(.palette)
+                                            .foregroundStyle(.white, .red)
+                                    }
+                                    .offset(x: 6, y: -6)
+                                }
+                            }
                         }
 
                         addCategoryButton
@@ -51,19 +71,31 @@ struct CategoriesView: View {
                     .padding(.horizontal, contentPadding)
 
                     uncategorizedSection
+            }
+            .padding(.bottom, 100)
+            .readWidth($contentWidth)
+        }
+        .refreshable {
+            await viewModel.loadData()
+        }
+        .background(Color.inkRoomBackground)
+        .navigationTitle("分类")
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.large)
+        #endif
+        .sensoryFeedback(.impact(weight: .medium), trigger: deleteTrigger)
+        .toolbar {
+                ToolbarItem(placement: .automatic) {
+                    if !viewModel.categories.isEmpty {
+                        Button(isEditingCategories ? "完成" : "编辑") {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                isEditingCategories.toggle()
+                            }
+                        }
+                        .font(.system(size: 15))
+                    }
                 }
-                .padding(.bottom, 100)
-                .readWidth($contentWidth)
-            }
-            .refreshable {
-                await viewModel.loadData()
-            }
-            .background(Color.inkRoomBackground)
-            .navigationTitle("分类")
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.large)
-            #endif
-            .toolbar {
+
                 ToolbarItem(placement: .automatic) {
                     Button {
                         showAddCategory = true
@@ -84,8 +116,12 @@ struct CategoriesView: View {
                 }
                 Button("删除", role: .destructive) {
                     if let category = categoryToDelete {
+                        deleteTrigger += 1
                         viewModel.deleteCategory(category)
                         categoryToDelete = nil
+                        if isEditingCategories, viewModel.categories.isEmpty {
+                            isEditingCategories = false
+                        }
                     }
                 }
             } message: {
@@ -99,7 +135,21 @@ struct CategoriesView: View {
             .navigationDestination(item: $selectedBook) { book in
                 BookDetailView(book: book)
             }
+        .onChange(of: viewModel.errorMessage) { _, message in
+            showError = message != nil
         }
+        .alert("操作失败", isPresented: $showError) {
+            Button("确定", role: .cancel) {
+                viewModel.errorMessage = nil
+            }
+        } message: {
+            Text(viewModel.errorMessage ?? "")
+        }
+    }
+
+    private func confirmDelete(_ category: Category) {
+        categoryToDelete = category
+        showDeleteConfirmation = true
     }
 
     private var addCategoryButton: some View {
@@ -130,6 +180,13 @@ struct CategoriesView: View {
                 .stroke(style: StrokeStyle(lineWidth: 1, dash: [6, 4]))
                 .fill(Color.inkRoomTextTertiary.opacity(0.2))
         )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            showAddCategory = true
+        }
+        #if os(iOS)
+        .hoverEffect(.lift)
+        #endif
     }
 
     private var contentPadding: CGFloat {
@@ -143,7 +200,12 @@ struct CategoriesView: View {
                 .foregroundColor(.inkRoomTextSecondary)
                 .padding(.horizontal, contentPadding)
 
-            let uncategorizedBooks = viewModel.books.filter { $0.categoryIds.isEmpty }
+            // Books with no categories OR books whose categories were deleted
+            let validCategoryIds = Set(viewModel.categories.map { $0.id })
+            let uncategorizedBooks = viewModel.books.filter { book in
+                book.categoryIds.isEmpty || 
+                !book.categoryIds.contains(where: { validCategoryIds.contains($0) })
+            }
 
             if uncategorizedBooks.isEmpty {
                 Text("暂无未分类书籍")
@@ -193,7 +255,7 @@ struct CategoryCard: View {
                     .fill(categoryColor.opacity(0.15))
                     .frame(width: 40, height: 40)
 
-                Image(systemName: category.iconName)
+                Image(safeSystemName: category.iconName)
                     .font(.system(size: 18))
                     .foregroundColor(categoryColor)
             }
@@ -230,7 +292,9 @@ struct CategoryDetailView: View {
     let category: Category
     @EnvironmentObject var viewModel: LibraryViewModel
     @Environment(\.layoutSizeClass) private var sizeClass
+    @Environment(\.dismiss) private var dismiss
     @State private var selectedBook: Book?
+    @State private var showDeleteConfirmation = false
 
     private var liveCategory: Category {
         viewModel.categories.first(where: { $0.id == category.id }) ?? category
@@ -249,7 +313,7 @@ struct CategoryDetailView: View {
                             .fill(Color(hex: liveCategory.colorHex)?.opacity(0.15) ?? Color.inkRoomPrimaryLight)
                             .frame(width: 56, height: 56)
 
-                        Image(systemName: liveCategory.iconName)
+                        Image(safeSystemName: liveCategory.iconName)
                             .font(.system(size: 24))
                             .foregroundColor(Color(hex: liveCategory.colorHex) ?? .inkRoomPrimary)
                     }
@@ -269,17 +333,37 @@ struct CategoryDetailView: View {
                 .padding(.horizontal, contentPadding)
                 .padding(.top, 8)
 
-                LazyVStack(spacing: 8) {
-                    ForEach(categoryBooks) { book in
-                        Button {
-                            selectedBook = book
-                        } label: {
-                            BookCard(book: book, viewMode: .list)
-                        }
-                        .buttonStyle(.plain)
+                if categoryBooks.isEmpty {
+                    VStack(spacing: 12) {
+                        Image(systemName: "books.vertical")
+                            .font(.system(size: 40))
+                            .foregroundColor(.inkRoomTextTertiary)
+
+                        Text("该分类暂无书籍")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(.inkRoomTextSecondary)
+
+                        Text("在书籍详情页可将书籍加入此分类")
+                            .font(.system(size: 13))
+                            .foregroundColor(.inkRoomTextTertiary)
+                            .multilineTextAlignment(.center)
                     }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 48)
+                    .padding(.horizontal, contentPadding)
+                } else {
+                    LazyVStack(spacing: 8) {
+                        ForEach(categoryBooks) { book in
+                            Button {
+                                selectedBook = book
+                            } label: {
+                                BookCard(book: book, viewMode: .list)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, contentPadding)
                 }
-                .padding(.horizontal, contentPadding)
             }
             .padding(.bottom, 100)
             .frame(maxWidth: detailMaxWidth)
@@ -290,6 +374,30 @@ struct CategoryDetailView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .toolbar {
+            ToolbarItem(placement: .automatic) {
+                Button(role: .destructive) {
+                    showDeleteConfirmation = true
+                } label: {
+                    Image(systemName: "trash")
+                        .font(.system(size: 16, weight: .medium))
+                }
+            }
+        }
+        .alert("删除分类", isPresented: $showDeleteConfirmation) {
+            Button("取消", role: .cancel) {}
+            Button("删除", role: .destructive) {
+                viewModel.deleteCategory(liveCategory)
+                dismiss()
+            }
+        } message: {
+            Text("确定要删除「\(liveCategory.name)」吗？分类内的书籍不会被删除。")
+        }
+        .onChange(of: viewModel.categories) { _, categories in
+            if !categories.contains(where: { $0.id == category.id }) {
+                dismiss()
+            }
+        }
         .navigationDestination(item: $selectedBook) { book in
             BookDetailView(book: book)
         }

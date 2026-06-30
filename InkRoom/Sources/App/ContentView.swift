@@ -19,31 +19,30 @@ struct ContentView: View {
 
         var icon: String {
             switch self {
-            case .library: return "book.open"
-            case .categories: return "folders"
-            case .statistics: return "chart.bar"
-            case .settings: return "person"
+            case .library: return "books.vertical.fill"
+            case .categories: return "folder.fill"
+            case .statistics: return "chart.bar.fill"
+            case .settings: return "person.circle.fill"
             }
         }
 
         var sidebarIcon: String {
-            switch self {
-            case .library: return "books.vertical"
-            case .categories: return "folder.fill"
-            case .statistics: return "chart.bar.fill"
-            case .settings: return "gearshape"
-            }
+            icon
         }
     }
 
     var body: some View {
         Group {
+            #if os(macOS)
+            expandedLayout
+            #else
             switch sizeClass {
             case .compact:
                 compactLayout
             case .regular, .expanded:
                 expandedLayout
             }
+            #endif
         }
         .sheet(isPresented: $showImport) {
             ImportView()
@@ -63,40 +62,59 @@ struct ContentView: View {
 
     // MARK: - Compact Layout (iPhone, narrow windows)
     private var compactLayout: some View {
-        TabView(selection: $selectedTab) {
-            NavigationStack {
-                LibraryView(selectedBook: $selectedBook)
-            }
-            .tabItem {
-                Label(AppSection.library.rawValue, systemImage: AppSection.library.icon)
-            }
-            .tag(AppSection.library)
-
-            NavigationStack {
-                CategoriesView()
-            }
-            .tabItem {
-                Label(AppSection.categories.rawValue, systemImage: AppSection.categories.icon)
-            }
-            .tag(AppSection.categories)
-
-            NavigationStack {
-                StatisticsView()
-            }
-            .tabItem {
-                Label(AppSection.statistics.rawValue, systemImage: AppSection.statistics.icon)
-            }
-            .tag(AppSection.statistics)
-
-            NavigationStack {
-                SettingsView()
-            }
-            .tabItem {
-                Label(AppSection.settings.rawValue, systemImage: AppSection.settings.icon)
-            }
-            .tag(AppSection.settings)
+        #if os(iOS)
+        SwipeableTabContainer(selectedTab: $selectedTab) {
+            tabPage(for: .library)
+                .tag(AppSection.library)
+            tabPage(for: .categories)
+                .tag(AppSection.categories)
+            tabPage(for: .statistics)
+                .tag(AppSection.statistics)
+            tabPage(for: .settings)
+                .tag(AppSection.settings)
         }
-        .tint(Color.inkRoomPrimary)
+        .sensoryFeedback(.selection, trigger: selectedTab)
+        .onChange(of: selectedTab) { _, _ in
+            selectedBook = nil
+        }
+        #else
+        legacyTabLayout
+        #endif
+    }
+
+    private var legacyTabLayout: some View {
+        TabView(selection: $selectedTab) {
+            tabRoot(LibraryView(selectedBook: $selectedBook), section: .library)
+            tabRoot(CategoriesView(), section: .categories)
+            tabRoot(StatisticsView(), section: .statistics)
+            tabRoot(SettingsView(), section: .settings)
+        }
+        .inkRoomTabBarStyle()
+    }
+
+    @ViewBuilder
+    private func tabPage(for section: AppSection) -> some View {
+        switch section {
+        case .library:
+            LibraryView(selectedBook: $selectedBook)
+        case .categories:
+            CategoriesView()
+        case .statistics:
+            StatisticsView()
+        case .settings:
+            SettingsView()
+        }
+    }
+
+    private func tabRoot<Content: View>(_ content: Content, section: AppSection) -> some View {
+        NavigationStack {
+            content
+        }
+        .tabItem {
+            Image(systemName: section.icon)
+            Text(section.rawValue)
+        }
+        .tag(section)
     }
 
     // MARK: - Expanded Layout (iPad, macOS, wide windows)
@@ -179,4 +197,5 @@ struct ContentView: View {
     ContentView()
         .environmentObject(LibraryViewModel())
         .environmentObject(SettingsViewModel())
+        .environmentObject(AppStoreUpdateService.shared)
 }

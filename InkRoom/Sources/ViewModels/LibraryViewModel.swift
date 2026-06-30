@@ -13,6 +13,10 @@ class LibraryViewModel: ObservableObject {
     @Published var searchText: String = ""
     @Published private(set) var debouncedSearchText: String = ""
     @Published var selectedGroup: BookGroup = .all
+    @Published var sortOption: BookSortOption
+    @Published var sortAscending: Bool
+    @Published private(set) var filteredBooks: [Book] = []
+    @Published private(set) var groupBookCounts: [BookGroup: Int] = [:]
     @Published var isLoading = false
     @Published var isImporting = false
     @Published var errorMessage: String?
@@ -22,9 +26,8 @@ class LibraryViewModel: ObservableObject {
         case list = "列表"
     }
 
-    var filteredBooks: [Book] {
-        BookFilter.filter(books, group: selectedGroup, searchText: debouncedSearchText)
-    }
+    private static let sortOptionKey = "librarySortOption"
+    private static let sortAscendingKey = "librarySortAscending"
 
     private let database: DatabaseService
     private let bookParser: BookParserService
@@ -34,10 +37,37 @@ class LibraryViewModel: ObservableObject {
         self.database = dependencies.database
         self.bookParser = dependencies.bookParser
 
+        let savedSort = UserDefaults.standard.string(forKey: Self.sortOptionKey)
+        let option = BookSortOption(rawValue: savedSort ?? "") ?? .recentRead
+        self.sortOption = option
+        if UserDefaults.standard.object(forKey: Self.sortAscendingKey) != nil {
+            self.sortAscending = UserDefaults.standard.bool(forKey: Self.sortAscendingKey)
+        } else {
+            self.sortAscending = option.defaultAscending
+        }
+
         $searchText
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .removeDuplicates()
             .assign(to: &$debouncedSearchText)
+
+        Publishers.CombineLatest3($books, $selectedGroup, $debouncedSearchText)
+            .combineLatest($sortOption, $sortAscending)
+            .throttle(for: .milliseconds(50), scheduler: RunLoop.main, latest: true)
+            .map { base, sortBy, ascending in
+                let (books, group, search) = base
+                return BookFilter.filter(books, group: group, searchText: search, sortBy: sortBy, ascending: ascending)
+            }
+            .removeDuplicates()
+            .assign(to: &$filteredBooks)
+
+        $books
+            .map { books in
+                Dictionary(uniqueKeysWithValues: BookGroup.allCases.map { group in
+                    (group, BookFilter.count(in: books, for: group))
+                })
+            }
+            .assign(to: &$groupBookCounts)
 
         NotificationCenter.default.publisher(for: .bookImportedNotification)
             .receive(on: DispatchQueue.main)
@@ -52,26 +82,47 @@ class LibraryViewModel: ObservableObject {
     func loadData() async {
         isLoading = true
 
-        database.setupDefaultCategoriesIfNeeded()
-        var loadedBooks = database.fetchAllBooks()
-        var loadedCategories = database.fetchAllCategories()
+        let database = self.database
+        var loaded = await Task.detached(priority: .userInitiated) {
+            database.setupDefaultCategoriesIfNeeded()
+            let books = database.fetchAllBooks()
+            let categories = database.fetchAllCategories()
+            return (books, categories)
+        }.value
 
         #if DEBUG
-        if loadedBooks.isEmpty {
+        if loaded.0.isEmpty {
             loadSampleData()
-            loadedBooks = database.fetchAllBooks()
-            loadedCategories = database.fetchAllCategories()
+            loaded = await Task.detached(priority: .userInitiated) {
+                (database.fetchAllBooks(), database.fetchAllCategories())
+            }.value
         }
         #endif
 
-        books = loadedBooks
-        categories = loadedCategories
+        books = loaded.0
+        categories = loaded.1
         isLoading = false
         updateWidgetData()
     }
 
+    func setSortOption(_ option: BookSortOption) {
+        if sortOption == option {
+            sortAscending.toggle()
+        } else {
+            sortOption = option
+            sortAscending = option.defaultAscending
+        }
+        UserDefaults.standard.set(sortOption.rawValue, forKey: Self.sortOptionKey)
+        UserDefaults.standard.set(sortAscending, forKey: Self.sortAscendingKey)
+    }
+
+    var sortOrderLabel: String {
+        sortAscending ? "升序" : "降序"
+    }
+
     private func reloadBooks() {
         books = database.fetchAllBooks()
+        categories = database.fetchAllCategories()
         updateWidgetData()
     }
 
@@ -150,6 +201,7 @@ class LibraryViewModel: ObservableObject {
             if !chapters.isEmpty {
                 try database.insertChapters(chapters, forBookId: book.id)
             }
+            // Batch update: reload once at the end to avoid multiple UI updates
             reloadBooks()
         } catch {
             errorMessage = InkRoomErrorMessage.friendly(for: error)
@@ -236,7 +288,10 @@ class LibraryViewModel: ObservableObject {
     func deleteCategory(_ category: Category) {
         perform {
             try database.deleteCategory(category)
-            reloadAllData()
+            for index in books.indices {
+                books[index].categoryIds.removeAll { $0 == category.id }
+            }
+            reloadCategories()
         }
     }
 
@@ -246,7 +301,7 @@ class LibraryViewModel: ObservableObject {
         let recentBooks = Array(
             books
                 .filter { $0.lastReadDate != nil }
-                .sorted { ($0.lastReadDate ?? $0.addedDate) > ($1.lastReadDate ?? $1.addedDate) }
+                .sorted { ($0.lastReadDate ?? .distantPast) > ($1.lastReadDate ?? .distantPast) }
                 .prefix(5)
         )
 

@@ -9,6 +9,8 @@ struct LibraryView: View {
     @State private var favoriteTrigger: Int = 0
     @State private var deleteTrigger: Int = 0
     @State private var contentWidth: CGFloat = 0
+    @State private var showError = false
+    @State private var cachedColumnCount: Int = 2
     @Binding var selectedBook: Book?
 
     init(selectedBook: Binding<Book?>? = nil) {
@@ -32,6 +34,10 @@ struct LibraryView: View {
         #endif
         .toolbar {
             ToolbarItem(placement: .automatic) {
+                sortMenu
+            }
+
+            ToolbarItem(placement: .automatic) {
                 Button {
                     showImport = true
                 } label: {
@@ -54,6 +60,9 @@ struct LibraryView: View {
                 if let book = bookToDelete {
                     deleteTrigger += 1
                     viewModel.deleteBook(book)
+                    if selectedBook?.id == book.id {
+                        selectedBook = nil
+                    }
                     bookToDelete = nil
                 }
             }
@@ -61,6 +70,16 @@ struct LibraryView: View {
             if let book = bookToDelete {
                 Text("确定要删除《\(book.title)》吗？此操作不可撤销。")
             }
+        }
+        .onChange(of: viewModel.errorMessage) { _, message in
+            showError = message != nil
+        }
+        .alert("操作失败", isPresented: $showError) {
+            Button("确定", role: .cancel) {
+                viewModel.errorMessage = nil
+            }
+        } message: {
+            Text(viewModel.errorMessage ?? "")
         }
     }
 
@@ -172,7 +191,7 @@ struct LibraryView: View {
     }
 
     private func bookCount(for group: BookGroup) -> Int {
-        BookFilter.count(in: viewModel.books, for: group)
+        viewModel.groupBookCounts[group] ?? 0
     }
 
     private var bookContent: some View {
@@ -180,23 +199,26 @@ struct LibraryView: View {
             if viewModel.isLoading {
                 loadingState
             } else if viewModel.filteredBooks.isEmpty {
-                emptyState
+                if viewModel.books.isEmpty {
+                    emptyState
+                } else {
+                    noResultsState
+                }
+            } else if viewModel.viewMode == .list {
+                listContent
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 16) {
                         if sizeClass != .expanded {
-                            HStack {
+                            HStack(spacing: 8) {
+                                sortMenuCompact
                                 Spacer()
                                 viewModeToggle
                             }
                             .padding(.horizontal, 16)
                         }
 
-                        if viewModel.viewMode == .grid {
-                            adaptiveGridView
-                        } else {
-                            listView
-                        }
+                        adaptiveGridView
                     }
                     .padding(.vertical, 16)
                     .readWidth($contentWidth)
@@ -207,6 +229,105 @@ struct LibraryView: View {
         .refreshable {
             await viewModel.loadData()
         }
+    }
+
+    private var listContent: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 8) {
+                sortMenuCompact
+                Spacer()
+                viewModeToggle
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+
+            List {
+                ForEach(viewModel.filteredBooks) { book in
+                    BookCard(book: book, viewMode: .list)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            selectedBook = book
+                        }
+                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                bookToDelete = book
+                                showDeleteConfirmation = true
+                            } label: {
+                                Label("删除", systemImage: "trash")
+                            }
+
+                            Button {
+                                favoriteTrigger += 1
+                                viewModel.toggleFavorite(for: book)
+                            } label: {
+                                Label(book.isFavorite ? "取消收藏" : "收藏", systemImage: book.isFavorite ? "heart.slash" : "heart")
+                            }
+                            .tint(.inkRoomPrimary)
+                        }
+                }
+            }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+        }
+        .refreshable {
+            await viewModel.loadData()
+        }
+    }
+
+    @ViewBuilder
+    private func bookContextMenu(for book: Book) -> some View {
+        Button {
+            ContextMenuDismiss.run {
+                favoriteTrigger += 1
+                viewModel.toggleFavorite(for: book)
+            }
+        } label: {
+            Label(book.isFavorite ? "取消收藏" : "收藏", systemImage: book.isFavorite ? "heart.slash" : "heart")
+        }
+
+        Divider()
+
+        Button(role: .destructive) {
+            ContextMenuDismiss.run {
+                bookToDelete = book
+                showDeleteConfirmation = true
+            }
+        } label: {
+            Label("删除", systemImage: "trash")
+        }
+    }
+
+    private var noResultsState: some View {
+        VStack(spacing: 16) {
+            Spacer()
+
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 48))
+                .foregroundColor(.inkRoomTextTertiary)
+
+            Text("没有匹配的书籍")
+                .font(.system(size: 17, weight: .medium))
+                .foregroundColor(.inkRoomTextPrimary)
+
+            Text("试试调整搜索词或切换分组")
+                .font(.system(size: 14))
+                .foregroundColor(.inkRoomTextTertiary)
+
+            if !viewModel.searchText.isEmpty {
+                Button("清除搜索") {
+                    viewModel.searchText = ""
+                }
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.inkRoomPrimary)
+                .padding(.top, 4)
+            }
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private var loadingState: some View {
@@ -242,12 +363,80 @@ struct LibraryView: View {
                 .font(.system(size: sizeClass == .compact ? 14 : 15))
                 .foregroundColor(.inkRoomTextTertiary)
 
-            InkRoomButton("导入书籍", icon: "plus") {
-                showImport = true
+            if viewModel.isImporting {
+                VStack(spacing: 8) {
+                    ProgressView()
+                        .tint(.inkRoomPrimary)
+                        .scaleEffect(1.2)
+                    Text("正在导入...")
+                        .font(.system(size: 13))
+                        .foregroundColor(.inkRoomTextTertiary)
+                }
+                .padding(.top, 8)
+            } else {
+                InkRoomButton("导入书籍", icon: "plus") {
+                    showImport = true
+                }
+                .padding(.top, 8)
             }
-            .padding(.top, 8)
 
             Spacer()
+        }
+    }
+
+    private var sortMenu: some View {
+        Menu {
+            ForEach(BookSortOption.allCases) { option in
+                Button {
+                    viewModel.setSortOption(option)
+                } label: {
+                    HStack {
+                        Label(option.rawValue, systemImage: option.icon)
+                        if viewModel.sortOption == option {
+                            Spacer()
+                            Image(systemName: viewModel.sortAscending ? "arrow.up" : "arrow.down")
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            Image(systemName: "arrow.up.arrow.down")
+                .font(.system(size: 16, weight: .medium))
+        }
+        .accessibilityLabel("排序：\(viewModel.sortOption.rawValue)，\(viewModel.sortOrderLabel)")
+    }
+
+    private var sortMenuCompact: some View {
+        Menu {
+            ForEach(BookSortOption.allCases) { option in
+                Button {
+                    viewModel.setSortOption(option)
+                } label: {
+                    if viewModel.sortOption == option {
+                        Label(
+                            "\(option.rawValue)（\(viewModel.sortOrderLabel)）",
+                            systemImage: viewModel.sortAscending ? "arrow.up" : "arrow.down"
+                        )
+                    } else {
+                        Label(option.rawValue, systemImage: option.icon)
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: "arrow.up.arrow.down")
+                    .font(.system(size: 13, weight: .medium))
+                Text(viewModel.sortOption.rawValue)
+                    .font(.system(size: 13, weight: .medium))
+                Image(systemName: viewModel.sortAscending ? "chevron.up" : "chevron.down")
+                    .font(.system(size: 10, weight: .semibold))
+            }
+            .foregroundColor(.inkRoomTextSecondary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Color.inkRoomBackgroundElevated)
+            .cornerRadius(8)
         }
     }
 
@@ -280,89 +469,42 @@ struct LibraryView: View {
     }
 
     private var adaptiveGridView: some View {
-        let columns = GridLayoutHelper.columnCount(
-            availableWidth: contentWidth > 0 ? contentWidth : 390,
+        // Cache column count calculation - only recalculate when width or size class changes
+        let columns = cachedColumnCount
+        return LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: columns), spacing: 16) {
+            ForEach(viewModel.filteredBooks) { book in
+                BookCard(book: book, viewMode: .grid)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        selectedBook = book
+                    }
+                    .contextMenu {
+                        bookContextMenu(for: book)
+                    }
+            }
+        }
+        .padding(.horizontal, sizeClass == .expanded ? 24 : 16)
+        .onChange(of: contentWidth) { _, newWidth in
+            updateColumnCount(width: newWidth)
+        }
+        .onChange(of: sizeClass) { _, _ in
+            updateColumnCount(width: contentWidth)
+        }
+        .onAppear {
+            updateColumnCount(width: contentWidth)
+        }
+    }
+
+    private func updateColumnCount(width: CGFloat) {
+        let newCount = GridLayoutHelper.columnCount(
+            availableWidth: width > 0 ? width : 390,
             cardWidth: 140,
             spacing: 16,
             padding: sizeClass == .expanded ? 48 : 32
         )
-        return LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: columns), spacing: 16) {
-            ForEach(viewModel.filteredBooks) { book in
-                Button {
-                    selectedBook = book
-                } label: {
-                    BookCard(book: book, viewMode: .grid)
-                }
-                .buttonStyle(.plain)
-                .contextMenu {
-                    Button {
-                        favoriteTrigger += 1
-                        viewModel.toggleFavorite(for: book)
-                    } label: {
-                        Label(book.isFavorite ? "取消收藏" : "收藏", systemImage: book.isFavorite ? "heart.slash" : "heart")
-                    }
-
-                    Divider()
-
-                    Button(role: .destructive) {
-                        bookToDelete = book
-                        showDeleteConfirmation = true
-                    } label: {
-                        Label("删除", systemImage: "trash")
-                    }
-                }
-            }
-            .animation(.easeInOut(duration: 0.25), value: viewModel.filteredBooks.count)
+        if newCount != cachedColumnCount {
+            cachedColumnCount = newCount
         }
-        .padding(.horizontal, sizeClass == .expanded ? 24 : 16)
-    }
-
-    private var listView: some View {
-        LazyVStack(spacing: 8) {
-            ForEach(viewModel.filteredBooks) { book in
-                Button {
-                    selectedBook = book
-                } label: {
-                    BookCard(book: book, viewMode: .list)
-                }
-                .buttonStyle(.plain)
-                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    Button(role: .destructive) {
-                        bookToDelete = book
-                        showDeleteConfirmation = true
-                    } label: {
-                        Label("删除", systemImage: "trash")
-                    }
-
-                    Button {
-                        favoriteTrigger += 1
-                        viewModel.toggleFavorite(for: book)
-                    } label: {
-                        Label(book.isFavorite ? "取消收藏" : "收藏", systemImage: book.isFavorite ? "heart.slash" : "heart")
-                    }
-                    .tint(.inkRoomPrimary)
-                }
-                .contextMenu {
-                    Button {
-                        favoriteTrigger += 1
-                        viewModel.toggleFavorite(for: book)
-                    } label: {
-                        Label(book.isFavorite ? "取消收藏" : "收藏", systemImage: book.isFavorite ? "heart.slash" : "heart")
-                    }
-
-                    Divider()
-
-                    Button(role: .destructive) {
-                        bookToDelete = book
-                        showDeleteConfirmation = true
-                    } label: {
-                        Label("删除", systemImage: "trash")
-                    }
-                }
-            }
-            .animation(.easeInOut(duration: 0.25), value: viewModel.filteredBooks.count)
-        }
-        .padding(.horizontal, sizeClass == .expanded ? 24 : 16)
     }
 }
 

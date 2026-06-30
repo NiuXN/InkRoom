@@ -152,15 +152,23 @@ final class DatabaseService {
                 t.column(sessionPagesRead)
             })
 
+            // Create indexes for better query performance
+            try db.run("CREATE INDEX IF NOT EXISTS idx_books_last_read ON books(last_read_date DESC)")
+            try db.run("CREATE INDEX IF NOT EXISTS idx_books_added_date ON books(added_date DESC)")
+            try db.run("CREATE INDEX IF NOT EXISTS idx_chapters_book_id ON chapters(book_id, order_index)")
+            try db.run("CREATE INDEX IF NOT EXISTS idx_bookmarks_book_id ON bookmarks(book_id, page)")
+            try db.run("CREATE INDEX IF NOT EXISTS idx_sessions_start_time ON reading_sessions(start_time DESC)")
+            try db.run("CREATE INDEX IF NOT EXISTS idx_sessions_book_id ON reading_sessions(book_id)")
+
         } catch {
             print("Table creation failed: \(error)")
         }
     }
 
-    private func parseUUID(_ string: String, context: String) -> UUID {
+    private func parseUUID(_ string: String, context: String) -> UUID? {
         guard let uuid = UUID(uuidString: string) else {
             print("[DatabaseService] WARNING: UUID 解析失败: \"\(string)\" (\(context))")
-            return UUID()
+            return nil
         }
         return uuid
     }
@@ -208,16 +216,17 @@ final class DatabaseService {
             // 一次性查询所有 book-category 关联关系，在内存中按 book_id 分组，避免 N+1 查询
             var bookCategoryMap: [String: [UUID]] = [:]
             for row in try db.prepare("SELECT book_id, category_id FROM book_category_relations") {
-                if let bookIdStr = row[0] as? String, let categoryIdStr = row[1] as? String {
-                    let catId = parseUUID(categoryIdStr, context: "book_category_relations.category_id")
+                if let bookIdStr = row[0] as? String, let categoryIdStr = row[1] as? String,
+                   let catId = parseUUID(categoryIdStr, context: "book_category_relations.category_id") {
                     bookCategoryMap[bookIdStr, default: []].append(catId)
                 }
             }
 
             for row in try db.prepare(books.order(bookLastReadDate.desc, bookAddedDate.desc)) {
                 let bookIdStr = row[bookId]
+                guard let bookUUID = parseUUID(bookIdStr, context: "books.id") else { continue }
                 let book = Book(
-                    id: parseUUID(bookIdStr, context: "books.id"),
+                    id: bookUUID,
                     title: row[bookTitle],
                     author: row[bookAuthor],
                     coverImageName: row[bookCoverPath],
@@ -285,6 +294,7 @@ final class DatabaseService {
             BookParserService.shared.clearCache(for: filePath)
         }
         if let coverURL = book.coverImageURL {
+            CoverImageCache.shared.remove(for: coverURL.path)
             try? FileManager.default.removeItem(at: coverURL)
         }
     }
@@ -375,8 +385,9 @@ final class DatabaseService {
                 let query = chapters.filter(chapterBookId == bookIdValue.uuidString)
                                    .order(chapterOrder)
                 for row in try db.prepare(query) {
+                    guard let chapterUUID = parseUUID(row[chapterId], context: "chapters.id") else { continue }
                     let chapter = Chapter(
-                        id: parseUUID(row[chapterId], context: "chapters.id"),
+                        id: chapterUUID,
                         title: row[chapterTitle],
                         startPage: row[chapterStartPage],
                         endPage: row[chapterEndPage]
@@ -425,8 +436,9 @@ final class DatabaseService {
                 let query = bookmarks.filter(bookmarkBookId == bookIdValue.uuidString)
                                    .order(bookmarkPage)
                 for row in try db.prepare(query) {
+                    guard let bookmarkUUID = parseUUID(row[bookmarkId], context: "bookmarks.id") else { continue }
                     let bookmark = Bookmark(
-                        id: parseUUID(row[bookmarkId], context: "bookmarks.id"),
+                        id: bookmarkUUID,
                         bookId: bookIdValue,
                         page: row[bookmarkPage],
                         chapterTitle: row[bookmarkChapterTitle],
@@ -485,7 +497,9 @@ final class DatabaseService {
         var results: [ReadingSession] = []
         do {
             for row in try db.prepare(readingSessions.order(sessionStartTime.desc)) {
-                results.append(mapReadingSession(from: row))
+                if let session = mapReadingSession(from: row) {
+                    results.append(session)
+                }
             }
         } catch {
             print("Fetch reading sessions failed: \(error)")
@@ -520,7 +534,9 @@ final class DatabaseService {
                 .filter(sessionStartTime >= start && sessionStartTime < end)
                 .order(sessionStartTime.desc)
             for row in try db.prepare(query) {
-                results.append(mapReadingSession(from: row))
+                if let session = mapReadingSession(from: row) {
+                    results.append(session)
+                }
             }
         } catch {
             print("Fetch reading sessions failed: \(error)")
@@ -528,10 +544,14 @@ final class DatabaseService {
         return results
     }
 
-    private func mapReadingSession(from row: Row) -> ReadingSession {
-        ReadingSession(
-            id: parseUUID(row[sessionId], context: "reading_sessions.id"),
-            bookId: parseUUID(row[sessionBookId], context: "reading_sessions.book_id"),
+    private func mapReadingSession(from row: Row) -> ReadingSession? {
+        guard let sessionUUID = parseUUID(row[sessionId], context: "reading_sessions.id"),
+              let bookUUID = parseUUID(row[sessionBookId], context: "reading_sessions.book_id") else {
+            return nil
+        }
+        return ReadingSession(
+            id: sessionUUID,
+            bookId: bookUUID,
             bookTitle: row[sessionBookTitle],
             startTime: Date(timeIntervalSince1970: row[sessionStartTime]),
             endTime: Date(timeIntervalSince1970: row[sessionEndTime]),
@@ -663,15 +683,34 @@ final class DatabaseService {
             let existingCategories = fetchAllCategoriesUnsafe()
             if existingCategories.isEmpty {
                 let defaults = [
-                    Category(name: "中国古典", iconName: "book.open", colorHex: "#C45C4A"),
+                    Category(name: "中国古典", iconName: "book.fill", colorHex: "#C45C4A"),
                     Category(name: "现代文学", iconName: "pencil", colorHex: "#4A7BC4"),
                     Category(name: "外国名著", iconName: "globe", colorHex: "#4A8C6F"),
-                    Category(name: "诗词歌赋", iconName: "music", colorHex: "#C49A4A")
+                    Category(name: "诗词歌赋", iconName: "music.note", colorHex: "#C49A4A")
                 ]
                 for category in defaults {
                     try? insertCategoryUnsafe(category)
                 }
+            } else {
+                migrateLegacyCategoryIconsUnsafe()
             }
+        }
+    }
+
+    private func migrateLegacyCategoryIconsUnsafe() {
+        guard let db = db else { return }
+
+        let legacyIcons: [(old: String, new: String)] = [
+            ("book.open", "book.fill"),
+            ("music", "music.note"),
+            ("textformat.letterSpacing", "character")
+        ]
+
+        for mapping in legacyIcons {
+            try? db.run(
+                categories.filter(categoryIconName == mapping.old)
+                    .update(categoryIconName <- mapping.new)
+            )
         }
     }
 
@@ -682,16 +721,17 @@ final class DatabaseService {
         do {
             var categoryBookMap: [String: [UUID]] = [:]
             for row in try db.prepare("SELECT category_id, book_id FROM book_category_relations") {
-                if let categoryIdStr = row[0] as? String, let bookIdStr = row[1] as? String {
-                    let bookUUID = parseUUID(bookIdStr, context: "book_category_relations.book_id")
+                if let categoryIdStr = row[0] as? String, let bookIdStr = row[1] as? String,
+                   let bookUUID = parseUUID(bookIdStr, context: "book_category_relations.book_id") {
                     categoryBookMap[categoryIdStr, default: []].append(bookUUID)
                 }
             }
 
             for row in try db.prepare(categories) {
                 let categoryIdStr = row[categoryId]
+                guard let categoryUUID = parseUUID(categoryIdStr, context: "categories.id") else { continue }
                 let category = Category(
-                    id: parseUUID(categoryIdStr, context: "categories.id"),
+                    id: categoryUUID,
                     name: row[categoryName],
                     iconName: row[categoryIconName],
                     colorHex: row[categoryColorHex],

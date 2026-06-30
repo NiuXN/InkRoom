@@ -9,7 +9,7 @@ struct AddCategoryView: View {
     var onSave: (Category) -> Void
 
     private let icons = [
-        "book.fill", "book.open", "pencil", "globe",
+        "book.fill", "books.vertical.fill", "pencil", "globe",
         "music.note", "film", "cup.and.saucer", "leaf",
         "heart.fill", "star.fill", "flag.fill", "folder.fill"
     ]
@@ -40,7 +40,7 @@ struct AddCategoryView: View {
                                         .fill(selectedIcon == icon ? Color(hex: selectedColorHex) ?? .inkRoomPrimary : Color.inkRoomBackgroundElevated)
                                         .frame(width: 44, height: 44)
 
-                                    Image(systemName: icon)
+                                    Image(safeSystemName: icon)
                                         .font(.system(size: 18))
                                         .foregroundColor(selectedIcon == icon ? .white : .inkRoomTextSecondary)
                                 }
@@ -136,7 +136,7 @@ struct CategoryPreviewCard: View {
                     .fill(Color(hex: colorHex)?.opacity(0.15) ?? .gray.opacity(0.15))
                     .frame(width: 40, height: 40)
 
-                Image(systemName: icon)
+                Image(safeSystemName: icon)
                     .font(.system(size: 18))
                     .foregroundColor(Color(hex: colorHex) ?? .gray)
             }

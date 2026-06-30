@@ -19,6 +19,11 @@ final class BookParserService {
 
     private var parseCache: [String: ParsedBook] = [:]
     private let cacheQueue = DispatchQueue(label: "com.inkroom.parsercache", attributes: .concurrent)
+    
+    // Cache limits to prevent memory pressure
+    private let maxCacheEntries = 20
+    private let maxCacheSizeBytes = 50 * 1024 * 1024 // 50 MB
+    private var currentCacheSizeBytes: Int = 0
 
     private init() {}
 
@@ -28,14 +33,37 @@ final class BookParserService {
     }
 
     private func setCache(_ book: ParsedBook, for path: String) {
-        cacheQueue.async(flags: .barrier) { self.parseCache[path] = book }
+        cacheQueue.async(flags: .barrier) { 
+            // Estimate size of parsed book
+            let estimatedSize = book.chapters.reduce(0) { $0 + $1.content.count } + (book.coverImage?.count ?? 0)
+            
+            // Evict oldest entries if cache would exceed limits
+            while self.parseCache.count >= self.maxCacheEntries || self.currentCacheSizeBytes + estimatedSize > self.maxCacheSizeBytes {
+                if let (oldestKey, oldestValue) = self.parseCache.first {
+                    self.currentCacheSizeBytes -= oldestValue.chapters.reduce(0) { $0 + $1.content.count } + (oldestValue.coverImage?.count ?? 0)
+                    self.parseCache.removeValue(forKey: oldestKey)
+                } else {
+                    break
+                }
+            }
+            
+            self.parseCache[path] = book
+            self.currentCacheSizeBytes += estimatedSize
+        }
     }
 
     func clearCache(for path: String? = nil) {
         if let path = path {
-            cacheQueue.async(flags: .barrier) { self.parseCache.removeValue(forKey: path) }
+            cacheQueue.async(flags: .barrier) { 
+                if let removed = self.parseCache.removeValue(forKey: path) {
+                    self.currentCacheSizeBytes -= removed.chapters.reduce(0) { $0 + $1.content.count } + (removed.coverImage?.count ?? 0)
+                }
+            }
         } else {
-            cacheQueue.async(flags: .barrier) { self.parseCache.removeAll() }
+            cacheQueue.async(flags: .barrier) { 
+                self.parseCache.removeAll()
+                self.currentCacheSizeBytes = 0
+            }
         }
     }
 
@@ -183,7 +211,13 @@ final class BookParserService {
         }
 
         let totalContent = contentParts.joined()
-        let totalPages = max(1, totalContent.count / 500)
+        // Improved page calculation: account for Chinese (denser) vs English text
+        // Chinese chars take ~2x the visual space of English chars
+        let chineseCharCount = totalContent.unicodeScalars.filter { $0.value >= 0x4E00 && $0.value <= 0x9FFF }.count
+        let englishCharCount = totalContent.count - chineseCharCount
+        // Weighted: Chinese chars count as 2, English as 1
+        let weightedChars = chineseCharCount * 2 + englishCharCount
+        let totalPages = max(1, weightedChars / AppConfig.charsPerPage)
 
         return ParsedBook(
             title: metadata.title ?? url.deletingPathExtension().lastPathComponent,
@@ -316,8 +350,11 @@ final class BookParserService {
         // Split into chapters (by double newlines or chapter markers)
         let chapters = splitIntoChapters(content)
 
-        // Calculate pages
-        let totalPages = max(1, content.count / 500)
+        // Calculate pages with weighted char count (Chinese chars are denser)
+        let chineseCharCount = content.unicodeScalars.filter { $0.value >= 0x4E00 && $0.value <= 0x9FFF }.count
+        let englishCharCount = content.count - chineseCharCount
+        let weightedChars = chineseCharCount * 2 + englishCharCount
+        let totalPages = max(1, weightedChars / AppConfig.charsPerPage)
 
         return ParsedBook(
             title: title,

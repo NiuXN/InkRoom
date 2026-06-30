@@ -9,6 +9,10 @@ struct InkRoomApp: App {
     @StateObject private var settingsViewModel = SettingsViewModel()
     @StateObject private var updateService = AppStoreUpdateService.shared
 
+    init() {
+        TabBarAppearance.configure()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
