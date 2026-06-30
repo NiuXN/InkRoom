@@ -239,13 +239,13 @@ struct ReaderView: View {
 
     private var tocOverlay: some View {
         ZStack(alignment: .trailing) {
-            Color.black.opacity(0.4)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    withAnimation {
-                        showToc = false
-                    }
-                }
+            Button {
+                withAnimation { showToc = false }
+            } label: {
+                Color.black.opacity(0.4).ignoresSafeArea()
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("关闭目录")
 
             VStack(spacing: 0) {
                 HStack {

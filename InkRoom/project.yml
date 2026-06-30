@@ -2,8 +2,8 @@ name: InkRoom
 options:
   bundleIdPrefix: com.inkroom.app
   deploymentTarget:
-    iOS: "17.0"
-    macOS: "14.0"
+    iOS: "18.0"
+    macOS: "15.0"
   xcodeVersion: "16.0"
   generateEmptyDirectories: true
   groupSortPosition: top
@@ -32,6 +32,24 @@ schemes:
   InkRoom:
     templates:
       - App
+  InkRoom_macOS:
+    build:
+      targets:
+        InkRoom_macOS: all
+        InkRoomWidget_macOS: all
+    test:
+      config: Debug
+      targets:
+        - InkRoomTests_macOS
+  InkRoom_iOS:
+    build:
+      targets:
+        InkRoom_iOS: all
+        InkRoomWidget_iOS: all
+    test:
+      config: Debug
+      targets:
+        - InkRoomTests_iOS
 
 settings:
   base:
@@ -39,7 +57,7 @@ settings:
     CURRENT_PROJECT_VERSION: "1"
     DEVELOPMENT_TEAM: ""
     CODE_SIGN_STYLE: Automatic
-    SWIFT_VERSION: "5.9"
+    SWIFT_VERSION: "6.0"
     ENABLE_USER_SCRIPT_SANDBOXING: false
     ENABLE_PREVIEWS: true
 

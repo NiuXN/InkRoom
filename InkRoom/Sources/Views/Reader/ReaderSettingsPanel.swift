@@ -31,7 +31,7 @@ struct ReaderSettingsPopover: View {
                         .foregroundStyle(Color.inkRoomTextPrimary)
                         .frame(width: 32, height: 32)
                         .background(Color.inkRoomBackgroundElevated)
-                        .cornerRadius(6)
+                        .clipShape(.rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("减小字号")
@@ -57,7 +57,7 @@ struct ReaderSettingsPopover: View {
                         .foregroundStyle(Color.inkRoomTextPrimary)
                         .frame(width: 32, height: 32)
                         .background(Color.inkRoomBackgroundElevated)
-                        .cornerRadius(6)
+                        .clipShape(.rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("增大字号")
@@ -85,7 +85,7 @@ struct ReaderSettingsPopover: View {
                                 settingsViewModel.readingLineSpacing == spacing ?
                                 Color.inkRoomPrimary : Color.inkRoomBackgroundElevated
                             )
-                            .cornerRadius(6)
+                            .clipShape(.rect(cornerRadius: 6))
                     }
                     .buttonStyle(.plain)
                 }
@@ -137,13 +137,13 @@ struct ReaderSettingsOverlay: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            Color.black.opacity(0.4)
-                .ignoresSafeArea()
-                .onTapGesture {
-                    withAnimation {
-                        isPresented = false
-                    }
-                }
+            Button {
+                withAnimation { isPresented = false }
+            } label: {
+                Color.black.opacity(0.4).ignoresSafeArea()
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("关闭设置面板")
             
             VStack(spacing: 0) {
                 RoundedRectangle(cornerRadius: 2.5)
@@ -186,7 +186,7 @@ struct ReaderSettingsOverlay: View {
                         .foregroundStyle(Color.inkRoomTextPrimary)
                         .frame(width: 36, height: 36)
                         .background(Color.inkRoomBackgroundElevated)
-                        .cornerRadius(8)
+                        .clipShape(.rect(cornerRadius: 8))
                 }
                 .accessibilityLabel("减小字号")
                 
@@ -210,7 +210,7 @@ struct ReaderSettingsOverlay: View {
                         .foregroundStyle(Color.inkRoomTextPrimary)
                         .frame(width: 36, height: 36)
                         .background(Color.inkRoomBackgroundElevated)
-                        .cornerRadius(8)
+                        .clipShape(.rect(cornerRadius: 8))
                 }
                 .accessibilityLabel("增大字号")
             }

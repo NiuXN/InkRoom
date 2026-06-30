@@ -3,7 +3,7 @@ import Foundation
 struct ReadingSettings: Codable {
     var fontSize: Int
     var lineSpacing: Int
-    var letterSpacing: Int
+    var letterSpacing: Double
     var readerTheme: ReaderTheme
     var pageTurnStyle: PageTurnStyle
     var ttsRate: Float

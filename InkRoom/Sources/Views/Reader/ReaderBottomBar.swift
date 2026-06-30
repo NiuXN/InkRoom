@@ -118,7 +118,7 @@ struct ReaderExpandedBottomBar: View {
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(textColor.opacity(0.08))
-                    .cornerRadius(8)
+                    .clipShape(.rect(cornerRadius: 8))
                 }
                 .disabled(currentPage <= 1)
                 .accessibilityLabel("上一页")
@@ -143,7 +143,7 @@ struct ReaderExpandedBottomBar: View {
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(textColor.opacity(0.08))
-                    .cornerRadius(8)
+                    .clipShape(.rect(cornerRadius: 8))
                 }
                 .disabled(currentPage >= totalPages)
                 .accessibilityLabel("下一页")

@@ -2,7 +2,8 @@ import CoreGraphics
 import SwiftUI
 
 struct ChapterFramePreferenceKey: PreferenceKey {
-    static var defaultValue: [Int: CGRect] = [:]
+    // PreferenceKey 协议要求 `var`，默认值是不可变快照，标记为 nonisolated(unsafe) 以满足 Swift 6 并发检查。
+    nonisolated(unsafe) static var defaultValue: [Int: CGRect] = [:]
 
     static func reduce(value: inout [Int: CGRect], nextValue: () -> [Int: CGRect]) {
         value.merge(nextValue(), uniquingKeysWith: { $1 })

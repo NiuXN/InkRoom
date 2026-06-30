@@ -20,6 +20,8 @@ final class ReaderViewModel: ObservableObject {
 
     private(set) var readingSessionStart: Date?
     private var libraryViewModel: LibraryViewModel?
+    private let bookParser: BookParserServiceProtocol
+    private let database: any DatabaseServiceProtocol
     private var pageLoadGeneration = 0
     private var pageLoadTask: Task<Void, Never>?
     private var scrollUpdateTask: Task<Void, Never>?
@@ -31,9 +33,11 @@ final class ReaderViewModel: ObservableObject {
         libraryViewModel?.books.first(where: { $0.id == book.id }) ?? book
     }
 
-    init(book: Book) {
+    init(book: Book, dependencies: AppDependencies = .shared) {
         self.book = book
         self.currentPage = max(1, book.currentPage)
+        self.bookParser = dependencies.bookParser
+        self.database = dependencies.database
     }
 
     func attach(library: LibraryViewModel) {
@@ -167,7 +171,7 @@ final class ReaderViewModel: ObservableObject {
               index >= 0, index < chapters.count,
               let filePath = activeBook.filePath else { return }
 
-        if let content = try? await BookParserService.shared.getChapterContent(
+        if let content = try? await bookParser.getChapterContent(
             for: index,
             from: filePath,
             charsPerPage: 10000
@@ -229,9 +233,9 @@ final class ReaderViewModel: ObservableObject {
         }
 
         if activeBook.filePath != nil {
-            chapters = await BookParserService.shared.getChapters(for: activeBook)
+            chapters = await bookParser.getChapters(for: activeBook)
             if !chapters.isEmpty {
-                try? await DatabaseService.shared.insertChapters(chapters, forBookId: activeBook.id)
+                try? await database.insertChapters(chapters, forBookId: activeBook.id)
             }
             buildPageToChapterIndexCache()
         } else if chapters.isEmpty {
@@ -291,7 +295,7 @@ final class ReaderViewModel: ObservableObject {
                     }
                 } else {
                     // Fallback to parser if cache miss
-                    if let content = await BookParserService.shared.getChapterContent(for: activeBook, page: currentPage) {
+                    if let content = await bookParser.getChapterContent(for: activeBook, page: currentPage) {
                         guard generation == pageLoadGeneration else { return }
                         pageText = content
                     } else {
@@ -301,7 +305,7 @@ final class ReaderViewModel: ObservableObject {
                 }
             } else {
                 // Fallback to parser
-                if let content = await BookParserService.shared.getChapterContent(for: activeBook, page: currentPage) {
+                if let content = await bookParser.getChapterContent(for: activeBook, page: currentPage) {
                     guard generation == pageLoadGeneration else { return }
                     pageText = content
                 } else {
@@ -369,7 +373,7 @@ final class ReaderViewModel: ObservableObject {
             pagesRead: pagesReadInSession
         )
         Task {
-            try? await DatabaseService.shared.insertReadingSession(session)
+            try? await database.insertReadingSession(session)
         }
         readingSessionStart = nil
     }

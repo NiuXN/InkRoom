@@ -19,8 +19,10 @@ enum AppVersion {
     }
 
     private static func compare(_ lhs: String, _ rhs: String) -> ComparisonResult {
-        let left = lhs.split(separator: ".").map { Int($0) ?? 0 }
-        let right = rhs.split(separator: ".").map { Int($0) ?? 0 }
+        // 非数字段（如 "beta"、"rc1"）视为 -1，低于任何数字段，
+        // 使预发布版本（1.0.beta）正确小于正式版本（1.0.0）。
+        let left = lhs.split(separator: ".").map { Int($0) ?? -1 }
+        let right = rhs.split(separator: ".").map { Int($0) ?? -1 }
         let count = max(left.count, right.count)
 
         for index in 0..<count {

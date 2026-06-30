@@ -153,11 +153,11 @@ final class WiFiTransferService: ObservableObject {
         do {
             let book = try await BookParserService.shared.importBook(from: url, copyFile: false)
             let chapters = await BookParserService.shared.getChapters(for: book)
-            try await MainActor.run {
-                try DatabaseService.shared.insertBook(book)
-                if !chapters.isEmpty {
-                    try DatabaseService.shared.insertChapters(chapters, forBookId: book.id)
-                }
+            try await DatabaseService.shared.insertBook(book)
+            if !chapters.isEmpty {
+                try await DatabaseService.shared.insertChapters(chapters, forBookId: book.id)
+            }
+            await MainActor.run {
                 NotificationCenter.default.post(name: .bookImportedNotification, object: nil)
             }
         } catch {

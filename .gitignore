@@ -9,11 +9,14 @@ DerivedData/
 *.ipa
 *.dSYM.zip
 *.dSYM
+*.xccheckout
+*.xpchmapping
 
 # Build artifacts
 InkRoom/build/
 InkRoom/InkRoom.xcodeproj/xcuserdata/
 InkRoom/InkRoom.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/*
 
 # Swift Package Manager
 .build/
@@ -26,3 +29,15 @@ Package.resolved
 
 # Cursor
 .cursor/
+
+# Logs
+*.log
+
+# SQLite databases
+*.sqlite
+
+# Environment variables
+.env
+
+# VS Code
+.xswiftopenerstate

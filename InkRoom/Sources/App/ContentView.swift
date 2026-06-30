@@ -64,14 +64,22 @@ struct ContentView: View {
     private var compactLayout: some View {
         #if os(iOS)
         SwipeableTabContainer(selectedTab: $selectedTab) {
-            tabPage(for: .library)
-                .tag(AppSection.library)
-            tabPage(for: .categories)
-                .tag(AppSection.categories)
-            tabPage(for: .statistics)
-                .tag(AppSection.statistics)
-            tabPage(for: .settings)
-                .tag(AppSection.settings)
+            NavigationStack {
+                tabPage(for: .library)
+            }
+            .tag(AppSection.library)
+            NavigationStack {
+                tabPage(for: .categories)
+            }
+            .tag(AppSection.categories)
+            NavigationStack {
+                tabPage(for: .statistics)
+            }
+            .tag(AppSection.statistics)
+            NavigationStack {
+                tabPage(for: .settings)
+            }
+            .tag(AppSection.settings)
         }
         .sensoryFeedback(.selection, trigger: selectedTab)
         .onChange(of: selectedTab) { _, _ in
@@ -144,7 +152,7 @@ struct ContentView: View {
                 ForEach([AppSection.library, .categories]) { section in
                     NavigationLink(value: section) {
                         Label(section.rawValue, systemImage: section.sidebarIcon)
-                            .foregroundColor(.inkRoomTextPrimary)
+                            .foregroundStyle(Color.inkRoomTextPrimary)
                     }
                     .tag(section)
                 }
@@ -153,13 +161,13 @@ struct ContentView: View {
             Section("个人") {
                 NavigationLink(value: AppSection.statistics) {
                     Label(AppSection.statistics.rawValue, systemImage: AppSection.statistics.sidebarIcon)
-                        .foregroundColor(.inkRoomTextPrimary)
+                        .foregroundStyle(Color.inkRoomTextPrimary)
                 }
                 .tag(AppSection.statistics)
 
                 NavigationLink(value: AppSection.settings) {
                     Label(AppSection.settings.rawValue, systemImage: AppSection.settings.sidebarIcon)
-                        .foregroundColor(.inkRoomTextPrimary)
+                        .foregroundStyle(Color.inkRoomTextPrimary)
                 }
                 .tag(AppSection.settings)
             }

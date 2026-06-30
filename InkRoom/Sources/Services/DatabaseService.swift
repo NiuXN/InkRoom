@@ -6,6 +6,15 @@ actor DatabaseService {
 
     private var db: Connection?
 
+    /// 数据库初始化过程中遇到的错误（若有）。`isReady` 为 false 时上层应提示用户。
+    ///
+    /// `nonisolated(unsafe)`：仅在 nonisolated `init` 中写入一次，之后只在 actor 内部读取，
+    /// 无并发风险；标记是为了让 actor 的 nonisolated 初始化器能够赋值。
+    nonisolated(unsafe) private var setupError: DatabaseError?
+
+    /// 数据库是否初始化成功并可正常使用。
+    var isReady: Bool { db != nil && setupError == nil }
+
     // MARK: - Tables
     let books = Table("books")
     let categories = Table("categories")
@@ -61,27 +70,29 @@ actor DatabaseService {
     let sessionPagesRead = Expression<Int>("pages_read")
 
     private init() {
-        setupDatabase()
-    }
-
-    private func setupDatabase() {
+        // actor 的 init 是 nonisolated，无法调用 isolated 方法，
+        // 因此把初始化逻辑内联，并把辅助方法标为 nonisolated / static。
         do {
-            let path = getDatabasePath()
-            db = try Connection(path)
-            createTables()
+            let path = Self.getDatabasePath()
+            let connection = try Connection(path)
+            db = connection
+            try createTables(on: connection)
+        } catch let error as DatabaseError {
+            setupError = error
+            print("[DatabaseService][\(error.errorCode)] setupDatabase failed: \(error)")
         } catch {
-            print("Database setup failed: \(error)")
+            setupError = .connectionFailed(underlying: error)
+            print("[DatabaseService][DB_001] setupDatabase failed: \(error)")
         }
     }
 
-    private func getDatabasePath() -> String {
+    private nonisolated static func getDatabasePath() -> String {
         let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         return documentsPath.appendingPathComponent("inkroom.sqlite3").path
     }
 
-    private func createTables() {
-        guard let db = db else { return }
-
+    /// 建表与索引。标 nonisolated：仅读取 `let` 表/列定义（Sendable），仅在 init 期间调用。
+    private nonisolated func createTables(on db: Connection) throws {
         do {
             try db.run(books.create(ifNotExists: true) { t in
                 t.column(bookId, primaryKey: true)
@@ -147,8 +158,14 @@ actor DatabaseService {
             try db.run("CREATE INDEX IF NOT EXISTS idx_sessions_book_id ON reading_sessions(book_id)")
 
         } catch {
-            print("Table creation failed: \(error)")
+            throw DatabaseError.tableCreationFailed(underlying: error)
         }
+    }
+
+    /// 结构化错误日志：统一打印 errorCode、操作、底层错误，便于排查。
+    private func log(_ error: DatabaseError, operation: String) {
+        let underlying = error.underlyingError.map { " \($0)" } ?? ""
+        print("[DatabaseService][\(error.errorCode)] \(operation) failed\(underlying)")
     }
 
     private func parseUUID(_ string: String, context: String) -> UUID? {
@@ -162,21 +179,25 @@ actor DatabaseService {
     // MARK: - Book Operations
 
     func insertBook(_ book: Book) throws {
-        guard let db = db else { return }
+        guard let db = db else { throw DatabaseError.connectionFailed(underlying: nil) }
 
-        let insert = books.insert(
-            bookId <- book.id.uuidString,
-            bookTitle <- book.title,
-            bookAuthor <- book.author,
-            bookCoverPath <- book.coverImageName,
-            bookFilePath <- book.filePath,
-            bookTotalPages <- book.totalPages,
-            bookCurrentPage <- book.currentPage,
-            bookLastReadDate <- book.lastReadDate?.timeIntervalSince1970,
-            bookIsFavorite <- book.isFavorite,
-            bookAddedDate <- book.addedDate.timeIntervalSince1970
-        )
-        try db.run(insert)
+        do {
+            let insert = books.insert(
+                bookId <- book.id.uuidString,
+                bookTitle <- book.title,
+                bookAuthor <- book.author,
+                bookCoverPath <- book.coverImageName,
+                bookFilePath <- book.filePath,
+                bookTotalPages <- book.totalPages,
+                bookCurrentPage <- book.currentPage,
+                bookLastReadDate <- book.lastReadDate?.timeIntervalSince1970,
+                bookIsFavorite <- book.isFavorite,
+                bookAddedDate <- book.addedDate.timeIntervalSince1970
+            )
+            try db.run(insert)
+        } catch {
+            throw DatabaseError.insertFailed(table: "books", underlying: error)
+        }
 
         for categoryId in book.categoryIds {
             try addBookToCategory(bookId: book.id, categoryId: categoryId)
@@ -215,52 +236,58 @@ actor DatabaseService {
                 results.append(book)
             }
         } catch {
-            print("Fetch books failed: \(error)")
+            log(.fetchFailed(table: "books", underlying: error), operation: "fetchAllBooks")
         }
         return results
     }
 
     func updateBook(_ book: Book) throws {
-        guard let db = db else { return }
+        guard let db = db else { throw DatabaseError.connectionFailed(underlying: nil) }
 
-        let target = books.filter(bookId == book.id.uuidString)
-        try db.run(target.update(
-            bookTitle <- book.title,
-            bookAuthor <- book.author,
-            bookCoverPath <- book.coverImageName,
-            bookFilePath <- book.filePath,
-            bookTotalPages <- book.totalPages,
-            bookCurrentPage <- book.currentPage,
-            bookLastReadDate <- book.lastReadDate?.timeIntervalSince1970,
-            bookIsFavorite <- book.isFavorite
-        ))
+        do {
+            let target = books.filter(bookId == book.id.uuidString)
+            try db.run(target.update(
+                bookTitle <- book.title,
+                bookAuthor <- book.author,
+                bookCoverPath <- book.coverImageName,
+                bookFilePath <- book.filePath,
+                bookTotalPages <- book.totalPages,
+                bookCurrentPage <- book.currentPage,
+                bookLastReadDate <- book.lastReadDate?.timeIntervalSince1970,
+                bookIsFavorite <- book.isFavorite
+            ))
+        } catch {
+            throw DatabaseError.updateFailed(table: "books", underlying: error)
+        }
     }
 
     func deleteBook(_ book: Book) throws {
-        guard let db = db else { return }
+        guard let db = db else { throw DatabaseError.connectionFailed(underlying: nil) }
 
         let bookIdStr = book.id.uuidString
 
-        let target = books.filter(bookId == bookIdStr)
-        try db.run(target.delete())
+        do {
+            let target = books.filter(bookId == bookIdStr)
+            try db.run(target.delete())
 
-        let chaptersTarget = chapters.filter(chapterBookId == bookIdStr)
-        try db.run(chaptersTarget.delete())
+            let chaptersTarget = chapters.filter(chapterBookId == bookIdStr)
+            try db.run(chaptersTarget.delete())
 
-        let bookmarksTarget = bookmarks.filter(bookmarkBookId == bookIdStr)
-        try db.run(bookmarksTarget.delete())
+            let bookmarksTarget = bookmarks.filter(bookmarkBookId == bookIdStr)
+            try db.run(bookmarksTarget.delete())
 
-        let sessionsTarget = readingSessions.filter(sessionBookId == bookIdStr)
-        try db.run(sessionsTarget.delete())
+            let sessionsTarget = readingSessions.filter(sessionBookId == bookIdStr)
+            try db.run(sessionsTarget.delete())
 
-        try db.run("DELETE FROM book_category_relations WHERE book_id = ?", bookIdStr)
+            try db.run("DELETE FROM book_category_relations WHERE book_id = ?", bookIdStr)
+        } catch {
+            throw DatabaseError.deleteFailed(table: "books", underlying: error)
+        }
 
         if let filePath = book.filePath {
             try? FileManager.default.removeItem(atPath: filePath)
-            // Clean up cache in background to avoid blocking actor
-            Task.detached {
-                BookParserService.shared.clearCache(for: filePath)
-            }
+            // BookParserService 是 actor，clearCache 为 nonisolated 可直接调用。
+            BookParserService.shared.clearCache(for: filePath)
         }
         if let coverURL = book.coverImageURL {
             CoverImageCache.shared.remove(for: coverURL.path)
@@ -269,34 +296,46 @@ actor DatabaseService {
     }
 
     func updateReadingProgress(bookId id: UUID, page: Int) throws {
-        guard let db = db else { return }
+        guard let db = db else { throw DatabaseError.connectionFailed(underlying: nil) }
 
-        let target = books.filter(bookId == id.uuidString)
-        try db.run(target.update(
-            bookCurrentPage <- page,
-            bookLastReadDate <- Date().timeIntervalSince1970
-        ))
+        do {
+            let target = books.filter(bookId == id.uuidString)
+            try db.run(target.update(
+                bookCurrentPage <- page,
+                bookLastReadDate <- Date().timeIntervalSince1970
+            ))
+        } catch {
+            throw DatabaseError.updateFailed(table: "books", underlying: error)
+        }
     }
 
     func toggleFavorite(bookId id: UUID, isFavorite: Bool) throws {
-        guard let db = db else { return }
+        guard let db = db else { throw DatabaseError.connectionFailed(underlying: nil) }
 
-        let target = books.filter(bookId == id.uuidString)
-        try db.run(target.update(bookIsFavorite <- isFavorite))
+        do {
+            let target = books.filter(bookId == id.uuidString)
+            try db.run(target.update(bookIsFavorite <- isFavorite))
+        } catch {
+            throw DatabaseError.updateFailed(table: "books", underlying: error)
+        }
     }
 
     // MARK: - Category Operations
 
     func insertCategory(_ category: Category) throws {
-        guard let db = db else { return }
+        guard let db = db else { throw DatabaseError.connectionFailed(underlying: nil) }
 
-        let insert = categories.insert(
-            categoryId <- category.id.uuidString,
-            categoryName <- category.name,
-            categoryIconName <- category.iconName,
-            categoryColorHex <- category.colorHex
-        )
-        try db.run(insert)
+        do {
+            let insert = categories.insert(
+                categoryId <- category.id.uuidString,
+                categoryName <- category.name,
+                categoryIconName <- category.iconName,
+                categoryColorHex <- category.colorHex
+            )
+            try db.run(insert)
+        } catch {
+            throw DatabaseError.insertFailed(table: "categories", underlying: error)
+        }
     }
 
     func fetchAllCategories() -> [Category] {
@@ -325,40 +364,48 @@ actor DatabaseService {
                 results.append(category)
             }
         } catch {
-            print("Fetch categories failed: \(error)")
+            log(.fetchFailed(table: "categories", underlying: error), operation: "fetchAllCategories")
         }
         return results
     }
 
     func deleteCategory(_ category: Category) throws {
-        guard let db = db else { return }
+        guard let db = db else { throw DatabaseError.connectionFailed(underlying: nil) }
 
-        let target = categories.filter(categoryId == category.id.uuidString)
-        try db.run(target.delete())
+        do {
+            let target = categories.filter(categoryId == category.id.uuidString)
+            try db.run(target.delete())
 
-        try db.run("DELETE FROM book_category_relations WHERE category_id = ?", category.id.uuidString)
+            try db.run("DELETE FROM book_category_relations WHERE category_id = ?", category.id.uuidString)
+        } catch {
+            throw DatabaseError.deleteFailed(table: "categories", underlying: error)
+        }
     }
 
     // MARK: - Chapter Operations
 
     func insertChapters(_ chaptersList: [Chapter], forBookId bookIdValue: UUID) throws {
-        guard let db = db else { return }
+        guard let db = db else { throw DatabaseError.connectionFailed(underlying: nil) }
 
-        let existing = chapters.filter(chapterBookId == bookIdValue.uuidString)
-        try db.run(existing.delete())
+        do {
+            let existing = chapters.filter(chapterBookId == bookIdValue.uuidString)
+            try db.run(existing.delete())
 
-        try db.transaction {
-            for (index, chapter) in chaptersList.enumerated() {
-                let insert = chapters.insert(
-                    chapterId <- chapter.id.uuidString,
-                    chapterBookId <- bookIdValue.uuidString,
-                    chapterTitle <- chapter.title,
-                    chapterStartPage <- chapter.startPage,
-                    chapterEndPage <- chapter.endPage,
-                    chapterOrder <- index
-                )
-                try db.run(insert)
+            try db.transaction {
+                for (index, chapter) in chaptersList.enumerated() {
+                    let insert = chapters.insert(
+                        chapterId <- chapter.id.uuidString,
+                        chapterBookId <- bookIdValue.uuidString,
+                        chapterTitle <- chapter.title,
+                        chapterStartPage <- chapter.startPage,
+                        chapterEndPage <- chapter.endPage,
+                        chapterOrder <- index
+                    )
+                    try db.run(insert)
+                }
             }
+        } catch {
+            throw DatabaseError.transactionFailed(underlying: error)
         }
     }
 
@@ -380,7 +427,7 @@ actor DatabaseService {
                 results.append(chapter)
             }
         } catch {
-            print("Fetch chapters failed: \(error)")
+            log(.fetchFailed(table: "chapters", underlying: error), operation: "fetchChapters")
         }
         return results
     }
@@ -388,24 +435,32 @@ actor DatabaseService {
     // MARK: - Bookmark Operations
 
     func addBookmark(_ bookmark: Bookmark) throws {
-        guard let db = db else { return }
+        guard let db = db else { throw DatabaseError.connectionFailed(underlying: nil) }
 
-        let insert = bookmarks.insert(
-            bookmarkId <- bookmark.id.uuidString,
-            bookmarkBookId <- bookmark.bookId.uuidString,
-            bookmarkPage <- bookmark.page,
-            bookmarkChapterTitle <- bookmark.chapterTitle,
-            bookmarkContent <- bookmark.content,
-            bookmarkCreatedAt <- bookmark.createdAt.timeIntervalSince1970
-        )
-        try db.run(insert)
+        do {
+            let insert = bookmarks.insert(
+                bookmarkId <- bookmark.id.uuidString,
+                bookmarkBookId <- bookmark.bookId.uuidString,
+                bookmarkPage <- bookmark.page,
+                bookmarkChapterTitle <- bookmark.chapterTitle,
+                bookmarkContent <- bookmark.content,
+                bookmarkCreatedAt <- bookmark.createdAt.timeIntervalSince1970
+            )
+            try db.run(insert)
+        } catch {
+            throw DatabaseError.insertFailed(table: "bookmarks", underlying: error)
+        }
     }
 
     func removeBookmark(_ bookmark: Bookmark) throws {
-        guard let db = db else { return }
+        guard let db = db else { throw DatabaseError.connectionFailed(underlying: nil) }
 
-        let target = bookmarks.filter(bookmarkId == bookmark.id.uuidString)
-        try db.run(target.delete())
+        do {
+            let target = bookmarks.filter(bookmarkId == bookmark.id.uuidString)
+            try db.run(target.delete())
+        } catch {
+            throw DatabaseError.deleteFailed(table: "bookmarks", underlying: error)
+        }
     }
 
     func fetchBookmarks(forBookId bookIdValue: UUID) -> [Bookmark] {
@@ -428,7 +483,7 @@ actor DatabaseService {
                 results.append(bookmark)
             }
         } catch {
-            print("Fetch bookmarks failed: \(error)")
+            log(.fetchFailed(table: "bookmarks", underlying: error), operation: "fetchBookmarks")
         }
         return results
     }
@@ -447,18 +502,22 @@ actor DatabaseService {
     // MARK: - Reading Session Operations
 
     func insertReadingSession(_ session: ReadingSession) throws {
-        guard let db = db else { return }
+        guard let db = db else { throw DatabaseError.connectionFailed(underlying: nil) }
 
-        let insert = readingSessions.insert(
-            sessionId <- session.id.uuidString,
-            sessionBookId <- session.bookId.uuidString,
-            sessionBookTitle <- session.bookTitle,
-            sessionStartTime <- session.startTime.timeIntervalSince1970,
-            sessionEndTime <- session.endTime.timeIntervalSince1970,
-            sessionDuration <- session.duration,
-            sessionPagesRead <- session.pagesRead
-        )
-        try db.run(insert)
+        do {
+            let insert = readingSessions.insert(
+                sessionId <- session.id.uuidString,
+                sessionBookId <- session.bookId.uuidString,
+                sessionBookTitle <- session.bookTitle,
+                sessionStartTime <- session.startTime.timeIntervalSince1970,
+                sessionEndTime <- session.endTime.timeIntervalSince1970,
+                sessionDuration <- session.duration,
+                sessionPagesRead <- session.pagesRead
+            )
+            try db.run(insert)
+        } catch {
+            throw DatabaseError.insertFailed(table: "reading_sessions", underlying: error)
+        }
     }
 
     func fetchAllSessions() -> [ReadingSession] {
@@ -472,7 +531,7 @@ actor DatabaseService {
                 }
             }
         } catch {
-            print("Fetch reading sessions failed: \(error)")
+            log(.fetchFailed(table: "reading_sessions", underlying: error), operation: "fetchAllSessions")
         }
         return results
     }
@@ -505,7 +564,7 @@ actor DatabaseService {
                 }
             }
         } catch {
-            print("Fetch reading sessions failed: \(error)")
+            log(.fetchFailed(table: "reading_sessions", underlying: error), operation: "fetchSessions(from:to:)")
         }
         return results
     }
@@ -533,7 +592,7 @@ actor DatabaseService {
             let total: Double? = try db.scalar(readingSessions.select(sessionDuration.sum))
             return Int((total ?? 0) / 60)
         } catch {
-            print("Fetch total reading minutes failed: \(error)")
+            log(.fetchFailed(table: "reading_sessions", underlying: error), operation: "fetchTotalReadingMinutes")
             return 0
         }
     }
@@ -547,9 +606,11 @@ actor DatabaseService {
 
         var todayDuration: TimeInterval = 0
         var weekDuration: TimeInterval = 0
+        var totalDuration: TimeInterval = 0
 
         for session in allSessions {
             let start = session.startTime.timeIntervalSince1970
+            totalDuration += session.duration
             if start >= startOfDay && start < endOfDay {
                 todayDuration += session.duration
             }
@@ -561,7 +622,7 @@ actor DatabaseService {
         return ReadingStatistics(
             todayMinutes: Int(todayDuration / 60),
             weekMinutes: Int(weekDuration / 60),
-            totalMinutes: fetchTotalReadingMinutes(),
+            totalMinutes: Int(totalDuration / 60),
             streakDays: computeStreakDays(from: allSessions),
             recentBookStats: computeBookStats(from: allSessions)
         )
@@ -615,17 +676,25 @@ actor DatabaseService {
     // MARK: - Relations
 
     func addBookToCategory(bookId bookIdValue: UUID, categoryId catId: UUID) throws {
-        guard let db = db else { return }
+        guard let db = db else { throw DatabaseError.connectionFailed(underlying: nil) }
 
-        try db.run("INSERT OR IGNORE INTO book_category_relations (book_id, category_id) VALUES (?, ?)",
-                   bookIdValue.uuidString, catId.uuidString)
+        do {
+            try db.run("INSERT OR IGNORE INTO book_category_relations (book_id, category_id) VALUES (?, ?)",
+                       bookIdValue.uuidString, catId.uuidString)
+        } catch {
+            throw DatabaseError.insertFailed(table: "book_category_relations", underlying: error)
+        }
     }
 
     func removeBookFromCategory(bookId bookIdValue: UUID, categoryId catId: UUID) throws {
-        guard let db = db else { return }
+        guard let db = db else { throw DatabaseError.connectionFailed(underlying: nil) }
 
-        try db.run("DELETE FROM book_category_relations WHERE book_id = ? AND category_id = ?",
-                   bookIdValue.uuidString, catId.uuidString)
+        do {
+            try db.run("DELETE FROM book_category_relations WHERE book_id = ? AND category_id = ?",
+                       bookIdValue.uuidString, catId.uuidString)
+        } catch {
+            throw DatabaseError.deleteFailed(table: "book_category_relations", underlying: error)
+        }
     }
 
     // MARK: - Default Categories

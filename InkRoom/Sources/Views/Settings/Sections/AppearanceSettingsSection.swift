@@ -24,7 +24,7 @@ struct AppearanceSettingsSection: View {
         } header: {
             Text("外观")
                 .textCase(nil)
-                .foregroundColor(.inkRoomTextSecondary)
+                .foregroundStyle(Color.inkRoomTextSecondary)
         } footer: {
             if settingsViewModel.followSystemTheme {
                 Text("开启跟随系统后，将自动使用系统当前的外观设置")
@@ -50,12 +50,12 @@ struct AppearanceSettingsSection: View {
 
                     Image(systemName: icon)
                         .font(.system(size: 14))
-                        .foregroundColor(color)
+                        .foregroundStyle(color)
                 }
 
                 Text(title)
             }
         }
-        .tint(.inkRoomPrimary)
+        .tint(Color.inkRoomPrimary)
     }
 }

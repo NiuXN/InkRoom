@@ -54,7 +54,7 @@ struct InkRoomButton: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
             .background(style.backgroundColor)
-            .cornerRadius(12)
+            .clipShape(.rect(cornerRadius: 12))
         }
     }
 }

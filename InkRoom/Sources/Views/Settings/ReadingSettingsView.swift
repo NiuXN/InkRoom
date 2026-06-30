@@ -23,7 +23,7 @@ struct ReadingSettingsView: View {
                             Text("A")
                                 .font(.system(size: 24))
                         }
-                        .foregroundColor(.inkRoomTextTertiary)
+                        .foregroundStyle(Color.inkRoomTextTertiary)
 
                         Slider(
                             value: Binding(
@@ -33,20 +33,20 @@ struct ReadingSettingsView: View {
                             in: 12...28,
                             step: 1
                         )
-                        .tint(.inkRoomPrimary)
+                        .tint(Color.inkRoomPrimary)
 
                         HStack {
                             Text("小")
                                 .font(.system(size: 11))
-                                .foregroundColor(.inkRoomTextTertiary)
+                                .foregroundStyle(Color.inkRoomTextTertiary)
                             Spacer()
                             Text("当前: \(settingsViewModel.readingFontSize)pt")
                                 .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(.inkRoomPrimary)
+                                .foregroundStyle(Color.inkRoomPrimary)
                             Spacer()
                             Text("大")
                                 .font(.system(size: 11))
-                                .foregroundColor(.inkRoomTextTertiary)
+                                .foregroundStyle(Color.inkRoomTextTertiary)
                         }
                     }
                 }
@@ -65,20 +65,20 @@ struct ReadingSettingsView: View {
                             in: 0...15,
                             step: 1
                         )
-                        .tint(.inkRoomPrimary)
+                        .tint(Color.inkRoomPrimary)
 
                         HStack {
                             Text("紧凑")
                                 .font(.system(size: 11))
-                                .foregroundColor(.inkRoomTextTertiary)
+                                .foregroundStyle(Color.inkRoomTextTertiary)
                             Spacer()
                             Text("当前: \(settingsViewModel.readingLineSpacing)")
                                 .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(.inkRoomPrimary)
+                                .foregroundStyle(Color.inkRoomPrimary)
                             Spacer()
                             Text("宽松")
                                 .font(.system(size: 11))
-                                .foregroundColor(.inkRoomTextTertiary)
+                                .foregroundStyle(Color.inkRoomTextTertiary)
                         }
                     }
                 }
@@ -91,26 +91,26 @@ struct ReadingSettingsView: View {
                     VStack(spacing: 12) {
                         Slider(
                             value: Binding(
-                                get: { Double(settingsViewModel.readingLetterSpacing) },
-                                set: { settingsViewModel.readingLetterSpacing = Int($0) }
+                                get: { settingsViewModel.readingLetterSpacing },
+                                set: { settingsViewModel.readingLetterSpacing = $0 }
                             ),
-                            in: -2...8,
-                            step: 1
+                            in: 0...10,
+                            step: 0.5
                         )
-                        .tint(.inkRoomPrimary)
+                        .tint(Color.inkRoomPrimary)
 
                         HStack {
                             Text("紧凑")
                                 .font(.system(size: 11))
-                                .foregroundColor(.inkRoomTextTertiary)
+                                .foregroundStyle(Color.inkRoomTextTertiary)
                             Spacer()
-                            Text("当前: \(settingsViewModel.readingLetterSpacing)")
+                            Text(String(format: "当前: %.1f", settingsViewModel.readingLetterSpacing))
                                 .font(.system(size: 11, weight: .medium))
-                                .foregroundColor(.inkRoomPrimary)
+                                .foregroundStyle(Color.inkRoomPrimary)
                             Spacer()
                             Text("宽松")
                                 .font(.system(size: 11))
-                                .foregroundColor(.inkRoomTextTertiary)
+                                .foregroundStyle(Color.inkRoomTextTertiary)
                         }
                     }
                 }
@@ -151,31 +151,32 @@ struct ReadingSettingsView: View {
 
     private var previewCard: some View {
         let bgColor = Color(hex: settingsViewModel.readerTheme.backgroundColor) ?? .readerBackgroundLight
-        let textColor = Color(hex: settingsViewModel.readerTheme.textColor) ?? .inkRoomTextPrimary
+        let textColor = Color(hex: settingsViewModel.readerTheme.textColor) ?? Color.inkRoomTextPrimary
 
         return VStack(alignment: .leading, spacing: CGFloat(settingsViewModel.readingLineSpacing)) {
             Text("墨斋 InkRoom")
                 .font(.system(size: CGFloat(settingsViewModel.readingFontSize), weight: .medium))
-                .foregroundColor(textColor)
+                .foregroundStyle(textColor)
 
             Text("东方禅意 · 水墨书房 · iOS 阅读器")
                 .font(.system(size: CGFloat(settingsViewModel.readingFontSize - 2)))
-                .foregroundColor(textColor.opacity(0.7))
+                .foregroundStyle(textColor.opacity(0.7))
 
             Text("在繁忙的生活中，阅读是一种难得的宁静。一本好书，如同一杯清茶，让人回味无穷。")
                 .font(.system(size: CGFloat(settingsViewModel.readingFontSize - 4)))
-                .foregroundColor(textColor.opacity(0.6))
+                .foregroundStyle(textColor.opacity(0.6))
                 .lineSpacing(4)
+                .tracking(CGFloat(settingsViewModel.readingLetterSpacing) * 0.1)
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(bgColor)
-        .cornerRadius(12)
+        .clipShape(.rect(cornerRadius: 12))
         .shadow(color: .black.opacity(0.05), radius: 8, y: 2)
-        .overlay(
+        .overlay {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Color.inkRoomTextTertiary.opacity(0.1), lineWidth: 0.5)
-        )
+        }
     }
 
     private func settingsSection<Content: View>(
@@ -187,17 +188,17 @@ struct ReadingSettingsView: View {
             HStack(spacing: 8) {
                 Image(safeSystemName: icon)
                     .font(.system(size: 14))
-                    .foregroundColor(.inkRoomPrimary)
+                    .foregroundStyle(Color.inkRoomPrimary)
 
                 Text(title)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.inkRoomTextPrimary)
+                    .foregroundStyle(Color.inkRoomTextPrimary)
             }
 
             content()
                 .padding(16)
                 .background(Color.inkRoomCard)
-                .cornerRadius(12)
+                .clipShape(.rect(cornerRadius: 12))
         }
     }
 
@@ -222,10 +223,12 @@ struct ReadingSettingsView: View {
 
                 Text(theme.rawValue)
                     .font(.system(size: 11))
-                    .foregroundColor(isSelected ? .inkRoomPrimary : .inkRoomTextSecondary)
+                    .foregroundStyle(isSelected ? Color.inkRoomPrimary : Color.inkRoomTextSecondary)
             }
         }
         .frame(maxWidth: .infinity)
+        .accessibilityLabel("\(theme.rawValue)主题")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     private func pageTurnButton(_ style: ReadingSettings.PageTurnStyle) -> some View {
@@ -236,13 +239,15 @@ struct ReadingSettingsView: View {
         } label: {
             Text(style.rawValue)
                 .font(.system(size: 13, weight: .medium))
-                .foregroundColor(isSelected ? .white : .inkRoomTextSecondary)
+                .foregroundStyle(isSelected ? .white : Color.inkRoomTextSecondary)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
                 .background(isSelected ? Color.inkRoomPrimary : Color.inkRoomBackgroundElevated)
-                .cornerRadius(8)
+                .clipShape(.rect(cornerRadius: 8))
         }
         .frame(maxWidth: .infinity)
+        .accessibilityLabel("\(style.rawValue)翻页方式")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

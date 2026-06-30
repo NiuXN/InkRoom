@@ -25,9 +25,9 @@
 
 | 平台 | 版本要求 | 状态 |
 |------|---------|------|
-| iOS | 17.0+ | ✅ 支持 |
-| iPadOS | 17.0+ | ✅ 支持 |
-| macOS | 14.0+ | ✅ 支持 |
+| iOS | 18.0+ | ✅ 支持 |
+| iPadOS | 18.0+ | ✅ 支持 |
+| macOS | 15.0+ | ✅ 支持 |
 
 ---
 
@@ -36,8 +36,8 @@
 ### 环境要求
 
 - Xcode 16.0+
-- Swift 5.9+
-- iOS 17.0+ / macOS 14.0+
+- Swift 6.0+
+- iOS 18.0+ / macOS 15.0+
 
 ### 安装依赖
 
@@ -66,7 +66,7 @@ xcodegen generate
 
 | 项目 | 要求 |
 |------|------|
-| macOS | 14.0+（推荐最新版） |
+| macOS | 15.0+（推荐最新版） |
 | Xcode | 16.0+ |
 | 命令行工具 | `xcode-select --install` |
 | XcodeGen | `brew install xcodegen` |

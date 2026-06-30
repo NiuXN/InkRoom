@@ -38,7 +38,7 @@ struct ReadingSettingsSection: View {
         } header: {
             Text("阅读")
                 .textCase(nil)
-                .foregroundColor(.inkRoomTextSecondary)
+                .foregroundStyle(Color.inkRoomTextSecondary)
         }
         .listRowBackground(Color.inkRoomCard)
     }
@@ -65,7 +65,7 @@ struct ReadingSettingsSection: View {
 
                 Image(systemName: icon)
                     .font(.system(size: 14))
-                    .foregroundColor(.inkRoomPrimary)
+                    .foregroundStyle(Color.inkRoomPrimary)
             }
 
             Text(title)
@@ -73,7 +73,7 @@ struct ReadingSettingsSection: View {
             if let value = value {
                 Spacer()
                 Text(value)
-                    .foregroundColor(.inkRoomTextTertiary)
+                    .foregroundStyle(Color.inkRoomTextTertiary)
             }
         }
     }

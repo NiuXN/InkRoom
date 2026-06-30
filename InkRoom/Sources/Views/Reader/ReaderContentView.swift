@@ -28,29 +28,35 @@ struct ReaderContentView: View {
                 
                 if !isScrollMode {
                     HStack(spacing: 0) {
-                        Color.clear
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                if settingsViewModel.pageTurnStyle == .tap || settingsViewModel.pageTurnStyle == .swipe {
-                                    onPrevPage()
-                                }
+                        Button {
+                            if settingsViewModel.pageTurnStyle == .tap || settingsViewModel.pageTurnStyle == .swipe {
+                                onPrevPage()
                             }
+                        } label: {
+                            Color.clear
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("上一页")
                         
-                        Color.clear
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    onToggleHeader()
-                                }
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                onToggleHeader()
                             }
+                        } label: {
+                            Color.clear
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("切换工具栏")
                         
-                        Color.clear
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                if settingsViewModel.pageTurnStyle == .tap || settingsViewModel.pageTurnStyle == .swipe {
-                                    onNextPage()
-                                }
+                        Button {
+                            if settingsViewModel.pageTurnStyle == .tap || settingsViewModel.pageTurnStyle == .swipe {
+                                onNextPage()
                             }
+                        } label: {
+                            Color.clear
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("下一页")
                     }
                 }
             }
@@ -93,7 +99,7 @@ struct ReaderContentView: View {
     private func scrollContentView(maxWidth: CGFloat) -> some View {
         ScrollViewReader { proxy in
             ScrollView {
-                VStack(alignment: .leading, spacing: CGFloat(settingsViewModel.readingLineSpacing)) {
+                LazyVStack(alignment: .leading, spacing: CGFloat(settingsViewModel.readingLineSpacing)) {
                     if readerVM.isLoading {
                         ProgressView()
                             .progressViewStyle(.circular)
@@ -172,9 +178,9 @@ struct ReaderContentView: View {
     
     private func highlightedText(original: String, range: Range<String.Index>) -> AttributedString {
         var attributed = AttributedString(original)
-        if let attrRange = attributed.range(of: String(original[range])) {
-            var highlightColor = Color.inkRoomPrimary
-            attributed[attrRange].foregroundColor = highlightColor
+        let nsRange = NSRange(range, in: original)
+        if let attrRange = Range(nsRange, in: attributed) {
+            attributed[attrRange].foregroundColor = Color.inkRoomPrimary
             attributed[attrRange].font = .system(size: CGFloat(settingsViewModel.readingFontSize), weight: .semibold)
         }
         return attributed

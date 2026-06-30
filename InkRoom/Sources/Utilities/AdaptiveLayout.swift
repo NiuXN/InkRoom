@@ -45,13 +45,14 @@ extension EnvironmentValues {
     }
 }
 
-private struct LayoutInfo: Equatable {
+private struct LayoutInfo: Equatable, Sendable {
     let sizeClass: LayoutSizeClass
     let isLandscape: Bool
 }
 
 private struct LayoutInfoKey: PreferenceKey {
-    static var defaultValue: LayoutInfo = LayoutInfo(sizeClass: .compact, isLandscape: false)
+    // PreferenceKey 协议要求 `var`，但此默认值是不可变快照，标记为 nonisolated(unsafe) 以满足 Swift 6 并发检查。
+    nonisolated(unsafe) static var defaultValue: LayoutInfo = LayoutInfo(sizeClass: .compact, isLandscape: false)
 
     static func reduce(value: inout LayoutInfo, nextValue: () -> LayoutInfo) {
         value = nextValue()

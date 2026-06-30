@@ -26,6 +26,7 @@
 		1CF4DCF4CC751222FC0A83A8 /* ProUpgradeSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B253342E3D38D476B66A2875 /* ProUpgradeSection.swift */; };
 		1E68A6F42F1D3DCC7CA5EBA2 /* InkRoomWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4D7166A5B5CFFCEFC0F53A /* InkRoomWidgetView.swift */; };
 		1F2A6B81BD863DB762BFFF36 /* AppVersionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 799B14DBA760EDA9B28CEB48 /* AppVersionTests.swift */; };
+		1FCDCA7B5068E530E0FD9825 /* PageCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7108EEAA36BA7491C56913BE /* PageCalculator.swift */; };
 		20FF1DE6BB89887CA4BF75A2 /* CoverImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A519F26E06B5525CF10C42B /* CoverImageCache.swift */; };
 		21F488DC4A86E1CD6CB63E7C /* TextEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316CB2986C5AFEF112472A38 /* TextEncoding.swift */; };
 		22EDAE3BE8F64F3C714AB898 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 776432DF5DFC4EAEDDB41BAC /* SQLite */; };
@@ -66,6 +67,7 @@
 		60CD58A22C2418B6F7C2C1E8 /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6B019BA3EF4FC3FAAA59DF7 /* Book.swift */; };
 		61847D2FBFACB791F131A269 /* ScrollReadingPositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FED2129022C05A3EBD968696 /* ScrollReadingPositionTests.swift */; };
 		61B54A1AB4D4741E07D60C63 /* QRCodeGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E960652FAF9EA727CFC10C /* QRCodeGenerator.swift */; };
+		623F9E709E1641F821F47D72 /* PageCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E1A0A0C2428578277AEBFE4 /* PageCalculatorTests.swift */; };
 		645011CFEF13EE2EEC76EADB /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646048B33D21356443CCAF5F /* CategoriesView.swift */; };
 		656CB10FA3946DFEFD550518 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93723830DEE0C8766683CFD /* ContentView.swift */; };
 		66A12DF399D5585A53487BF0 /* AppStoreUpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 190436AA1DCBD604112569DC /* AppStoreUpdateService.swift */; };
@@ -91,6 +93,7 @@
 		81DBB363D2AE990AE43AF15C /* ReaderTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7346398646390D4EA5C9E04D /* ReaderTypes.swift */; };
 		87567EE0730A2C0C0FE4B568 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A450D34BFC6C498DF40F2F /* DurationFormatter.swift */; };
 		8798EF4571A52D3ACB5E63C0 /* ReadingSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33134106B2AD2E30D028FBC4 /* ReadingSettingsSection.swift */; };
+		8E32AEA9E8DAEF71FBAB701D /* PageCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7108EEAA36BA7491C56913BE /* PageCalculator.swift */; };
 		8F08232326DF5A5E604502E8 /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646048B33D21356443CCAF5F /* CategoriesView.swift */; };
 		917B5185008F8CDC81C05D17 /* ReaderTTSPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E37E0E004147593EC52B4619 /* ReaderTTSPanel.swift */; };
 		91C22F9BAF7184A913F76C41 /* InkRoomWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09328011300025A77511F75F /* InkRoomWidgetBundle.swift */; };
@@ -151,6 +154,7 @@
 		E6B1928207BF93E002E51C4B /* WidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D08BCE0F9CD987A2CE3D965 /* WidgetData.swift */; };
 		E6D14FC4DE00954AB1D050BB /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B4C8DB54DC1C205C3D23F2 /* ImportView.swift */; };
 		EB86C4723276988143C151AA /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A026A3802E382F2004003C0 /* SettingsViewModel.swift */; };
+		EC1DC8C20F4EC934CAFB7EE8 /* PageCalculatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E1A0A0C2428578277AEBFE4 /* PageCalculatorTests.swift */; };
 		EF14193444C9B615B9D5EBE8 /* ProUpgradeSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = B253342E3D38D476B66A2875 /* ProUpgradeSection.swift */; };
 		F0068A6E0CD4C4A01091834D /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0469B5F9143E266C1E019C37 /* StatisticsView.swift */; };
 		F216C2718F24B1FFB4C80BD0 /* WidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D08BCE0F9CD987A2CE3D965 /* WidgetData.swift */; };
@@ -216,9 +220,11 @@
 		68A450D34BFC6C498DF40F2F /* DurationFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationFormatter.swift; sourceTree = "<group>"; };
 		6D08BCE0F9CD987A2CE3D965 /* WidgetData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetData.swift; sourceTree = "<group>"; };
 		6EA68764EABD7F5887405FF1 /* ReadingSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingSettings.swift; sourceTree = "<group>"; };
+		7108EEAA36BA7491C56913BE /* PageCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageCalculator.swift; sourceTree = "<group>"; };
 		7346398646390D4EA5C9E04D /* ReaderTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderTypes.swift; sourceTree = "<group>"; };
 		799B14DBA760EDA9B28CEB48 /* AppVersionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionTests.swift; sourceTree = "<group>"; };
 		7A21D632F55683E65FF6B345 /* DatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseService.swift; sourceTree = "<group>"; };
+		7E1A0A0C2428578277AEBFE4 /* PageCalculatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageCalculatorTests.swift; sourceTree = "<group>"; };
 		7FC3D6601A47A2859F2BCB48 /* InkRoomWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = InkRoomWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		81CD4D24CA0A3E78F8034D22 /* MainTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBar.swift; sourceTree = "<group>"; };
 		83501658714A74A25DD9712B /* ReadingSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingSession.swift; sourceTree = "<group>"; };
@@ -292,6 +298,7 @@
 				A89577F804A936312A57AF0A /* BookFilterTests.swift */,
 				5E1FA2C170125EEA1F881A58 /* BookModelTests.swift */,
 				C898E6AAFA21B07F59EFD497 /* DurationFormatterTests.swift */,
+				7E1A0A0C2428578277AEBFE4 /* PageCalculatorTests.swift */,
 				FED2129022C05A3EBD968696 /* ScrollReadingPositionTests.swift */,
 			);
 			path = Tests;
@@ -520,6 +527,7 @@
 				9CF052A273B06CD7C3E92BED /* EPUBXMLParser.swift */,
 				CBE0675E6CC80142B0566359 /* GridLayoutHelper.swift */,
 				1570387C5699022953783953 /* HTMLEntityDecoder.swift */,
+				7108EEAA36BA7491C56913BE /* PageCalculator.swift */,
 				C1E960652FAF9EA727CFC10C /* QRCodeGenerator.swift */,
 				50D8A511FD9B1D28B9BDAAAC /* ScrollReadingPosition.swift */,
 				AB7A897E5D1D8B41EAEF23EF /* SFSymbolCompat.swift */,
@@ -750,6 +758,7 @@
 				95548343AE715515C892D101 /* BookFilterTests.swift in Sources */,
 				AFEB8234A55D439A63D5B57D /* BookModelTests.swift in Sources */,
 				5CA4278115A3794EDCEB1413 /* DurationFormatterTests.swift in Sources */,
+				EC1DC8C20F4EC934CAFB7EE8 /* PageCalculatorTests.swift in Sources */,
 				29A3BF091103A9CFAC739AF4 /* ScrollReadingPositionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -793,6 +802,7 @@
 				28B56C38732D84FDC0575D99 /* LibraryView.swift in Sources */,
 				E3F156ACAEA7C2DB80657F93 /* LibraryViewModel.swift in Sources */,
 				9534F770F8D9EC7416C861A4 /* MainTabBar.swift in Sources */,
+				1FCDCA7B5068E530E0FD9825 /* PageCalculator.swift in Sources */,
 				1CF4DCF4CC751222FC0A83A8 /* ProUpgradeSection.swift in Sources */,
 				61B54A1AB4D4741E07D60C63 /* QRCodeGenerator.swift in Sources */,
 				0219982605E24B49F69961CC /* ReaderBottomBar.swift in Sources */,
@@ -832,6 +842,7 @@
 				180137E36B4EEB8D0BBD33C1 /* BookFilterTests.swift in Sources */,
 				721550F6468B41E4E6EA2B0A /* BookModelTests.swift in Sources */,
 				34263DD867943DD299444015 /* DurationFormatterTests.swift in Sources */,
+				623F9E709E1641F821F47D72 /* PageCalculatorTests.swift in Sources */,
 				61847D2FBFACB791F131A269 /* ScrollReadingPositionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -887,6 +898,7 @@
 				F9853BC2A531EA5E1017408C /* LibraryView.swift in Sources */,
 				31192FFFBDE18693ED8BAC85 /* LibraryViewModel.swift in Sources */,
 				964B797C844CAA0AD75264AB /* MainTabBar.swift in Sources */,
+				8E32AEA9E8DAEF71FBAB701D /* PageCalculator.swift in Sources */,
 				EF14193444C9B615B9D5EBE8 /* ProUpgradeSection.swift in Sources */,
 				769284F985AA0F1D69CF8B6D /* QRCodeGenerator.swift in Sources */,
 				AE455F2845FD3FDBAC0FD74D /* ReaderBottomBar.swift in Sources */,
@@ -1205,15 +1217,15 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.9;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
@@ -1310,8 +1322,8 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -1319,7 +1331,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.9;
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};

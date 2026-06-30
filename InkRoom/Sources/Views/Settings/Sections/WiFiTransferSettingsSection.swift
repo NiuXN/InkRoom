@@ -24,7 +24,7 @@ struct WiFiTransferSettingsSection: View {
 
                         Image(systemName: "wifi")
                             .font(.system(size: 14))
-                            .foregroundColor(.inkRoomPrimary)
+                            .foregroundStyle(Color.inkRoomPrimary)
                     }
 
                     VStack(alignment: .leading, spacing: 2) {
@@ -33,12 +33,12 @@ struct WiFiTransferSettingsSection: View {
                         if settingsViewModel.wifiTransferEnabled && !wifiService.ipAddress.isEmpty {
                             Text(wifiService.ipAddress)
                                 .font(.system(size: 11))
-                                .foregroundColor(.stateSuccess)
+                                .foregroundStyle(Color.stateSuccess)
                         }
                     }
                 }
             }
-            .tint(.inkRoomPrimary)
+            .tint(Color.inkRoomPrimary)
 
             NavigationLink {
                 WiFiTransferDetailView()
@@ -53,7 +53,7 @@ struct WiFiTransferSettingsSection: View {
         } header: {
             Text("传书")
                 .textCase(nil)
-                .foregroundColor(.inkRoomTextSecondary)
+                .foregroundStyle(Color.inkRoomTextSecondary)
         } footer: {
             if settingsViewModel.wifiTransferEnabled {
                 Text("在电脑浏览器中输入上方地址，即可上传书籍")
@@ -76,7 +76,7 @@ struct WiFiTransferSettingsSection: View {
 
                 Image(systemName: icon)
                     .font(.system(size: 14))
-                    .foregroundColor(.inkRoomPrimary)
+                    .foregroundStyle(Color.inkRoomPrimary)
             }
 
             Text(title)
@@ -84,7 +84,7 @@ struct WiFiTransferSettingsSection: View {
             if let value = value {
                 Spacer()
                 Text(value)
-                    .foregroundColor(.inkRoomTextTertiary)
+                    .foregroundStyle(Color.inkRoomTextTertiary)
             }
         }
     }
@@ -116,13 +116,13 @@ struct WiFiTransferDetailView: View {
                     Text("IP 地址")
                     Spacer()
                     Text(wifiService.ipAddress)
-                        .foregroundColor(.inkRoomTextTertiary)
+                        .foregroundStyle(Color.inkRoomTextTertiary)
                 }
                 HStack {
                     Text("端口")
                     Spacer()
                     Text(":8080")
-                        .foregroundColor(.inkRoomTextTertiary)
+                        .foregroundStyle(Color.inkRoomTextTertiary)
                 }
             } header: {
                 Text("连接信息")
@@ -137,10 +137,10 @@ struct WiFiTransferDetailView: View {
                         VStack(spacing: 8) {
                             Image(systemName: "tray")
                                 .font(.system(size: 32))
-                                .foregroundColor(.inkRoomTextTertiary)
+                                .foregroundStyle(Color.inkRoomTextTertiary)
                             Text("暂无上传记录")
                                 .font(.system(size: 14))
-                                .foregroundColor(.inkRoomTextTertiary)
+                                .foregroundStyle(Color.inkRoomTextTertiary)
                         }
                         .padding(.vertical, 24)
                         Spacer()
@@ -182,24 +182,24 @@ struct UploadedFileRow: View {
 
                 Image(systemName: "doc")
                     .font(.system(size: 14))
-                    .foregroundColor(.inkRoomPrimary)
+                    .foregroundStyle(Color.inkRoomPrimary)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(file.fileName)
                     .font(.system(size: 14))
-                    .foregroundColor(.inkRoomTextPrimary)
+                    .foregroundStyle(Color.inkRoomTextPrimary)
                     .lineLimit(1)
 
                 Text("\(ByteCountFormatter.string(fromByteCount: file.size, countStyle: .file)) · \(file.uploadedAt.formatted(.dateTime.hour().minute()))")
                     .font(.system(size: 11))
-                    .foregroundColor(.inkRoomTextTertiary)
+                    .foregroundStyle(Color.inkRoomTextTertiary)
             }
 
             Spacer()
 
             Image(systemName: "checkmark.circle.fill")
-                .foregroundColor(.stateSuccess)
+                .foregroundStyle(Color.stateSuccess)
         }
     }
 }

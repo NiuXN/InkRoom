@@ -265,16 +265,19 @@ extension TTSService: @preconcurrency AVSpeechSynthesizerDelegate {
     }
     
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, willSpeakRangeOfSpeechString characterRange: NSRange, utterance: AVSpeechUtterance) {
+        // AVSpeechUtterance 非 Sendable，不能跨 actor 传递。
+        // 在 nonisolated 上下文先提取所需 Sendable 数据，再切到 MainActor。
+        let text = utterance.speechString
+        let rate = utterance.rate
         Task { @MainActor in
             self.currentSentenceRange = characterRange
-            let text = utterance.speechString
             if let range = Range(characterRange, in: text) {
                 let sentence = String(text[range])
                 self.onSentenceChange?(characterRange, sentence)
             }
             // Update lock screen progress periodically
             let progress = Double(characterRange.location) / Double(text.count)
-            let estimatedDuration = TimeInterval(text.count) * 0.05 / Double(utterance.rate)
+            let estimatedDuration = TimeInterval(text.count) * 0.05 / Double(rate)
             let elapsedTime = estimatedDuration * progress
             self.updateNowPlayingInfo(playbackPosition: elapsedTime)
         }

@@ -7,7 +7,7 @@ class SettingsViewModel: ObservableObject {
     @AppStorage("followSystemTheme") var followSystemTheme: Bool = false
     @AppStorage("readingFontSize") var readingFontSize: Int = 18
     @AppStorage("readingLineSpacing") var readingLineSpacing: Int = 8
-    @AppStorage("readingLetterSpacing") var readingLetterSpacing: Int = 0
+    @AppStorage("readingLetterSpacing") var readingLetterSpacing: Double = 0.0
     @AppStorage("readerTheme") var readerThemeRaw: String = ReadingSettings.ReaderTheme.light.rawValue
     @AppStorage("pageTurnStyle") var pageTurnStyleRaw: String = ReadingSettings.PageTurnStyle.swipe.rawValue
     @AppStorage("wifiTransferEnabled") var wifiTransferEnabled: Bool = true

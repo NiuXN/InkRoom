@@ -223,7 +223,7 @@ struct ReaderTOCSidebar: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .background(Color.inkRoomBackgroundElevated)
-        .cornerRadius(8)
+        .clipShape(.rect(cornerRadius: 8))
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
     }
@@ -279,9 +279,10 @@ struct ReaderTOCSidebar: View {
             isSearching = false
             return
         }
-        let delay: UInt64 = immediate ? 0 : 300_000_000
         searchTask = Task {
-            try? await Task.sleep(nanoseconds: delay)
+            if !immediate {
+                try? await Task.sleep(for: .milliseconds(300))
+            }
             if Task.isCancelled { return }
             await performSearch(query: query)
         }

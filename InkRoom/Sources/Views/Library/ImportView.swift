@@ -92,11 +92,11 @@ struct ImportView: View {
             HStack(spacing: 8) {
                 Image(systemName: "wifi")
                     .font(.system(size: 18))
-                    .foregroundColor(.inkRoomPrimary)
+                    .foregroundStyle(Color.inkRoomPrimary)
 
                 Text("Wi-Fi 传书")
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.inkRoomTextPrimary)
+                    .foregroundStyle(Color.inkRoomTextPrimary)
 
                 Spacer()
 
@@ -107,7 +107,7 @@ struct ImportView: View {
 
                     Text(wifiService.isRunning ? "已开启" : "未开启")
                         .font(.system(size: 12))
-                        .foregroundColor(wifiService.isRunning ? .stateSuccess : .inkRoomTextTertiary)
+                        .foregroundStyle(wifiService.isRunning ? .stateSuccess : Color.inkRoomTextTertiary)
                 }
             }
 
@@ -115,7 +115,7 @@ struct ImportView: View {
                  ? "确保手机与电脑在同一 Wi-Fi 网络下"
                  : "请在「我的 → 传书」中开启 Wi-Fi 传书")
                 .font(.system(size: 13))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
 
             if wifiService.isRunning {
                 let transferURL = wifiService.ipAddress.isEmpty
@@ -128,28 +128,28 @@ struct ImportView: View {
                             QRCodeView(content: transferURL, size: 100)
                                 .padding(8)
                                 .background(Color.white)
-                                .cornerRadius(8)
+                                .clipShape(.rect(cornerRadius: 8))
 
                             Text("扫码传书")
                                 .font(.system(size: 11))
-                                .foregroundColor(.inkRoomTextTertiary)
+                                .foregroundStyle(Color.inkRoomTextTertiary)
                         }
                     }
 
                     VStack(spacing: 4) {
                         Text(wifiService.ipAddress.isEmpty ? "正在获取..." : transferURL.replacingOccurrences(of: "http://", with: ""))
                             .font(.system(size: 20, weight: .medium, design: .monospaced))
-                            .foregroundColor(.white)
+                            .foregroundStyle(.white)
                             .multilineTextAlignment(.center)
 
                         Text("在电脑浏览器中输入此地址")
                             .font(.system(size: 11))
-                            .foregroundColor(.white.opacity(0.8))
+                            .foregroundStyle(.white.opacity(0.8))
                     }
                     .padding(.horizontal, 20)
                     .padding(.vertical, 16)
                     .background(Color.inkRoomPrimary)
-                    .cornerRadius(10)
+                    .clipShape(.rect(cornerRadius: 10))
                     .shadow(color: Color.inkRoomPrimary.opacity(0.3), radius: 8, y: 2)
                 }
                 .frame(maxWidth: .infinity)
@@ -157,7 +157,7 @@ struct ImportView: View {
         }
         .padding(16)
         .background(Color.inkRoomCard)
-        .cornerRadius(12)
+        .clipShape(.rect(cornerRadius: 12))
     }
 
     private var uploadArea: some View {
@@ -167,22 +167,22 @@ struct ImportView: View {
             VStack(spacing: 12) {
                 Image(systemName: "square.and.arrow.down")
                     .font(.system(size: 32))
-                    .foregroundColor(.inkRoomTextTertiary)
+                    .foregroundStyle(Color.inkRoomTextTertiary)
 
                 Text("选择文件导入")
                     .font(.system(size: 15))
-                    .foregroundColor(.inkRoomTextSecondary)
+                    .foregroundStyle(Color.inkRoomTextSecondary)
 
                 Text(".epub  .txt")
                     .font(.system(size: 12))
-                    .foregroundColor(.inkRoomTextTertiary)
+                    .foregroundStyle(Color.inkRoomTextTertiary)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 40)
             .background(
                 RoundedRectangle(cornerRadius: 12)
                     .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [8, 4]))
-                    .foregroundColor(.inkRoomTextTertiary.opacity(0.5))
+                    .foregroundStyle(Color.inkRoomTextTertiary.opacity(0.5))
             )
         }
         .buttonStyle(.plain)
@@ -217,7 +217,7 @@ struct ImportView: View {
             HStack {
                 Text("导入任务")
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.inkRoomTextSecondary)
+                    .foregroundStyle(Color.inkRoomTextSecondary)
 
                 Spacer()
 
@@ -246,49 +246,49 @@ struct ImportView: View {
                 case .pending, .uploading:
                     if task.status == .uploading {
                         ProgressView()
-                            .tint(.inkRoomPrimary)
+                            .tint(Color.inkRoomPrimary)
                     } else {
                         Image(systemName: "clock")
                             .font(.system(size: 16))
-                            .foregroundColor(.inkRoomTextTertiary)
+                            .foregroundStyle(Color.inkRoomTextTertiary)
                     }
                 case .success:
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 18))
-                        .foregroundColor(.stateSuccess)
+                        .foregroundStyle(Color.stateSuccess)
                 case .failed:
                     Image(systemName: "exclamationmark.circle.fill")
                         .font(.system(size: 18))
-                        .foregroundColor(.stateError)
+                        .foregroundStyle(Color.stateError)
                 }
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(task.fileName)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.inkRoomTextPrimary)
+                    .foregroundStyle(Color.inkRoomTextPrimary)
                     .lineLimit(1)
 
                 switch task.status {
                 case .pending:
                     Text("等待中...")
                         .font(.system(size: 11))
-                        .foregroundColor(.inkRoomTextTertiary)
+                        .foregroundStyle(Color.inkRoomTextTertiary)
                 case .uploading:
                     HStack(spacing: 8) {
                         ProgressBar(progress: task.progress)
                         Text("\(Int(task.progress * 100))%")
                             .font(.system(size: 10, weight: .medium))
-                            .foregroundColor(.inkRoomPrimary)
+                            .foregroundStyle(Color.inkRoomPrimary)
                     }
                 case .success:
                     Text("导入成功")
                         .font(.system(size: 11))
-                        .foregroundColor(.stateSuccess)
+                        .foregroundStyle(Color.stateSuccess)
                 case .failed(let reason):
                     Text(reason)
                         .font(.system(size: 11))
-                        .foregroundColor(.stateError)
+                        .foregroundStyle(Color.stateError)
                 }
             }
 
@@ -304,16 +304,16 @@ struct ImportView: View {
                     }
                 }
                 .font(.system(size: 12))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
                 .background(Color.inkRoomBackgroundElevated)
-                .cornerRadius(6)
+                .clipShape(.rect(cornerRadius: 6))
             }
         }
         .padding(12)
         .background(Color.inkRoomCard)
-        .cornerRadius(12)
+        .clipShape(.rect(cornerRadius: 12))
     }
 
     private func statusColor(_ status: UploadTask.Status) -> Color {
@@ -328,7 +328,7 @@ struct ImportView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("其他导入方式")
                 .font(.system(size: 13, weight: .medium))
-                .foregroundColor(.inkRoomTextSecondary)
+                .foregroundStyle(Color.inkRoomTextSecondary)
 
             VStack(spacing: 0) {
                 Button {
@@ -342,24 +342,24 @@ struct ImportView: View {
 
                             Image(systemName: "airplayaudio")
                                 .font(.system(size: 16))
-                                .foregroundColor(.inkRoomPrimary)
+                                .foregroundStyle(Color.inkRoomPrimary)
                         }
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("隔空投送")
                                 .font(.system(size: 15, weight: .medium))
-                                .foregroundColor(.inkRoomTextPrimary)
+                                .foregroundStyle(Color.inkRoomTextPrimary)
 
                             Text("通过 AirDrop 发送文件到墨斋")
                                 .font(.system(size: 12))
-                                .foregroundColor(.inkRoomTextTertiary)
+                                .foregroundStyle(Color.inkRoomTextTertiary)
                         }
 
                         Spacer()
 
                         Image(systemName: "chevron.right")
                             .font(.system(size: 14))
-                            .foregroundColor(.inkRoomTextTertiary)
+                            .foregroundStyle(Color.inkRoomTextTertiary)
                     }
                     .padding(14)
                 }
@@ -378,34 +378,34 @@ struct ImportView: View {
 
                             Image(systemName: "folder")
                                 .font(.system(size: 16))
-                                .foregroundColor(.inkRoomPrimary)
+                                .foregroundStyle(Color.inkRoomPrimary)
                         }
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("文件 App")
                                 .font(.system(size: 15, weight: .medium))
-                                .foregroundColor(.inkRoomTextPrimary)
+                                .foregroundStyle(Color.inkRoomTextPrimary)
 
                             Text("在「文件」中选择墨斋打开")
                                 .font(.system(size: 12))
-                                .foregroundColor(.inkRoomTextTertiary)
+                                .foregroundStyle(Color.inkRoomTextTertiary)
                         }
 
                         Spacer()
 
                         Image(systemName: "chevron.right")
                             .font(.system(size: 14))
-                            .foregroundColor(.inkRoomTextTertiary)
+                            .foregroundStyle(Color.inkRoomTextTertiary)
                     }
                     .padding(14)
                 }
             }
             .background(Color.inkRoomCard)
-            .cornerRadius(12)
+            .clipShape(.rect(cornerRadius: 12))
 
             Text("支持 epub 和 txt 格式，单文件最大 100MB")
                 .font(.system(size: 11))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.top, 8)
         }

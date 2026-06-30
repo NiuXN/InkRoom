@@ -38,7 +38,7 @@ extension View {
 #else
 extension View {
     func cornerRadius(_ radius: CGFloat, corners: some Any) -> some View {
-        self.cornerRadius(radius)
+        clipShape(.rect(cornerRadius: radius))
     }
 }
 #endif

@@ -3,8 +3,8 @@ import Foundation
 /// Protocol-based dependency injection for testability.
 /// All services should be accessed through these protocols.
 @MainActor
-protocol AppDependenciesProtocol: AnyObject {
-    var database: DatabaseServiceProtocol { get }
+protocol AppDependenciesProtocol {
+    var database: any DatabaseServiceProtocol { get }
     var bookParser: BookParserServiceProtocol { get }
     var wifiTransfer: WiFiTransferServiceProtocol { get }
     var updateService: AppStoreUpdateServiceProtocol { get }
@@ -14,7 +14,7 @@ protocol AppDependenciesProtocol: AnyObject {
 /// Manages service singletons and provides them to ViewModels.
 @MainActor
 final class AppDependencies: ObservableObject, AppDependenciesProtocol {
-    let database: DatabaseServiceProtocol
+    let database: any DatabaseServiceProtocol
     let bookParser: BookParserServiceProtocol
     let wifiTransfer: WiFiTransferServiceProtocol
     let updateService: AppStoreUpdateServiceProtocol
@@ -36,7 +36,7 @@ final class AppDependencies: ObservableObject, AppDependenciesProtocol {
 
     /// Create a test instance with mock services
     static func test(
-        database: DatabaseServiceProtocol? = nil,
+        database: (any DatabaseServiceProtocol)? = nil,
         bookParser: BookParserServiceProtocol? = nil,
         wifiTransfer: WiFiTransferServiceProtocol? = nil,
         updateService: AppStoreUpdateServiceProtocol? = nil
@@ -53,8 +53,7 @@ final class AppDependencies: ObservableObject, AppDependenciesProtocol {
 // MARK: - Service Protocols
 
 /// Protocol for database operations - enables mocking for tests
-@MainActor
-protocol DatabaseServiceProtocol: AnyObject {
+protocol DatabaseServiceProtocol: Actor {
     func setupDefaultCategoriesIfNeeded()
     func fetchAllBooks() -> [Book]
     func fetchAllCategories() -> [Category]
@@ -79,8 +78,10 @@ protocol DatabaseServiceProtocol: AnyObject {
 }
 
 /// Protocol for book parsing operations
-@MainActor
-protocol BookParserServiceProtocol: AnyObject {
+///
+/// 注意：解析服务是 `actor`（非 `@MainActor`），重计算在后台执行，避免阻塞 UI。
+/// 继承 `Sendable` 使 existential `any BookParserServiceProtocol` 可跨 actor 安全传递。
+protocol BookParserServiceProtocol: Sendable {
     func parseBook(from url: URL) async throws -> ParsedBook
     func importBook(from sourceURL: URL, copyFile: Bool) async throws -> Book
     func getChapters(for book: Book) async -> [Chapter]
@@ -107,7 +108,7 @@ protocol AppStoreUpdateServiceProtocol: AnyObject {
     var isChecking: Bool { get }
     var statusMessage: String? { get }
     func checkForUpdate(showStatusWhenUpToDate: Bool) async
-    func openAppStore()
+    func openAppStore(for update: AppStoreUpdateService.UpdateInfo?)
     func openProUpgradePage()
 }
 

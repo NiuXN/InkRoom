@@ -15,7 +15,7 @@ struct AboutSettingsSection: View {
                         .scaleEffect(0.8)
                 } else {
                     Text(AppVersion.displayString)
-                        .foregroundColor(.inkRoomTextTertiary)
+                        .foregroundStyle(Color.inkRoomTextTertiary)
                 }
             }
 
@@ -33,7 +33,7 @@ struct AboutSettingsSection: View {
 
                         Image(systemName: "arrow.down.circle")
                             .font(.system(size: 14))
-                            .foregroundColor(.inkRoomPrimary)
+                            .foregroundStyle(Color.inkRoomPrimary)
                     }
 
                     Text("检查 App Store 更新")
@@ -43,7 +43,7 @@ struct AboutSettingsSection: View {
                     if updateService.pendingUpdate != nil {
                         Text("有新版本")
                             .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(.inkRoomPrimary)
+                            .foregroundStyle(Color.inkRoomPrimary)
                     }
                 }
             }
@@ -63,7 +63,7 @@ struct AboutSettingsSection: View {
         } header: {
             Text("关于")
                 .textCase(nil)
-                .foregroundColor(.inkRoomTextSecondary)
+                .foregroundStyle(Color.inkRoomTextSecondary)
         } footer: {
             Text("自动检查更新每 24 小时最多执行一次，仅在发现新版本时弹出提醒。")
                 .textCase(nil)
@@ -80,11 +80,11 @@ struct PrivacyPolicyView: View {
             VStack(alignment: .leading, spacing: 20) {
                 Text("隐私政策")
                     .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(.inkRoomTextPrimary)
+                    .foregroundStyle(Color.inkRoomTextPrimary)
 
                 Text("更新日期：2026年6月")
                     .font(.system(size: 12))
-                    .foregroundColor(.inkRoomTextTertiary)
+                    .foregroundStyle(Color.inkRoomTextTertiary)
 
                 infoBlock(
                     title: "数据存储",
@@ -114,17 +114,17 @@ struct PrivacyPolicyView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.system(size: 16, weight: .semibold))
-                .foregroundColor(.inkRoomTextPrimary)
+                .foregroundStyle(Color.inkRoomTextPrimary)
 
             Text(content)
                 .font(.system(size: 14))
-                .foregroundColor(.inkRoomTextSecondary)
+                .foregroundStyle(Color.inkRoomTextSecondary)
                 .lineSpacing(4)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
         .background(Color.inkRoomCard)
-        .cornerRadius(12)
+        .clipShape(.rect(cornerRadius: 12))
     }
 }
 
@@ -135,11 +135,11 @@ struct ThanksView: View {
             VStack(alignment: .leading, spacing: 20) {
                 Text("感谢")
                     .font(.system(size: 22, weight: .bold))
-                    .foregroundColor(.inkRoomTextPrimary)
+                    .foregroundStyle(Color.inkRoomTextPrimary)
 
                 Text("墨斋的成长离不开开源社区的支持。感谢以下优秀的开源项目：")
                     .font(.system(size: 14))
-                    .foregroundColor(.inkRoomTextSecondary)
+                    .foregroundStyle(Color.inkRoomTextSecondary)
                     .lineSpacing(4)
 
                 VStack(spacing: 12) {
@@ -162,7 +162,7 @@ struct ThanksView: View {
 
                 Text("感谢每一位使用墨斋的读者，是你们让这款应用有了意义。")
                     .font(.system(size: 14))
-                    .foregroundColor(.inkRoomTextSecondary)
+                    .foregroundStyle(Color.inkRoomTextSecondary)
                     .lineSpacing(4)
             }
             .padding(20)
@@ -183,23 +183,23 @@ struct ThanksView: View {
 
                 Image(systemName: icon)
                     .font(.system(size: 16))
-                    .foregroundColor(.inkRoomPrimary)
+                    .foregroundStyle(Color.inkRoomPrimary)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(name)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.inkRoomTextPrimary)
+                    .foregroundStyle(Color.inkRoomTextPrimary)
 
                 Text(description)
                     .font(.system(size: 12))
-                    .foregroundColor(.inkRoomTextTertiary)
+                    .foregroundStyle(Color.inkRoomTextTertiary)
             }
 
             Spacer()
         }
         .padding(14)
         .background(Color.inkRoomCard)
-        .cornerRadius(12)
+        .clipShape(.rect(cornerRadius: 12))
     }
 }

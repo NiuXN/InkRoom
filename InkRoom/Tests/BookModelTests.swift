@@ -59,8 +59,9 @@ final class BookModelTests: XCTestCase {
 
     func testBookEquality() {
         let id = UUID()
-        let book1 = Book(id: id, title: "Test", author: "Author")
-        let book2 = Book(id: id, title: "Test", author: "Author")
+        let fixedDate = Date(timeIntervalSince1970: 1_700_000_000)
+        let book1 = Book(id: id, title: "Test", author: "Author", addedDate: fixedDate)
+        let book2 = Book(id: id, title: "Test", author: "Author", addedDate: fixedDate)
         XCTAssertEqual(book1, book2)
     }
 

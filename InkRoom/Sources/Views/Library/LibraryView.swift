@@ -126,7 +126,7 @@ struct LibraryView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .background(Color.inkRoomBackgroundElevated)
-        .cornerRadius(10)
+        .clipShape(.rect(cornerRadius: 10))
     }
 
     private var groupTabs: some View {
@@ -156,12 +156,12 @@ struct LibraryView: View {
                             viewModel.selectedGroup == group ?
                             Color.inkRoomPrimary.opacity(0.12) : Color.clear
                         )
-                        .cornerRadius(8)
+                        .clipShape(.rect(cornerRadius: 8))
                     }
                     .buttonStyle(.plain)
                 }
             } else {
-                ScrollView(.horizontal, showsIndicators: false) {
+                ScrollView(.horizontal) {
                     HStack(spacing: 8) {
                         ForEach(BookGroup.allCases) { group in
                             Button {
@@ -178,12 +178,13 @@ struct LibraryView: View {
                                         viewModel.selectedGroup == group ?
                                         Color.inkRoomPrimary : Color.inkRoomBackgroundElevated
                                     )
-                                    .cornerRadius(8)
+                                    .clipShape(.rect(cornerRadius: 8))
                             }
                         }
                     }
                     .padding(.horizontal, 16)
                 }
+                .scrollIndicators(.hidden)
                 .padding(.vertical, 12)
             }
         }
@@ -444,7 +445,7 @@ struct LibraryView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .background(Color.inkRoomBackgroundElevated)
-            .cornerRadius(8)
+            .clipShape(.rect(cornerRadius: 8))
         }
     }
 
@@ -477,7 +478,7 @@ struct LibraryView: View {
             .accessibilityAddTraits(viewModel.viewMode == .list ? .isSelected : [])
         }
         .background(Color.inkRoomBackgroundElevated)
-        .cornerRadius(8)
+        .clipShape(.rect(cornerRadius: 8))
     }
 
     private var adaptiveGridView: some View {

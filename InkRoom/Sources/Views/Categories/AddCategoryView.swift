@@ -37,12 +37,12 @@ struct AddCategoryView: View {
                             } label: {
                                 ZStack {
                                     Circle()
-                                        .fill(selectedIcon == icon ? Color(hex: selectedColorHex) ?? .inkRoomPrimary : Color.inkRoomBackgroundElevated)
+                                        .fill(selectedIcon == icon ? Color(hex: selectedColorHex) ?? Color.inkRoomPrimary : Color.inkRoomBackgroundElevated)
                                         .frame(width: 44, height: 44)
 
                                     Image(safeSystemName: icon)
                                         .font(.system(size: 18))
-                                        .foregroundColor(selectedIcon == icon ? .white : .inkRoomTextSecondary)
+                                        .foregroundStyle(selectedIcon == icon ? .white : Color.inkRoomTextSecondary)
                                 }
                             }
                             .buttonStyle(.plain)
@@ -138,21 +138,21 @@ struct CategoryPreviewCard: View {
 
                 Image(safeSystemName: icon)
                     .font(.system(size: 18))
-                    .foregroundColor(Color(hex: colorHex) ?? .gray)
+                    .foregroundStyle(Color(hex: colorHex) ?? .gray)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(name)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundColor(.inkRoomTextPrimary)
+                    .foregroundStyle(Color.inkRoomTextPrimary)
 
                 Text("0 本")
                     .font(.system(size: 11))
-                    .foregroundColor(Color(hex: colorHex) ?? .gray)
+                    .foregroundStyle(Color(hex: colorHex) ?? .gray)
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
                     .background(Color(hex: colorHex)?.opacity(0.1) ?? .gray.opacity(0.1))
-                    .cornerRadius(4)
+                    .clipShape(.rect(cornerRadius: 4))
             }
 
             Spacer()
@@ -160,7 +160,7 @@ struct CategoryPreviewCard: View {
         .padding(14)
         .frame(width: 240)
         .background(Color.inkRoomCard)
-        .cornerRadius(12)
+        .clipShape(.rect(cornerRadius: 12))
     }
 }
 

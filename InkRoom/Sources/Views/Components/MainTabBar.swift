@@ -19,7 +19,7 @@ struct MainTabBar: View {
                         Text(section.rawValue)
                             .font(.system(size: 10, weight: selectedTab == section ? .semibold : .regular))
                     }
-                    .foregroundColor(selectedTab == section ? .inkRoomPrimary : .inkRoomTextTertiary)
+                    .foregroundStyle(selectedTab == section ? Color.inkRoomPrimary : Color.inkRoomTextTertiary)
                     .frame(maxWidth: .infinity)
                     .contentShape(Rectangle())
                 }
@@ -46,18 +46,14 @@ struct SwipeableTabContainer<Content: View>: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // 单一 NavigationStack：分页 TabView 若每页各包一层栈，滑动时会触发
-            // UINavigationBar 嵌套布局断言崩溃（统计/设置等 Tab 切换时尤甚）。
-            NavigationStack {
-                TabView(selection: $selectedTab) {
-                    content()
-                }
-                .tabViewStyle(.page(indexDisplayMode: .never))
+            TabView(selection: $selectedTab) {
+                content()
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
 
             MainTabBar(selectedTab: $selectedTab)
         }
-        .tint(.inkRoomPrimary)
+        .tint(Color.inkRoomPrimary)
     }
 }
 #endif

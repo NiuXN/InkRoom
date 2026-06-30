@@ -1,7 +1,9 @@
 import Foundation
 
 /// 封面图片内存缓存，避免列表滚动时重复读盘。
-final class CoverImageCache {
+///
+/// `@unchecked Sendable`：底层 `NSCache` 本身线程安全，可跨 actor 安全共享。
+final class CoverImageCache: @unchecked Sendable {
     static let shared = CoverImageCache()
 
     private let cache = NSCache<NSString, NSData>()

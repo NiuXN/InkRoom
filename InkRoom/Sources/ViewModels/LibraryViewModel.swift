@@ -72,7 +72,7 @@ class LibraryViewModel: ObservableObject {
         NotificationCenter.default.publisher(for: .bookImportedNotification)
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
-                Task { await self?.reloadAllData() }
+                Task { await self?.reload(books: true, categories: true) }
             }
             .store(in: &cancellables)
 
@@ -113,20 +113,17 @@ class LibraryViewModel: ObservableObject {
         sortAscending ? "升序" : "降序"
     }
 
-    private func reloadBooks() async {
-        books = await database.fetchAllBooks()
-        categories = await database.fetchAllCategories()
-        updateWidgetData()
-    }
-
-    private func reloadCategories() async {
-        categories = await database.fetchAllCategories()
-    }
-
-    private func reloadAllData() async {
-        books = await database.fetchAllBooks()
-        categories = await database.fetchAllCategories()
-        updateWidgetData()
+    /// 重新加载指定数据。`reloadAllData()` 的统一入口，避免三处近乎重复的实现。
+    private func reload(books: Bool = false, categories: Bool = false, updateWidget: Bool = true) async {
+        if books {
+            self.books = await database.fetchAllBooks()
+        }
+        if categories {
+            self.categories = await database.fetchAllCategories()
+        }
+        if updateWidget {
+            updateWidgetData()
+        }
     }
 
     @discardableResult
@@ -142,6 +139,14 @@ class LibraryViewModel: ObservableObject {
 
     #if DEBUG
     func loadSampleData() async {
+        // 防重复插入：仅当不存在同名样本书籍时才写入。
+        let existing = await database.fetchAllBooks()
+        let existingTitles = Set(existing.map { $0.title })
+        let sampleTitles: Set<String> = ["人间草木", "浮生六记", "围城"]
+        if !existingTitles.isDisjoint(with: sampleTitles) {
+            return
+        }
+
         let sampleBooks = [
             Book(
                 title: "人间草木",
@@ -178,8 +183,6 @@ class LibraryViewModel: ObservableObject {
         for book in sampleBooks {
             try? await database.insertBook(book)
         }
-
-        books = await database.fetchAllBooks()
     }
     #endif
 
@@ -195,7 +198,7 @@ class LibraryViewModel: ObservableObject {
             if !chapters.isEmpty {
                 try await database.insertChapters(chapters, forBookId: book.id)
             }
-            await reloadBooks()
+            await reload(books: true, categories: true)
         } catch {
             errorMessage = InkRoomErrorMessage.friendly(for: error)
         }
@@ -204,14 +207,14 @@ class LibraryViewModel: ObservableObject {
     func addBook(_ book: Book) async {
         await perform {
             try await database.insertBook(book)
-            await reloadBooks()
+            await reload(books: true, categories: true)
         }
     }
 
     func deleteBook(_ book: Book) async {
         await perform {
             try await database.deleteBook(book)
-            await reloadBooks()
+            await reload(books: true, categories: true)
         }
     }
 
@@ -238,14 +241,14 @@ class LibraryViewModel: ObservableObject {
     func addBookToCategory(_ book: Book, category: Category) async {
         await perform {
             try await database.addBookToCategory(bookId: book.id, categoryId: category.id)
-            await reloadAllData()
+            await reload(books: true, categories: true)
         }
     }
 
     func removeBookFromCategory(_ book: Book, category: Category) async {
         await perform {
             try await database.removeBookFromCategory(bookId: book.id, categoryId: category.id)
-            await reloadAllData()
+            await reload(books: true, categories: true)
         }
     }
 
@@ -272,7 +275,7 @@ class LibraryViewModel: ObservableObject {
     func addCategory(_ category: Category) async {
         await perform {
             try await database.insertCategory(category)
-            await reloadCategories()
+            await reload(categories: true)
         }
     }
 
@@ -282,7 +285,7 @@ class LibraryViewModel: ObservableObject {
             for index in books.indices {
                 books[index].categoryIds.removeAll { $0 == category.id }
             }
-            await reloadCategories()
+            await reload(categories: true)
         }
     }
 

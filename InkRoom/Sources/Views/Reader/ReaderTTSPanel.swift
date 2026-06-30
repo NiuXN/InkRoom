@@ -184,7 +184,7 @@ struct ReaderTTSCompactPanel: View {
                             settingsViewModel.ttsTimerMinutes == minutes ?
                             Color.inkRoomPrimary : textColor.opacity(0.08)
                         )
-                        .cornerRadius(6)
+                        .clipShape(.rect(cornerRadius: 6))
                 }
                 .buttonStyle(.plain)
             }

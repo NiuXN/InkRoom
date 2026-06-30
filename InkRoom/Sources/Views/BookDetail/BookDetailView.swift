@@ -89,7 +89,7 @@ struct BookDetailView: View {
                 }
             }
         } message: {
-            Text("确定要删除《\(book.title)》吗？此操作不可撤销。")
+            Text("确定要删除《\(currentBook.title)》吗？此操作不可撤销。")
         }
         #if os(iOS)
         .fullScreenCover(isPresented: $showReader) {
@@ -239,7 +239,7 @@ struct BookDetailView: View {
         }
         .padding(16)
         .background(Color.inkRoomCard)
-        .cornerRadius(12)
+        .clipShape(.rect(cornerRadius: 12))
     }
 
     private var actionButtons: some View {
@@ -261,7 +261,7 @@ struct BookDetailView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 10)
                 .background(Color.inkRoomBackgroundElevated)
-                .cornerRadius(10)
+                .clipShape(.rect(cornerRadius: 10))
             }
             .buttonStyle(.plain)
         }

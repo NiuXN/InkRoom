@@ -33,7 +33,7 @@ enum TabBarAppearance {
 struct TabBarStyleModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .tint(.inkRoomPrimary)
+            .tint(Color.inkRoomPrimary)
             #if os(iOS)
             .toolbarBackground(Color.inkRoomBackgroundElevated, for: .tabBar)
             .toolbarBackground(.visible, for: .tabBar)

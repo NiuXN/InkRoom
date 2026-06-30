@@ -179,12 +179,12 @@ struct CategoriesView: View {
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.inkRoomCard.opacity(0.5))
-        .cornerRadius(12)
-        .overlay(
+        .clipShape(.rect(cornerRadius: 12))
+        .overlay {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(style: StrokeStyle(lineWidth: 1, dash: [6, 4]))
                 .fill(Color.inkRoomTextTertiary.opacity(0.2))
-        )
+        }
         .contentShape(Rectangle())
         .onTapGesture {
             showAddCategory = true
@@ -218,7 +218,7 @@ struct CategoriesView: View {
                     .foregroundStyle(Color.inkRoomTextTertiary)
                     .padding(.horizontal, contentPadding)
             } else {
-                ScrollView(.horizontal, showsIndicators: false) {
+                ScrollView(.horizontal) {
                     HStack(spacing: 12) {
                         ForEach(uncategorizedBooks) { book in
                             Button {
@@ -241,6 +241,7 @@ struct CategoriesView: View {
                     }
                     .padding(.horizontal, contentPadding)
                 }
+                .scrollIndicators(.hidden)
             }
         }
     }
@@ -277,7 +278,7 @@ struct CategoryCard: View {
                     .padding(.horizontal, 6)
                     .padding(.vertical, 2)
                     .background(categoryColor.opacity(0.1))
-                    .cornerRadius(4)
+                    .clipShape(.rect(cornerRadius: 4))
             }
 
             Spacer()
@@ -288,7 +289,7 @@ struct CategoryCard: View {
         }
         .padding(14)
         .background(Color.inkRoomCard)
-        .cornerRadius(12)
+        .clipShape(.rect(cornerRadius: 12))
         .shadow(color: .black.opacity(0.03), radius: 2, y: 1)
     }
 }

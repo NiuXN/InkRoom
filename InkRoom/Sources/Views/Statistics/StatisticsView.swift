@@ -17,7 +17,7 @@ struct StatisticsView: View {
                 VStack(spacing: 16) {
                     if isLoading {
                         ProgressView()
-                            .tint(.inkRoomPrimary)
+                            .tint(Color.inkRoomPrimary)
                             .padding(.top, 48)
                     } else {
                         summaryGrid
@@ -81,7 +81,7 @@ struct StatisticsView: View {
 
                     Image(safeSystemName: icon)
                         .font(.system(size: 14))
-                        .foregroundColor(iconColor)
+                        .foregroundStyle(iconColor)
                 }
 
                 Spacer()
@@ -91,19 +91,19 @@ struct StatisticsView: View {
 
             Text(value)
                 .font(.system(size: 22, weight: .semibold))
-                .foregroundColor(.inkRoomTextPrimary)
+                .foregroundStyle(Color.inkRoomTextPrimary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
 
             Text(title)
                 .font(.system(size: 12))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(height: sizeClass == .compact ? 104 : 112)
         .background(Color.inkRoomCard)
-        .cornerRadius(14)
+        .clipShape(.rect(cornerRadius: 14))
         .shadow(color: Color.black.opacity(0.03), radius: 4, x: 0, y: 2)
     }
 
@@ -113,13 +113,13 @@ struct StatisticsView: View {
             HStack {
                 Text("最近阅读")
                     .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(.inkRoomTextPrimary)
+                    .foregroundStyle(Color.inkRoomTextPrimary)
 
                 Spacer()
 
                 Text("\(statistics.recentBookStats.count) 本")
                     .font(.system(size: 13))
-                    .foregroundColor(.inkRoomTextTertiary)
+                    .foregroundStyle(Color.inkRoomTextTertiary)
             }
             .padding(.horizontal, 4)
 
@@ -137,7 +137,7 @@ struct StatisticsView: View {
                     }
                 }
                 .background(Color.inkRoomCard)
-                .cornerRadius(14)
+                .clipShape(.rect(cornerRadius: 14))
                 .shadow(color: Color.black.opacity(0.03), radius: 4, x: 0, y: 2)
             }
         }
@@ -147,18 +147,18 @@ struct StatisticsView: View {
         VStack(spacing: 8) {
             Image(systemName: "book.closed")
                 .font(.system(size: 32))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
             Text("还没有阅读记录")
                 .font(.system(size: 14))
-                .foregroundColor(.inkRoomTextTertiary)
+                .foregroundStyle(Color.inkRoomTextTertiary)
             Text("开始阅读后，这里会展示你的阅读统计")
                 .font(.system(size: 12))
-                .foregroundColor(.inkRoomTextTertiary.opacity(0.8))
+                .foregroundStyle(Color.inkRoomTextTertiary.opacity(0.8))
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 40)
         .background(Color.inkRoomCard)
-        .cornerRadius(14)
+        .clipShape(.rect(cornerRadius: 14))
     }
 
     private func bookRow(_ stat: BookReadingStat) -> some View {
@@ -170,25 +170,25 @@ struct StatisticsView: View {
 
                 Image(safeSystemName: "book.fill")
                     .font(.system(size: 14))
-                    .foregroundColor(.inkRoomPrimary)
+                    .foregroundStyle(Color.inkRoomPrimary)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(stat.title)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(.inkRoomTextPrimary)
+                    .foregroundStyle(Color.inkRoomTextPrimary)
                     .lineLimit(1)
 
                 Text(DurationFormatter.relativeText(from: stat.lastRead))
                     .font(.system(size: 11))
-                    .foregroundColor(.inkRoomTextTertiary)
+                    .foregroundStyle(Color.inkRoomTextTertiary)
             }
 
             Spacer()
 
             Text(DurationFormatter.secondsText(stat.totalDuration))
                 .font(.system(size: 13, weight: .medium))
-                .foregroundColor(.inkRoomPrimary)
+                .foregroundStyle(Color.inkRoomPrimary)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
@@ -218,9 +218,7 @@ struct StatisticsView: View {
     // MARK: - Data Loading
     private func loadStatistics() async {
         isLoading = true
-        let stats = await Task.detached(priority: .utility) {
-            DatabaseService.shared.fetchReadingStatistics()
-        }.value
+        let stats = await DatabaseService.shared.fetchReadingStatistics()
         statistics = stats
         isLoading = false
     }

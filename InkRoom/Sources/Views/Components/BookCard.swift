@@ -91,7 +91,7 @@ struct BookCard: View {
         }
         .padding(12)
         .background(Color.inkRoomCard)
-        .cornerRadius(12)
+        .clipShape(.rect(cornerRadius: 12))
     }
 }
 
