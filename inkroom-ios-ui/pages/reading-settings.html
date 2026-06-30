@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阅读设置</title>
+    <style id="theme-vars">
+/* ============================================
+   墨斋 InkRoom — Brand Design Tokens
+   东方禅意 · 水墨书房 · iOS 阅读器
+   ============================================ */
+
+:root {
+  /* ── Color System: 水墨禅意 ── */
+  --color-primary: #C45C4A;
+  --color-primary-hover: #B04A39;
+  --color-primary-light: rgba(196, 92, 74, 0.12);
+  --color-primary-muted: rgba(196, 92, 74, 0.06);
+
+  /* ── Surface & Background: 纸张色系 ── */
+  --color-bg-primary: #F5F0E8;
+  --color-bg-secondary: #EDE7DB;
+  --color-bg-elevated: #FAF7F2;
+  --color-bg-card: #FFFFFF;
+  --color-bg-overlay: rgba(44, 44, 44, 0.5);
+
+  /* ── Text: 墨色层次 ── */
+  --color-text-primary: #2C2C2C;
+  --color-text-secondary: #6B6B6B;
+  --color-text-tertiary: #9A9A9A;
+  --color-text-inverse: #F5F0E8;
+  --color-text-on-primary: #FFFFFF;
+
+  /* ── Border & Divider ── */
+  --color-border: rgba(44, 44, 44, 0.08);
+  --color-border-strong: rgba(44, 44, 44, 0.16);
+  --color-divider: rgba(44, 44, 44, 0.06);
+
+  /* ── State Colors ── */
+  --state-success: #4A8C6F;
+  --state-warning: #C49A4A;
+  --state-error: #C44A4A;
+  --state-info: #4A7BC4;
+
+  /* ── Typography ── */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+  --font-family-display: "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+  --font-family-mono: "SF Mono", "Menlo", monospace;
+
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 34px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.04em;
+
+  /* ── Spacing ── */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-base: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 40px;
+  --spacing-4xl: 48px;
+
+  /* ── Radius ── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ── Shadow ── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.08);
+
+  /* ── Reading Theme Tokens ── */
+  --reader-bg-light: #F5F0E8;
+  --reader-bg-warm: #F0E6D0;
+  --reader-bg-dark: #1A1A1A;
+  --reader-text-light: #2C2C2C;
+  --reader-text-dark: #D4CFC7;
+}
+
+/* ── Dark Mode ── */
+.dark {
+  --color-bg-primary: #1A1A1A;
+  --color-bg-secondary: #242424;
+  --color-bg-elevated: #2A2A2A;
+  --color-bg-card: #2E2E2E;
+  --color-bg-overlay: rgba(0, 0, 0, 0.6);
+
+  --color-text-primary: #D4CFC7;
+  --color-text-secondary: #A0A0A0;
+  --color-text-tertiary: #6B6B6B;
+  --color-text-inverse: #2C2C2C;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+  --color-divider: rgba(255, 255, 255, 0.06);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Typography Classes ── */
+.typo-display {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.typo-heading {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.typo-body {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-normal);
+}
+
+.typo-caption {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Ink Wash Accent Utility ── */
+.ink-wash {
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+}
+
+.ink-accent-bar {
+  width: 32px;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+}
+
+/* ── iOS Frosted Glass Utilities ── */
+.ios-frosted-bar {
+  background: rgba(250, 247, 242, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+.ios-frosted-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: saturate(150%) blur(16px);
+  -webkit-backdrop-filter: saturate(150%) blur(16px);
+}
+.ios-frosted-tab {
+  background: rgba(250, 247, 242, 0.78);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-inkroom-primary: var(--color-primary);
+    --color-inkroom-primary-hover: var(--color-primary-hover);
+    --color-inkroom-primary-light: var(--color-primary-light);
+    --color-inkroom-primary-muted: var(--color-primary-muted);
+    --color-inkroom-bg-primary: var(--color-bg-primary);
+    --color-inkroom-bg-secondary: var(--color-bg-secondary);
+    --color-inkroom-bg-elevated: var(--color-bg-elevated);
+    --color-inkroom-bg-card: var(--color-bg-card);
+    --color-inkroom-text-primary: var(--color-text-primary);
+    --color-inkroom-text-secondary: var(--color-text-secondary);
+    --color-inkroom-text-tertiary: var(--color-text-tertiary);
+    --color-inkroom-text-inverse: var(--color-text-inverse);
+    --color-inkroom-text-on-primary: var(--color-text-on-primary);
+    --color-inkroom-border: var(--color-border);
+    --color-inkroom-border-strong: var(--color-border-strong);
+    --color-inkroom-divider: var(--color-divider);
+    --color-inkroom-state-success: var(--state-success);
+    --color-inkroom-state-warning: var(--state-warning);
+    --color-inkroom-state-error: var(--state-error);
+    --color-inkroom-state-info: var(--state-info);
+    --color-inkroom-shadow-sm: var(--shadow-sm);
+    --color-inkroom-shadow-md: var(--shadow-md);
+    --color-inkroom-shadow-lg: var(--shadow-lg);
+  }
+  @layer base {
+    body { background: var(--color-bg-primary); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="min-h-screen pb-8" style="background: var(--color-bg-primary);">
+      <!-- Status bar spacer -->
+      <div class="h-11"></div>
+
+      <!-- Top navigation (iOS Frosted Glass) -->
+      <header class="sticky top-0 z-30 flex h-11 items-center px-4 ios-frosted-bar" style="border-bottom: 0.5px solid rgba(44, 44, 44, 0.08);">
+        <button onclick="location.href='settings.html'" class="inline-flex h-8 w-8 items-center justify-center rounded-md transition-all duration-150 hover:bg-[rgba(44,44,44,0.06)] active:scale-[0.94]" style="color: var(--color-text-primary);" aria-label="返回设置">
+          <i data-lucide="chevron-left" class="h-5 w-5"></i>
+        </button>
+        <h1 class="min-w-0 flex-1 text-center text-sm font-semibold truncate" style="color: var(--color-text-primary); letter-spacing: var(--letter-spacing-tight);">阅读设置</h1>
+        <div class="w-8"></div>
+      </header>
+
+      <div class="px-5 pt-6 space-y-6">
+
+        <!-- 预览卡片 -->
+        <section>
+          <div class="rounded-xl p-4 ios-frosted-card" style="border: 0.5px solid rgba(44, 44, 44, 0.06);">
+            <p class="text-xs mb-2" style="color: var(--color-text-tertiary);">预览</p>
+            <p id="preview-text" class="leading-relaxed" style="font-size: 16px; line-height: 1.75; color: var(--color-text-primary); text-indent: 2em;">
+              多年以后，面对行刑队，奥雷里亚诺布恩迪亚上校将会回想起父亲带他去见识冰块的那个遥远的下午。
+            </p>
+          </div>
+        </section>
+
+        <!-- 字号设置 -->
+        <section>
+          <div class="flex items-center justify-between mb-3 px-1">
+            <h2 class="text-sm font-medium" style="color: var(--color-text-secondary);">字号</h2>
+            <span id="font-size-value" class="text-sm font-medium" style="color: var(--color-primary);">16px</span>
+          </div>
+          <div class="flex items-center gap-3 px-1">
+            <span class="text-xs" style="color: var(--color-text-tertiary);">A</span>
+            <div class="flex-1 relative h-1 rounded-full" style="background: var(--color-divider);">
+              <div id="font-size-progress" class="absolute left-0 top-0 h-full rounded-full" style="width: 50%; background: var(--color-primary);"></div>
+              <div id="font-size-thumb" class="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 cursor-pointer" style="left: 50%; margin-left: -10px; background: var(--color-bg-card); border-color: var(--color-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+            </div>
+            <span class="text-lg" style="color: var(--color-text-tertiary);">A</span>
+          </div>
+          <div class="flex justify-between mt-3 px-1">
+            <button onclick="setFontSize(0)" class="text-xs transition-colors duration-150" style="color: var(--color-text-tertiary);">小</button>
+            <button onclick="setFontSize(3)" class="text-xs font-medium transition-colors duration-150" style="color: var(--color-primary);">默认</button>
+            <button onclick="setFontSize(6)" class="text-xs transition-colors duration-150" style="color: var(--color-text-tertiary);">大</button>
+          </div>
+        </section>
+
+        <!-- 行距设置 -->
+        <section>
+          <div class="flex items-center justify-between mb-3 px-1">
+            <h2 class="text-sm font-medium" style="color: var(--color-text-secondary);">行距</h2>
+            <span id="line-height-value" class="text-sm font-medium" style="color: var(--color-primary);">1.75</span>
+          </div>
+          <div class="flex items-center gap-3 px-1">
+            <span class="text-xs" style="color: var(--color-text-tertiary);">紧</span>
+            <div class="flex-1 relative h-1 rounded-full" style="background: var(--color-divider);">
+              <div id="line-height-progress" class="absolute left-0 top-0 h-full rounded-full" style="width: 50%; background: var(--color-primary);"></div>
+              <div id="line-height-thumb" class="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 cursor-pointer" style="left: 50%; margin-left: -10px; background: var(--color-bg-card); border-color: var(--color-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+            </div>
+            <span class="text-xs" style="color: var(--color-text-tertiary);">松</span>
+          </div>
+          <div class="flex justify-between mt-3 px-1">
+            <button onclick="setLineHeight(0)" class="text-xs transition-colors duration-150" style="color: var(--color-text-tertiary);">紧凑</button>
+            <button onclick="setLineHeight(2)" class="text-xs font-medium transition-colors duration-150" style="color: var(--color-primary);">默认</button>
+            <button onclick="setLineHeight(4)" class="text-xs transition-colors duration-150" style="color: var(--color-text-tertiary);">宽松</button>
+          </div>
+        </section>
+
+        <!-- 阅读主题 -->
+        <section>
+          <div class="flex items-center justify-between mb-3 px-1">
+            <h2 class="text-sm font-medium" style="color: var(--color-text-secondary);">阅读主题</h2>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            <button onclick="setTheme('light')" id="theme-light-btn" class="flex flex-col items-center gap-2 py-3 rounded-xl border-2 transition-all duration-150" style="border-color: var(--color-primary); background: #F5F0E8;">
+              <div class="w-10 h-10 rounded-full" style="background: #F5F0E8; border: 2px solid #E8E0D0;"></div>
+              <span class="text-xs" style="color: var(--color-text-primary);">纸张白</span>
+            </button>
+            <button onclick="setTheme('warm')" id="theme-warm-btn" class="flex flex-col items-center gap-2 py-3 rounded-xl border transition-all duration-150" style="border-color: var(--color-border); background: #F0E6D0;">
+              <div class="w-10 h-10 rounded-full" style="background: #F0E6D0; border: 2px solid #E0D0A8;"></div>
+              <span class="text-xs" style="color: var(--color-text-secondary);">护眼暖</span>
+            </button>
+            <button onclick="setTheme('dark')" id="theme-dark-btn" class="flex flex-col items-center gap-2 py-3 rounded-xl border transition-all duration-150" style="border-color: var(--color-border); background: #1A1A1A;">
+              <div class="w-10 h-10 rounded-full" style="background: #1A1A1A; border: 2px solid #333;"></div>
+              <span class="text-xs" style="color: #9A9A9A;">夜间</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- 字距设置 -->
+        <section>
+          <div class="flex items-center justify-between mb-3 px-1">
+            <h2 class="text-sm font-medium" style="color: var(--color-text-secondary);">字距</h2>
+            <span id="letter-spacing-value" class="text-sm font-medium" style="color: var(--color-primary);">标准</span>
+          </div>
+          <div class="flex items-center gap-3 px-1">
+            <span class="text-xs" style="color: var(--color-text-tertiary);">紧</span>
+            <div class="flex-1 relative h-1 rounded-full" style="background: var(--color-divider);">
+              <div id="letter-spacing-progress" class="absolute left-0 top-0 h-full rounded-full" style="width: 33%; background: var(--color-primary);"></div>
+              <div id="letter-spacing-thumb" class="absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 cursor-pointer" style="left: 33%; margin-left: -10px; background: var(--color-bg-card); border-color: var(--color-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
+            </div>
+            <span class="text-xs" style="color: var(--color-text-tertiary);">松</span>
+          </div>
+        </section>
+
+        <!-- 翻页方式 -->
+        <section>
+          <div class="flex items-center justify-between mb-3 px-1">
+            <h2 class="text-sm font-medium" style="color: var(--color-text-secondary);">翻页方式</h2>
+          </div>
+          <div class="rounded-xl overflow-hidden ios-frosted-card" style="border: 0.5px solid rgba(44, 44, 44, 0.06);">
+            <div class="flex items-center px-4 min-h-[44px]" style="border-bottom: 1px solid var(--color-divider);">
+              <div class="flex-1 min-w-0">
+                <span class="text-[15px]" style="color: var(--color-text-primary);">垂直滚动</span>
+                <p class="text-xs mt-0.5" style="color: var(--color-text-tertiary);">类似网页的无缝滚动</p>
+              </div>
+              <div class="relative w-[51px] h-[31px] rounded-full flex-shrink-0 cursor-pointer" style="background: var(--color-primary);">
+                <div class="absolute top-[2px] right-[2px] w-[27px] h-[27px] rounded-full bg-white" style="box-shadow: 0 1px 3px rgba(0,0,0,0.15);"></div>
+              </div>
+            </div>
+            <div class="flex items-center px-4 min-h-[44px]">
+              <div class="flex-1 min-w-0">
+                <span class="text-[15px]" style="color: var(--color-text-secondary);">仿真翻页</span>
+                <p class="text-xs mt-0.5" style="color: var(--color-text-tertiary);">拟真翻页动画效果（开发中）</p>
+              </div>
+              <div class="relative w-[51px] h-[31px] rounded-full flex-shrink-0" style="background: rgba(44,44,44,0.12);">
+                <div class="absolute top-[2px] left-[2px] w-[27px] h-[27px] rounded-full bg-white" style="box-shadow: 0 1px 3px rgba(0,0,0,0.15);"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <style>
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+        }
+      }
+    </style>
+    <script>
+      lucide.createIcons();
+
+      const fontSizes = [13, 14, 15, 16, 17, 18, 20];
+      const lineHeights = [1.4, 1.55, 1.75, 1.9, 2.1];
+      const letterSpacings = [-0.02, 0, 0.02, 0.04];
+      const letterSpacingLabels = ['紧凑', '标准', '宽松', '舒展'];
+
+      let fontSizeIdx = 3;
+      let lineHeightIdx = 2;
+      let letterSpacingIdx = 1;
+      let currentTheme = 'light';
+
+      function updatePreview() {
+        const preview = document.getElementById('preview-text');
+        if (preview) {
+          preview.style.fontSize = fontSizes[fontSizeIdx] + 'px';
+          preview.style.lineHeight = lineHeights[lineHeightIdx];
+          preview.style.letterSpacing = letterSpacings[letterSpacingIdx] + 'em';
+        }
+        const fontSizeValue = document.getElementById('font-size-value');
+        if (fontSizeValue) fontSizeValue.textContent = fontSizes[fontSizeIdx] + 'px';
+        const lineHeightValue = document.getElementById('line-height-value');
+        if (lineHeightValue) lineHeightValue.textContent = lineHeights[lineHeightIdx].toFixed(2);
+        const letterSpacingValue = document.getElementById('letter-spacing-value');
+        if (letterSpacingValue) letterSpacingValue.textContent = letterSpacingLabels[letterSpacingIdx];
+
+        updateSlider('font-size', fontSizeIdx / (fontSizes.length - 1));
+        updateSlider('line-height', lineHeightIdx / (lineHeights.length - 1));
+        updateSlider('letter-spacing', letterSpacingIdx / (letterSpacings.length - 1));
+      }
+
+      function updateSlider(name, pct) {
+        const progress = document.getElementById(name + '-progress');
+        const thumb = document.getElementById(name + '-thumb');
+        if (progress) progress.style.width = (pct * 100) + '%';
+        if (thumb) { thumb.style.left = (pct * 100) + '%'; thumb.style.marginLeft = '-10px'; }
+      }
+
+      function setFontSize(idx) {
+        fontSizeIdx = Math.max(0, Math.min(fontSizes.length - 1, idx));
+        updatePreview();
+      }
+
+      function setLineHeight(idx) {
+        lineHeightIdx = Math.max(0, Math.min(lineHeights.length - 1, idx));
+        updatePreview();
+      }
+
+      function setLetterSpacing(idx) {
+        letterSpacingIdx = Math.max(0, Math.min(letterSpacings.length - 1, idx));
+        updatePreview();
+      }
+
+      function setTheme(theme) {
+        currentTheme = theme;
+        const html = document.documentElement;
+        const main = document.querySelector('main');
+
+        ['light', 'warm', 'dark'].forEach(t => {
+          const btn = document.getElementById('theme-' + t + '-btn');
+          if (btn) {
+            btn.style.borderColor = t === theme ? 'var(--color-primary)' : 'var(--color-border)';
+            btn.style.borderWidth = t === theme ? '2px' : '1px';
+          }
+        });
+
+        if (theme === 'dark') {
+          html.classList.add('dark');
+        } else {
+          html.classList.remove('dark');
+          if (main) {
+            if (theme === 'warm') {
+              main.style.backgroundColor = 'var(--reader-bg-warm)';
+            } else {
+              main.style.backgroundColor = 'var(--color-bg-primary)';
+            }
+          }
+        }
+      }
+
+      updatePreview();
+    </script>
+</body>
+</html>

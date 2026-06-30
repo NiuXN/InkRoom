@@ -1,0 +1,69 @@
+{
+  "root": {
+    "nodeId": "gen-project-shell",
+    "kind": "project-shell",
+    "pageIds": ["page-library", "page-reader", "page-book-detail", "page-import", "page-settings"],
+    "output": "partials/project-shell.html",
+    "sharedRegions": ["tab-bar", "status-bar", "safe-area"],
+    "privateRegions": [],
+    "mutableSlots": ["activeTabItem", "pageTitle", "pageContent"],
+    "status": "planned",
+    "children": [
+      {
+        "nodeId": "gen-page-library",
+        "kind": "page-leaf",
+        "pageIds": ["page-library"],
+        "output": "pages/library.html",
+        "sharedRegions": ["tab-bar", "status-bar"],
+        "privateRegions": ["search-bar", "view-toggle", "group-tabs", "book-grid", "book-list"],
+        "mutableSlots": ["activeTabItem"],
+        "status": "planned",
+        "children": []
+      },
+      {
+        "nodeId": "gen-page-reader",
+        "kind": "page-leaf",
+        "pageIds": ["page-reader"],
+        "output": "pages/reader.html",
+        "sharedRegions": ["status-bar"],
+        "privateRegions": ["reader-header", "reader-content", "reader-toolbar", "toc-drawer"],
+        "mutableSlots": [],
+        "status": "planned",
+        "children": []
+      },
+      {
+        "nodeId": "gen-page-book-detail",
+        "kind": "page-leaf",
+        "pageIds": ["page-book-detail"],
+        "output": "pages/book-detail.html",
+        "sharedRegions": ["status-bar"],
+        "privateRegions": ["book-cover", "book-meta", "reading-progress", "action-buttons"],
+        "mutableSlots": [],
+        "status": "planned",
+        "children": []
+      },
+      {
+        "nodeId": "gen-page-import",
+        "kind": "page-leaf",
+        "pageIds": ["page-import"],
+        "output": "pages/import.html",
+        "sharedRegions": ["status-bar"],
+        "privateRegions": ["wifi-info", "upload-area", "import-methods"],
+        "mutableSlots": [],
+        "status": "planned",
+        "children": []
+      },
+      {
+        "nodeId": "gen-page-settings",
+        "kind": "page-leaf",
+        "pageIds": ["page-settings"],
+        "output": "pages/settings.html",
+        "sharedRegions": ["tab-bar", "status-bar"],
+        "privateRegions": ["settings-groups", "about-section"],
+        "mutableSlots": ["activeTabItem"],
+        "status": "planned",
+        "children": []
+      }
+    ]
+  }
+}

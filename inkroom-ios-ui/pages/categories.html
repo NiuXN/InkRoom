@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分类 - 墨斋 InkRoom</title>
+    <style id="theme-vars">
+/* ============================================
+   墨斋 InkRoom — Brand Design Tokens
+   东方禅意 · 水墨书房 · iOS 阅读器
+   ============================================ */
+
+:root {
+  /* ── Color System: 水墨禅意 ── */
+  --color-primary: #C45C4A;
+  --color-primary-hover: #B04A39;
+  --color-primary-light: rgba(196, 92, 74, 0.12);
+  --color-primary-muted: rgba(196, 92, 74, 0.06);
+
+  /* ── Surface & Background: 纸张色系 ── */
+  --color-bg-primary: #F5F0E8;
+  --color-bg-secondary: #EDE7DB;
+  --color-bg-elevated: #FAF7F2;
+  --color-bg-card: #FFFFFF;
+  --color-bg-overlay: rgba(44, 44, 44, 0.5);
+
+  /* ── Text: 墨色层次 ── */
+  --color-text-primary: #2C2C2C;
+  --color-text-secondary: #6B6B6B;
+  --color-text-tertiary: #9A9A9A;
+  --color-text-inverse: #F5F0E8;
+  --color-text-on-primary: #FFFFFF;
+
+  /* ── Border & Divider ── */
+  --color-border: rgba(44, 44, 44, 0.08);
+  --color-border-strong: rgba(44, 44, 44, 0.16);
+  --color-divider: rgba(44, 44, 44, 0.06);
+
+  /* ── State Colors ── */
+  --state-success: #4A8C6F;
+  --state-warning: #C49A4A;
+  --state-error: #C44A4A;
+  --state-info: #4A7BC4;
+
+  /* ── Typography ── */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+  --font-family-display: "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+  --font-family-mono: "SF Mono", "Menlo", monospace;
+
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 34px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.04em;
+
+  /* ── Spacing ── */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-base: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 40px;
+  --spacing-4xl: 48px;
+
+  /* ── Radius ── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ── Shadow ── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.08);
+
+  /* ── Reading Theme Tokens ── */
+  --reader-bg-light: #F5F0E8;
+  --reader-bg-warm: #F0E6D0;
+  --reader-bg-dark: #1A1A1A;
+  --reader-text-light: #2C2C2C;
+  --reader-text-dark: #D4CFC7;
+}
+
+/* ── Dark Mode ── */
+.dark {
+  --color-bg-primary: #1A1A1A;
+  --color-bg-secondary: #242424;
+  --color-bg-elevated: #2A2A2A;
+  --color-bg-card: #2E2E2E;
+  --color-bg-overlay: rgba(0, 0, 0, 0.6);
+
+  --color-text-primary: #D4CFC7;
+  --color-text-secondary: #A0A0A0;
+  --color-text-tertiary: #6B6B6B;
+  --color-text-inverse: #2C2C2C;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+  --color-divider: rgba(255, 255, 255, 0.06);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Typography Classes ── */
+.typo-display {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.typo-heading {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.typo-body {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-normal);
+}
+
+.typo-caption {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Ink Wash Accent Utility ── */
+.ink-wash {
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+}
+
+.ink-accent-bar {
+  width: 32px;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+}
+
+/* ── iOS Frosted Glass Utilities ── */
+.ios-frosted-bar {
+  background: rgba(250, 247, 242, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+.ios-frosted-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: saturate(150%) blur(16px);
+  -webkit-backdrop-filter: saturate(150%) blur(16px);
+}
+.ios-frosted-tab {
+  background: rgba(250, 247, 242, 0.78);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-inkroom-primary: var(--color-primary);
+    --color-inkroom-primary-hover: var(--color-primary-hover);
+    --color-inkroom-primary-light: var(--color-primary-light);
+    --color-inkroom-primary-muted: var(--color-primary-muted);
+    --color-inkroom-bg-primary: var(--color-bg-primary);
+    --color-inkroom-bg-secondary: var(--color-bg-secondary);
+    --color-inkroom-bg-elevated: var(--color-bg-elevated);
+    --color-inkroom-bg-card: var(--color-bg-card);
+    --color-inkroom-text-primary: var(--color-text-primary);
+    --color-inkroom-text-secondary: var(--color-text-secondary);
+    --color-inkroom-text-tertiary: var(--color-text-tertiary);
+    --color-inkroom-text-inverse: var(--color-text-inverse);
+    --color-inkroom-text-on-primary: var(--color-text-on-primary);
+    --color-inkroom-border: var(--color-border);
+    --color-inkroom-border-strong: var(--color-border-strong);
+    --color-inkroom-divider: var(--color-divider);
+    --color-inkroom-state-success: var(--state-success);
+    --color-inkroom-state-warning: var(--state-warning);
+    --color-inkroom-state-error: var(--state-error);
+    --color-inkroom-state-info: var(--state-info);
+    --color-inkroom-shadow-sm: var(--shadow-sm);
+    --color-inkroom-shadow-md: var(--shadow-md);
+    --color-inkroom-shadow-lg: var(--shadow-lg);
+  }
+  @layer base {
+    body { background: var(--color-bg-primary); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="pb-24">
+      <!-- Status bar safe area -->
+      <div class="h-11"></div>
+
+      <!-- Page Title -->
+      <header class="flex items-center justify-between px-5 pt-1 pb-3">
+        <div class="w-10"></div>
+        <h1 class="typo-display text-[22px]" style="color: var(--color-text-primary); letter-spacing: 0.06em;">分类</h1>
+        <button data-dom-id="edit-categories" class="text-sm font-medium transition-transform duration-150 active:scale-[0.96]" style="color: var(--color-primary);">编辑</button>
+      </header>
+
+      <!-- Stats summary -->
+      <p class="text-center text-xs mb-5 typo-caption" style="color: var(--color-text-tertiary);">共 6 本书 · 4 个分类</p>
+
+      <!-- Category grid (2-column) -->
+      <div class="grid grid-cols-2 gap-3 px-5 mb-6">
+
+        <!-- Category 1: 中国古典 -->
+        <a href="category-detail.html" data-dom-id="category-1" class="flex items-center gap-3 p-3.5 rounded-xl ios-frosted-card border transition-transform duration-150 active:scale-[0.96]" style="border-color: rgba(44, 44, 44, 0.06); box-shadow: 0 0.5px 0 0.5px rgba(0,0,0,0.04);">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: var(--color-primary-light);">
+            <i data-lucide="book-open" class="w-5 h-5" style="color: var(--color-primary);"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium truncate" style="color: var(--color-text-primary);">中国古典</p>
+            <span class="inline-block text-[10px] px-1.5 py-0.5 rounded-full mt-0.5" style="background: var(--color-primary-light); color: var(--color-primary);">2本</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+        </a>
+
+        <!-- Category 2: 现代文学 -->
+        <a href="category-detail.html" data-dom-id="category-2" class="flex items-center gap-3 p-3.5 rounded-xl ios-frosted-card border transition-transform duration-150 active:scale-[0.96]" style="border-color: rgba(44, 44, 44, 0.06); box-shadow: 0 0.5px 0 0.5px rgba(0,0,0,0.04);">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: rgba(74,123,196,0.1);">
+            <i data-lucide="pen-tool" class="w-5 h-5" style="color: #4A7BC4;"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium truncate" style="color: var(--color-text-primary);">现代文学</p>
+            <span class="inline-block text-[10px] px-1.5 py-0.5 rounded-full mt-0.5" style="background: rgba(74,123,196,0.1); color: #4A7BC4;">1本</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+        </a>
+
+        <!-- Category 3: 外国名著 -->
+        <a href="category-detail.html" data-dom-id="category-3" class="flex items-center gap-3 p-3.5 rounded-xl ios-frosted-card border transition-transform duration-150 active:scale-[0.96]" style="border-color: rgba(44, 44, 44, 0.06); box-shadow: 0 0.5px 0 0.5px rgba(0,0,0,0.04);">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: rgba(74,140,111,0.1);">
+            <i data-lucide="globe" class="w-5 h-5" style="color: #4A8C6F;"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium truncate" style="color: var(--color-text-primary);">外国名著</p>
+            <span class="inline-block text-[10px] px-1.5 py-0.5 rounded-full mt-0.5" style="background: rgba(74,140,111,0.1); color: #4A8C6F;">2本</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+        </a>
+
+        <!-- Category 4: 诗词歌赋 -->
+        <a href="category-detail.html" data-dom-id="category-4" class="flex items-center gap-3 p-3.5 rounded-xl ios-frosted-card border transition-transform duration-150 active:scale-[0.96]" style="border-color: rgba(44, 44, 44, 0.06); box-shadow: 0 0.5px 0 0.5px rgba(0,0,0,0.04);">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background: rgba(196,154,74,0.1);">
+            <i data-lucide="music" class="w-5 h-5" style="color: #C49A4A;"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium truncate" style="color: var(--color-text-primary);">诗词歌赋</p>
+            <span class="inline-block text-[10px] px-1.5 py-0.5 rounded-full mt-0.5" style="background: rgba(196,154,74,0.1); color: #C49A4A;">1本</span>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+        </a>
+
+      </div>
+
+      <!-- 未分类 section -->
+      <section class="px-5 mb-6">
+        <div class="flex items-center gap-2 mb-3">
+          <h2 class="typo-heading text-base" style="color: var(--color-text-primary);">未分类</h2>
+          <div class="ink-accent-bar"></div>
+        </div>
+
+        <div class="flex gap-3 overflow-x-auto no-scrollbar -mx-5 px-5">
+          <!-- Book 1 -->
+          <div class="shrink-0 w-[68px]">
+            <div class="w-12 h-[68px] rounded-md overflow-hidden" style="box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+              <img src="../assets/book-shelf-covers.jpg" alt="人间草木" class="w-full h-full object-cover">
+            </div>
+            <p class="text-[10px] mt-1.5 truncate text-center" style="color: var(--color-text-secondary);">人间草木</p>
+          </div>
+
+          <!-- Book 2 -->
+          <div class="shrink-0 w-[68px]">
+            <div class="w-12 h-[68px] rounded-md overflow-hidden" style="box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+              <img src="../assets/book-shelf-covers.jpg" alt="文心雕龙" class="w-full h-full object-cover">
+            </div>
+            <p class="text-[10px] mt-1.5 truncate text-center" style="color: var(--color-text-secondary);">文心雕龙</p>
+          </div>
+
+          <!-- Book 3 -->
+          <div class="shrink-0 w-[68px]">
+            <div class="w-12 h-[68px] rounded-md overflow-hidden" style="box-shadow: 0 1px 4px rgba(0,0,0,0.1);">
+              <img src="../assets/book-shelf-covers.jpg" alt="长物志" class="w-full h-full object-cover">
+            </div>
+            <p class="text-[10px] mt-1.5 truncate text-center" style="color: var(--color-text-secondary);">长物志</p>
+          </div>
+
+          <!-- Add hint -->
+          <div class="shrink-0 flex items-center pl-2">
+            <span class="text-xs whitespace-nowrap" style="color: var(--color-text-tertiary);">+ 添加到分类</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Add category button -->
+      <div class="px-5 mb-6">
+        <button data-dom-id="add-category" class="flex items-center justify-center gap-2 w-full h-12 rounded-xl border text-sm font-medium transition-transform duration-150 active:scale-[0.96]" style="border-color: var(--color-border-strong); color: var(--color-primary); background: transparent;">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          新建分类
+        </button>
+      </div>
+
+      <!-- @media prefers-reduced-motion -->
+      <style>
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after {
+            transition-duration: 0.01ms !important;
+            animation-duration: 0.01ms !important;
+          }
+        }
+      </style>
+
+      <!-- ===== Bottom Tab Bar (iOS Frosted Glass) ===== -->
+      <nav class="fixed bottom-0 left-0 right-0 z-40 ios-frosted-tab" style="border-top: 0.5px solid rgba(44, 44, 44, 0.1);">
+        <div class="flex items-center justify-around h-[49px] max-w-lg mx-auto">
+          <!-- Tab: 书架 (inactive) -->
+          <a href="library.html" data-dom-id="tab-library" class="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-150" style="color: var(--color-text-tertiary);">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+            <span class="text-[10px]">书架</span>
+          </a>
+          <!-- Tab: 分类 (active, 朱砂红) -->
+          <button class="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-150" style="color: var(--color-primary);">
+            <i data-lucide="folders" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium">分类</span>
+          </button>
+          <!-- Tab: 我的 (inactive) -->
+          <a href="settings.html" data-dom-id="tab-profile" class="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-150" style="color: var(--color-text-tertiary);">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span class="text-[10px]">我的</span>
+          </a>
+        </div>
+        <div class="h-[env(safe-area-inset-bottom,20px)]"></div>
+      </nav>
+    </main>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

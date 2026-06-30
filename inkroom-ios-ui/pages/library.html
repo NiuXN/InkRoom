@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>书架首页</title>
+    <style id="theme-vars">
+/* ============================================
+   墨斋 InkRoom — Brand Design Tokens
+   东方禅意 · 水墨书房 · iOS 阅读器
+   ============================================ */
+
+:root {
+  /* ── Color System: 水墨禅意 ── */
+  --color-primary: #C45C4A;
+  --color-primary-hover: #B04A39;
+  --color-primary-light: rgba(196, 92, 74, 0.12);
+  --color-primary-muted: rgba(196, 92, 74, 0.06);
+
+  /* ── Surface & Background: 纸张色系 ── */
+  --color-bg-primary: #F5F0E8;
+  --color-bg-secondary: #EDE7DB;
+  --color-bg-elevated: #FAF7F2;
+  --color-bg-card: #FFFFFF;
+  --color-bg-overlay: rgba(44, 44, 44, 0.5);
+
+  /* ── Text: 墨色层次 ── */
+  --color-text-primary: #2C2C2C;
+  --color-text-secondary: #6B6B6B;
+  --color-text-tertiary: #9A9A9A;
+  --color-text-inverse: #F5F0E8;
+  --color-text-on-primary: #FFFFFF;
+
+  /* ── Border & Divider ── */
+  --color-border: rgba(44, 44, 44, 0.08);
+  --color-border-strong: rgba(44, 44, 44, 0.16);
+  --color-divider: rgba(44, 44, 44, 0.06);
+
+  /* ── State Colors ── */
+  --state-success: #4A8C6F;
+  --state-warning: #C49A4A;
+  --state-error: #C44A4A;
+  --state-info: #4A7BC4;
+
+  /* ── Typography ── */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+  --font-family-display: "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+  --font-family-mono: "SF Mono", "Menlo", monospace;
+
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 34px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.04em;
+
+  /* ── Spacing ── */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-base: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 40px;
+  --spacing-4xl: 48px;
+
+  /* ── Radius ── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ── Shadow ── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.08);
+
+  /* ── Reading Theme Tokens ── */
+  --reader-bg-light: #F5F0E8;
+  --reader-bg-warm: #F0E6D0;
+  --reader-bg-dark: #1A1A1A;
+  --reader-text-light: #2C2C2C;
+  --reader-text-dark: #D4CFC7;
+}
+
+/* ── Dark Mode ── */
+.dark {
+  --color-bg-primary: #1A1A1A;
+  --color-bg-secondary: #242424;
+  --color-bg-elevated: #2A2A2A;
+  --color-bg-card: #2E2E2E;
+  --color-bg-overlay: rgba(0, 0, 0, 0.6);
+
+  --color-text-primary: #D4CFC7;
+  --color-text-secondary: #A0A0A0;
+  --color-text-tertiary: #6B6B6B;
+  --color-text-inverse: #2C2C2C;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+  --color-divider: rgba(255, 255, 255, 0.06);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Typography Classes ── */
+.typo-display {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.typo-heading {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.typo-body {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-normal);
+}
+
+.typo-caption {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Ink Wash Accent Utility ── */
+.ink-wash {
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+}
+
+.ink-accent-bar {
+  width: 32px;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+}
+
+/* ── iOS Frosted Glass Utilities ── */
+.ios-frosted-bar {
+  background: rgba(250, 247, 242, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+.ios-frosted-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: saturate(150%) blur(16px);
+  -webkit-backdrop-filter: saturate(150%) blur(16px);
+}
+.ios-frosted-tab {
+  background: rgba(250, 247, 242, 0.78);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-inkroom-primary: var(--color-primary);
+    --color-inkroom-primary-hover: var(--color-primary-hover);
+    --color-inkroom-primary-light: var(--color-primary-light);
+    --color-inkroom-primary-muted: var(--color-primary-muted);
+    --color-inkroom-bg-primary: var(--color-bg-primary);
+    --color-inkroom-bg-secondary: var(--color-bg-secondary);
+    --color-inkroom-bg-elevated: var(--color-bg-elevated);
+    --color-inkroom-bg-card: var(--color-bg-card);
+    --color-inkroom-text-primary: var(--color-text-primary);
+    --color-inkroom-text-secondary: var(--color-text-secondary);
+    --color-inkroom-text-tertiary: var(--color-text-tertiary);
+    --color-inkroom-text-inverse: var(--color-text-inverse);
+    --color-inkroom-text-on-primary: var(--color-text-on-primary);
+    --color-inkroom-border: var(--color-border);
+    --color-inkroom-border-strong: var(--color-border-strong);
+    --color-inkroom-divider: var(--color-divider);
+    --color-inkroom-state-success: var(--state-success);
+    --color-inkroom-state-warning: var(--state-warning);
+    --color-inkroom-state-error: var(--state-error);
+    --color-inkroom-state-info: var(--state-info);
+    --color-inkroom-shadow-sm: var(--shadow-sm);
+    --color-inkroom-shadow-md: var(--shadow-md);
+    --color-inkroom-shadow-lg: var(--shadow-lg);
+  }
+  @layer base {
+    body { background: var(--color-bg-primary); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="pb-24">
+      <!-- Status bar safe area -->
+      <div class="h-11"></div>
+
+      <!-- App Title Bar -->
+      <header class="flex items-center justify-center px-5 pt-1 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="typo-display text-[22px]" style="color: var(--color-text-primary); letter-spacing: 0.06em;">墨斋</span>
+          <span class="inline-block w-5 h-px" style="background: var(--color-primary); opacity: 0.6;"></span>
+          <span class="inline-block w-1.5 h-1.5 rounded-full" style="background: var(--color-primary); opacity: 0.3;"></span>
+        </div>
+      </header>
+
+      <!-- Search Bar (iOS Frosted Glass) -->
+      <div class="px-5 mb-4">
+        <div class="flex items-center gap-2 px-3.5 h-10 rounded-xl ios-frosted-card border" style="border-color: rgba(44, 44, 44, 0.06);">
+          <i data-lucide="search" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+          <span class="text-sm whitespace-nowrap" style="color: var(--color-text-tertiary);">搜索书名或作者</span>
+        </div>
+      </div>
+
+      <!-- Controls Row -->
+      <div class="flex items-center justify-between px-5 mb-4">
+        <!-- Left: View Toggle -->
+        <div class="flex items-center gap-1">
+          <button onclick="setView('grid')" id="view-grid-btn" class="inline-flex items-center justify-center w-9 h-9 rounded-lg transition-colors duration-150" style="background: var(--color-primary-light); color: var(--color-primary);" aria-label="网格视图" data-dom-id="view-grid">
+            <i data-lucide="layout-grid" class="w-[18px] h-[18px]"></i>
+          </button>
+          <button onclick="setView('list')" id="view-list-btn" data-dom-id="view-list" class="inline-flex items-center justify-center w-9 h-9 rounded-lg transition-colors duration-150 hover:opacity-60" style="color: var(--color-text-tertiary);" aria-label="列表视图">
+            <i data-lucide="list" class="w-[18px] h-[18px]"></i>
+          </button>
+        </div>
+        <!-- Right: Import Button -->
+        <a href="import.html" data-dom-id="nav-import" class="inline-flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-150 hover:opacity-90 active:scale-[0.98]" style="background: var(--color-primary); color: var(--color-text-on-primary); box-shadow: 0 1px 3px rgba(196, 92, 74, 0.15);">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>导入</span>
+        </a>
+      </div>
+
+      <!-- Group Tabs (iOS Segmented Control) -->
+      <div class="px-5 mb-5">
+        <div class="flex items-center ios-frosted-card rounded-[10px] p-[3px] border" style="border-color: rgba(44, 44, 44, 0.04);">
+          <button class="flex-1 h-[28px] rounded-[7px] text-xs font-semibold whitespace-nowrap transition-all duration-250" style="background: var(--color-bg-card); color: var(--color-primary); box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.04);">全部</button>
+          <button class="flex-1 h-[28px] rounded-[7px] text-xs font-medium whitespace-nowrap transition-all duration-250" style="color: var(--color-text-tertiary);">最近阅读</button>
+          <button class="flex-1 h-[28px] rounded-[7px] text-xs font-medium whitespace-nowrap transition-all duration-250" style="color: var(--color-text-tertiary);">未读</button>
+          <button class="flex-1 h-[28px] rounded-[7px] text-xs font-medium whitespace-nowrap transition-all duration-250" style="color: var(--color-text-tertiary);">在读</button>
+          <button class="flex-1 h-[28px] rounded-[7px] text-xs font-medium whitespace-nowrap transition-all duration-250" style="color: var(--color-text-tertiary);">已读</button>
+        </div>
+      </div>
+
+      <!-- Book Grid -->
+      <section id="book-grid-view" class="px-5">
+        <div class="grid grid-cols-2 gap-4">
+          <!-- Book Card 1 (clickable) -->
+          <a href="book-detail.html" data-dom-id="book-card-1" class="group block rounded-xl overflow-hidden transition-transform duration-150 active:scale-[0.98] hover:-translate-y-0.5" style="background: var(--color-bg-card); box-shadow: 0 0.5px 0 0.5px rgba(0,0,0,0.04);">
+            <div class="aspect-[3/4] overflow-hidden">
+              <img src="../assets/book-shelf-covers.jpg" alt="人间草木" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+            </div>
+            <div class="p-3 pb-2">
+              <h3 class="text-sm font-medium truncate" style="color: var(--color-text-primary);">人间草木</h3>
+              <p class="text-xs truncate mt-0.5" style="color: var(--color-text-tertiary);">汪曾祺</p>
+              <div class="mt-2 h-[2px] rounded-full overflow-hidden" style="background: var(--color-divider);">
+                <div class="h-full rounded-full" style="width: 68%; background: var(--color-primary);"></div>
+              </div>
+            </div>
+          </a>
+          <!-- Book Card 2 -->
+          <a href="book-detail.html" class="group block rounded-xl overflow-hidden transition-transform duration-150 active:scale-[0.98] hover:-translate-y-0.5" style="background: var(--color-bg-card); box-shadow: 0 0.5px 0 0.5px rgba(0,0,0,0.04);">
+            <div class="aspect-[3/4] overflow-hidden">
+              <img src="../assets/book-shelf-covers.jpg" alt="浮生六记" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+            </div>
+            <div class="p-3 pb-2">
+              <h3 class="text-sm font-medium truncate" style="color: var(--color-text-primary);">浮生六记</h3>
+              <p class="text-xs truncate mt-0.5" style="color: var(--color-text-tertiary);">沈复</p>
+              <div class="mt-2 h-[2px] rounded-full overflow-hidden" style="background: var(--color-divider);">
+                <div class="h-full rounded-full" style="width: 42%; background: var(--color-primary);"></div>
+              </div>
+            </div>
+          </a>
+          <!-- Book Card 3 -->
+          <a href="book-detail.html" class="group block rounded-xl overflow-hidden transition-transform duration-150 active:scale-[0.98] hover:-translate-y-0.5" style="background: var(--color-bg-card); box-shadow: 0 0.5px 0 0.5px rgba(0,0,0,0.04);">
+            <div class="aspect-[3/4] overflow-hidden">
+              <img src="../assets/book-shelf-covers.jpg" alt="文心雕龙" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+            </div>
+            <div class="p-3 pb-2">
+              <h3 class="text-sm font-medium truncate" style="color: var(--color-text-primary);">文心雕龙</h3>
+              <p class="text-xs truncate mt-0.5" style="color: var(--color-text-tertiary);">刘勰</p>
+              <div class="mt-2 h-[2px] rounded-full overflow-hidden" style="background: var(--color-divider);">
+                <div class="h-full rounded-full" style="width: 15%; background: var(--color-primary);"></div>
+              </div>
+            </div>
+          </a>
+          <!-- Book Card 4 -->
+          <a href="book-detail.html" class="group block rounded-xl overflow-hidden transition-transform duration-150 active:scale-[0.98] hover:-translate-y-0.5" style="background: var(--color-bg-card); box-shadow: 0 0.5px 0 0.5px rgba(0,0,0,0.04);">
+            <div class="aspect-[3/4] overflow-hidden">
+              <img src="../assets/book-shelf-covers.jpg" alt="长物志" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+            </div>
+            <div class="p-3 pb-2">
+              <h3 class="text-sm font-medium truncate" style="color: var(--color-text-primary);">长物志</h3>
+              <p class="text-xs truncate mt-0.5" style="color: var(--color-text-tertiary);">文震亨</p>
+              <div class="mt-2 h-[2px] rounded-full overflow-hidden" style="background: var(--color-divider);">
+                <div class="h-full rounded-full" style="width: 85%; background: var(--color-primary);"></div>
+              </div>
+            </div>
+          </a>
+          <!-- Book Card 5 -->
+          <a href="book-detail.html" class="group block rounded-xl overflow-hidden transition-transform duration-150 active:scale-[0.98] hover:-translate-y-0.5" style="background: var(--color-bg-card); box-shadow: 0 0.5px 0 0.5px rgba(0,0,0,0.04);">
+            <div class="aspect-[3/4] overflow-hidden">
+              <img src="../assets/book-shelf-covers.jpg" alt="闲情偶寄" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+            </div>
+            <div class="p-3 pb-2">
+              <h3 class="text-sm font-medium truncate" style="color: var(--color-text-primary);">闲情偶寄</h3>
+              <p class="text-xs truncate mt-0.5" style="color: var(--color-text-tertiary);">李渔</p>
+              <div class="mt-2 h-[2px] rounded-full overflow-hidden" style="background: var(--color-divider);">
+                <div class="h-full rounded-full" style="width: 30%; background: var(--color-primary);"></div>
+              </div>
+            </div>
+          </a>
+          <!-- Book Card 6 -->
+          <a href="book-detail.html" class="group block rounded-xl overflow-hidden transition-transform duration-150 active:scale-[0.98] hover:-translate-y-0.5" style="background: var(--color-bg-card); box-shadow: 0 0.5px 0 0.5px rgba(0,0,0,0.04);">
+            <div class="aspect-[3/4] overflow-hidden">
+              <img src="../assets/book-shelf-covers.jpg" alt="东坡志林" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy">
+            </div>
+            <div class="p-3 pb-2">
+              <h3 class="text-sm font-medium truncate" style="color: var(--color-text-primary);">东坡志林</h3>
+              <p class="text-xs truncate mt-0.5" style="color: var(--color-text-tertiary);">苏轼</p>
+              <div class="mt-2 h-[2px] rounded-full overflow-hidden" style="background: var(--color-divider);">
+                <div class="h-full rounded-full" style="width: 55%; background: var(--color-primary);"></div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Book List View -->
+      <section id="book-list-view" class="px-5 hidden">
+        <div class="space-y-1">
+          <!-- List Item 1 -->
+          <a href="book-detail.html" data-dom-id="book-list-1" class="flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-150 active:bg-[rgba(44,44,44,0.04)]" style="background: var(--color-bg-card);">
+            <img src="../assets/book-shelf-covers.jpg" alt="人间草木" class="w-12 h-16 rounded-md object-cover shrink-0" style="box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-medium truncate" style="color: var(--color-text-primary);">人间草木</h3>
+              <p class="text-xs truncate mt-0.5" style="color: var(--color-text-tertiary);">汪曾祺 · 2019年</p>
+              <div class="flex items-center gap-2 mt-2">
+                <div class="flex-1 h-[2px] rounded-full overflow-hidden" style="background: var(--color-divider);">
+                  <div class="h-full rounded-full" style="width: 68%; background: var(--color-primary);"></div>
+                </div>
+                <span class="text-[10px] tabular-nums shrink-0" style="color: var(--color-primary);">68%</span>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+          </a>
+          <!-- List Item 2 -->
+          <a href="book-detail.html" class="flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-150 active:bg-[rgba(44,44,44,0.04)]" style="background: var(--color-bg-card);">
+            <img src="../assets/book-shelf-covers.jpg" alt="浮生六记" class="w-12 h-16 rounded-md object-cover shrink-0" style="box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-medium truncate" style="color: var(--color-text-primary);">浮生六记</h3>
+              <p class="text-xs truncate mt-0.5" style="color: var(--color-text-tertiary);">沈复 · 清代</p>
+              <div class="flex items-center gap-2 mt-2">
+                <div class="flex-1 h-[2px] rounded-full overflow-hidden" style="background: var(--color-divider);">
+                  <div class="h-full rounded-full" style="width: 42%; background: var(--color-primary);"></div>
+                </div>
+                <span class="text-[10px] tabular-nums shrink-0" style="color: var(--color-primary);">42%</span>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+          </a>
+          <!-- List Item 3 -->
+          <a href="book-detail.html" class="flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-150 active:bg-[rgba(44,44,44,0.04)]" style="background: var(--color-bg-card);">
+            <img src="../assets/book-shelf-covers.jpg" alt="文心雕龙" class="w-12 h-16 rounded-md object-cover shrink-0" style="box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-medium truncate" style="color: var(--color-text-primary);">文心雕龙</h3>
+              <p class="text-xs truncate mt-0.5" style="color: var(--color-text-tertiary);">刘勰 · 南朝梁</p>
+              <div class="flex items-center gap-2 mt-2">
+                <div class="flex-1 h-[2px] rounded-full overflow-hidden" style="background: var(--color-divider);">
+                  <div class="h-full rounded-full" style="width: 15%; background: var(--color-primary);"></div>
+                </div>
+                <span class="text-[10px] tabular-nums shrink-0" style="color: var(--color-primary);">15%</span>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+          </a>
+          <!-- List Item 4 -->
+          <a href="book-detail.html" class="flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-150 active:bg-[rgba(44,44,44,0.04)]" style="background: var(--color-bg-card);">
+            <img src="../assets/book-shelf-covers.jpg" alt="长物志" class="w-12 h-16 rounded-md object-cover shrink-0" style="box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-medium truncate" style="color: var(--color-text-primary);">长物志</h3>
+              <p class="text-xs truncate mt-0.5" style="color: var(--color-text-tertiary);">文震亨 · 明代</p>
+              <div class="flex items-center gap-2 mt-2">
+                <div class="flex-1 h-[2px] rounded-full overflow-hidden" style="background: var(--color-divider);">
+                  <div class="h-full rounded-full" style="width: 85%; background: var(--color-primary);"></div>
+                </div>
+                <span class="text-[10px] tabular-nums shrink-0" style="color: var(--color-primary);">85%</span>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+          </a>
+          <!-- List Item 5 -->
+          <a href="book-detail.html" class="flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-150 active:bg-[rgba(44,44,44,0.04)]" style="background: var(--color-bg-card);">
+            <img src="../assets/book-shelf-covers.jpg" alt="闲情偶寄" class="w-12 h-16 rounded-md object-cover shrink-0" style="box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-medium truncate" style="color: var(--color-text-primary);">闲情偶寄</h3>
+              <p class="text-xs truncate mt-0.5" style="color: var(--color-text-tertiary);">李渔 · 清代</p>
+              <div class="flex items-center gap-2 mt-2">
+                <div class="flex-1 h-[2px] rounded-full overflow-hidden" style="background: var(--color-divider);">
+                  <div class="h-full rounded-full" style="width: 30%; background: var(--color-primary);"></div>
+                </div>
+                <span class="text-[10px] tabular-nums shrink-0" style="color: var(--color-primary);">30%</span>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+          </a>
+          <!-- List Item 6 -->
+          <a href="book-detail.html" class="flex items-center gap-3 px-3 py-3 rounded-xl transition-colors duration-150 active:bg-[rgba(44,44,44,0.04)]" style="background: var(--color-bg-card);">
+            <img src="../assets/book-shelf-covers.jpg" alt="东坡志林" class="w-12 h-16 rounded-md object-cover shrink-0" style="box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+            <div class="flex-1 min-w-0">
+              <h3 class="text-sm font-medium truncate" style="color: var(--color-text-primary);">东坡志林</h3>
+              <p class="text-xs truncate mt-0.5" style="color: var(--color-text-tertiary);">苏轼 · 北宋</p>
+              <div class="flex items-center gap-2 mt-2">
+                <div class="flex-1 h-[2px] rounded-full overflow-hidden" style="background: var(--color-divider);">
+                  <div class="h-full rounded-full" style="width: 55%; background: var(--color-primary);"></div>
+                </div>
+                <span class="text-[10px] tabular-nums shrink-0" style="color: var(--color-primary);">55%</span>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+          </a>
+        </div>
+      </section>
+
+      <!-- Bottom Tab Bar (iOS Frosted Glass) -->
+      <nav class="fixed bottom-0 left-0 right-0 z-40 ios-frosted-tab" style="border-top: 0.5px solid rgba(44, 44, 44, 0.1);">
+        <div class="flex items-center justify-around h-[49px] max-w-lg mx-auto">
+          <!-- Tab: 书架 (active) -->
+          <button class="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-150" style="color: var(--color-primary);">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium">书架</span>
+          </button>
+          <!-- Tab: 分类 -->
+          <a href="categories.html" data-dom-id="tab-categories" class="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-150" style="color: var(--color-text-tertiary);">
+            <i data-lucide="folders" class="w-5 h-5"></i>
+            <span class="text-[10px]">分类</span>
+          </a>
+          <!-- Tab: 我的 -->
+          <a href="settings.html" data-dom-id="tab-profile" class="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-150" style="color: var(--color-text-tertiary);">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span class="text-[10px]">我的</span>
+          </a>
+        </div>
+        <div class="h-[env(safe-area-inset-bottom,20px)]"></div>
+      </nav>
+    </main>
+
+    <style>
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+        }
+      }
+    </style>
+    <script>
+      lucide.createIcons();
+
+      let currentView = 'grid';
+
+      function setView(view) {
+        currentView = view;
+        const gridView = document.getElementById('book-grid-view');
+        const listView = document.getElementById('book-list-view');
+        const gridBtn = document.getElementById('view-grid-btn');
+        const listBtn = document.getElementById('view-list-btn');
+
+        if (view === 'grid') {
+          gridView.classList.remove('hidden');
+          listView.classList.add('hidden');
+          gridBtn.style.background = 'var(--color-primary-light)';
+          gridBtn.style.color = 'var(--color-primary)';
+          listBtn.style.background = 'transparent';
+          listBtn.style.color = 'var(--color-text-tertiary)';
+        } else {
+          gridView.classList.add('hidden');
+          listView.classList.remove('hidden');
+          listBtn.style.background = 'var(--color-primary-light)';
+          listBtn.style.color = 'var(--color-primary)';
+          gridBtn.style.background = 'transparent';
+          gridBtn.style.color = 'var(--color-text-tertiary)';
+        }
+        lucide.createIcons();
+      }
+    </script>
+</body>
+</html>

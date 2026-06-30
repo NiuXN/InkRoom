@@ -1,0 +1,248 @@
+{
+  "data": [
+    {
+      "id": "page-library",
+      "title": "书架首页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782723600000,
+      "canvasData": {
+        "x": 420,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/library.html",
+        "interactions": [
+          {
+            "domId": "book-card-1",
+            "targetPageId": "page-book-detail",
+            "transitionLabel": "查看书籍"
+          },
+          {
+            "domId": "tab-categories",
+            "targetPageId": "page-categories",
+            "transitionLabel": "分类",
+            "hideEdge": true
+          },
+          {
+            "domId": "tab-profile",
+            "targetPageId": "page-settings",
+            "transitionLabel": "我的",
+            "hideEdge": true
+          },
+          {
+            "domId": "nav-import",
+            "targetPageId": "page-import",
+            "transitionLabel": "导入书籍",
+            "hideEdge": true
+          },
+          {
+            "domId": "tab-discover",
+            "targetPageId": "page-discover",
+            "transitionLabel": "发现",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-categories",
+      "title": "分类",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782723800000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/categories.html",
+        "interactions": [
+          {
+            "domId": "category-1",
+            "targetPageId": "page-library",
+            "transitionLabel": "中国古典"
+          },
+          {
+            "domId": "category-2",
+            "targetPageId": "page-library",
+            "transitionLabel": "现代文学"
+          },
+          {
+            "domId": "category-3",
+            "targetPageId": "page-library",
+            "transitionLabel": "外国名著"
+          },
+          {
+            "domId": "category-4",
+            "targetPageId": "page-library",
+            "transitionLabel": "诗词歌赋"
+          },
+          {
+            "domId": "tab-library",
+            "targetPageId": "page-library",
+            "transitionLabel": "书架",
+            "hideEdge": true
+          },
+          {
+            "domId": "tab-profile",
+            "targetPageId": "page-settings",
+            "transitionLabel": "我的",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-reader",
+      "title": "阅读器",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782723600000,
+      "canvasData": {
+        "x": 1260,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/reader.html",
+        "interactions": [
+          {
+            "domId": "back-detail",
+            "targetPageId": "page-book-detail",
+            "transitionLabel": "返回详情",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-book-detail",
+      "title": "书籍详情",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782723600000,
+      "canvasData": {
+        "x": 840,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/book-detail.html",
+        "interactions": [
+          {
+            "domId": "start-reading",
+            "targetPageId": "page-reader",
+            "transitionLabel": "开始阅读"
+          },
+          {
+            "domId": "continue-reading",
+            "targetPageId": "page-reader",
+            "transitionLabel": "继续阅读"
+          },
+          {
+            "domId": "back-library",
+            "targetPageId": "page-library",
+            "transitionLabel": "返回书架",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-import",
+      "title": "导入传书",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782723600000,
+      "canvasData": {
+        "x": 0,
+        "y": 834,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/import.html",
+        "interactions": [
+          {
+            "domId": "back-library",
+            "targetPageId": "page-library",
+            "transitionLabel": "返回书架",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-settings",
+      "title": "我的",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782723600000,
+      "canvasData": {
+        "x": 420,
+        "y": 834,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/settings.html",
+        "interactions": [
+          {
+            "domId": "tab-library",
+            "targetPageId": "page-library",
+            "transitionLabel": "书架",
+            "hideEdge": true
+          },
+          {
+            "domId": "tab-categories",
+            "targetPageId": "page-categories",
+            "transitionLabel": "分类",
+            "hideEdge": true
+          },
+          {
+            "domId": "tab-discover",
+            "targetPageId": "page-discover",
+            "transitionLabel": "发现",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "image-001",
+      "title": "书架封面",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1782723700000,
+      "canvasData": {
+        "x": 0,
+        "y": 1554
+      },
+      "devMetadata": {
+        "imageSrc": "assets/book-shelf-covers.jpg"
+      }
+    },
+    {
+      "id": "image-002",
+      "title": "书籍封面详情",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1782723700000,
+      "canvasData": {
+        "x": 420,
+        "y": 1554
+      },
+      "devMetadata": {
+        "imageSrc": "assets/book-detail-cover.jpg"
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "mobile",
+    "projectName": "墨斋 InkRoom iOS UI",
+    "designLibrary": null,
+    "showEdge": false
+  }
+}

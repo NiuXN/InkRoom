@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导入传书</title>
+    <style id="theme-vars">
+/* ============================================
+   墨斋 InkRoom — Brand Design Tokens
+   东方禅意 · 水墨书房 · iOS 阅读器
+   ============================================ */
+
+:root {
+  /* ── Color System: 水墨禅意 ── */
+  --color-primary: #C45C4A;
+  --color-primary-hover: #B04A39;
+  --color-primary-light: rgba(196, 92, 74, 0.12);
+  --color-primary-muted: rgba(196, 92, 74, 0.06);
+
+  /* ── Surface & Background: 纸张色系 ── */
+  --color-bg-primary: #F5F0E8;
+  --color-bg-secondary: #EDE7DB;
+  --color-bg-elevated: #FAF7F2;
+  --color-bg-card: #FFFFFF;
+  --color-bg-overlay: rgba(44, 44, 44, 0.5);
+
+  /* ── Text: 墨色层次 ── */
+  --color-text-primary: #2C2C2C;
+  --color-text-secondary: #6B6B6B;
+  --color-text-tertiary: #9A9A9A;
+  --color-text-inverse: #F5F0E8;
+  --color-text-on-primary: #FFFFFF;
+
+  /* ── Border & Divider ── */
+  --color-border: rgba(44, 44, 44, 0.08);
+  --color-border-strong: rgba(44, 44, 44, 0.16);
+  --color-divider: rgba(44, 44, 44, 0.06);
+
+  /* ── State Colors ── */
+  --state-success: #4A8C6F;
+  --state-warning: #C49A4A;
+  --state-error: #C44A4A;
+  --state-info: #4A7BC4;
+
+  /* ── Typography ── */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+  --font-family-display: "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+  --font-family-mono: "SF Mono", "Menlo", monospace;
+
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 34px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.04em;
+
+  /* ── Spacing ── */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-base: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 40px;
+  --spacing-4xl: 48px;
+
+  /* ── Radius ── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ── Shadow ── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.08);
+
+  /* ── Reading Theme Tokens ── */
+  --reader-bg-light: #F5F0E8;
+  --reader-bg-warm: #F0E6D0;
+  --reader-bg-dark: #1A1A1A;
+  --reader-text-light: #2C2C2C;
+  --reader-text-dark: #D4CFC7;
+}
+
+/* ── Dark Mode ── */
+.dark {
+  --color-bg-primary: #1A1A1A;
+  --color-bg-secondary: #242424;
+  --color-bg-elevated: #2A2A2A;
+  --color-bg-card: #2E2E2E;
+  --color-bg-overlay: rgba(0, 0, 0, 0.6);
+
+  --color-text-primary: #D4CFC7;
+  --color-text-secondary: #A0A0A0;
+  --color-text-tertiary: #6B6B6B;
+  --color-text-inverse: #2C2C2C;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+  --color-divider: rgba(255, 255, 255, 0.06);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Typography Classes ── */
+.typo-display {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.typo-heading {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.typo-body {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-normal);
+}
+
+.typo-caption {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Ink Wash Accent Utility ── */
+.ink-wash {
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+}
+
+.ink-accent-bar {
+  width: 32px;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+}
+
+/* ── iOS Frosted Glass Utilities ── */
+.ios-frosted-bar {
+  background: rgba(250, 247, 242, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+.ios-frosted-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: saturate(150%) blur(16px);
+  -webkit-backdrop-filter: saturate(150%) blur(16px);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg-primary); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="min-h-screen" style="background: var(--color-bg-primary);">
+        <!-- Status Bar Spacer -->
+        <div class="h-11" aria-hidden="true"></div>
+
+        <!-- Navigation Header (iOS Frosted Glass, sticky) -->
+        <header class="sticky top-0 z-30 flex items-center px-4 h-11 ios-frosted-bar" style="border-bottom: 0.5px solid rgba(44, 44, 44, 0.08);">
+            <button data-dom-id="back-library" onclick="location.href='library.html'" class="inline-flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-150 hover:bg-[rgba(44,44,44,0.06)] active:scale-[0.94]" aria-label="返回书架">
+                <i data-lucide="chevron-left" class="w-5 h-5" style="color: var(--color-text-primary);"></i>
+            </button>
+            <h1 class="flex-1 text-center text-[var(--font-size-md)] font-semibold tracking-tight" style="color: var(--color-text-primary); margin-right: 32px;">导入书籍</h1>
+        </header>
+
+        <!-- Page Content -->
+        <div class="px-4 pt-6 pb-8 space-y-5">
+
+            <!-- Wi-Fi Transfer Card (iOS Frosted Glass) -->
+            <section class="rounded-xl p-5 ios-frosted-card" style="border: 0.5px solid rgba(44, 44, 44, 0.06);">
+                <!-- Title Row -->
+                <div class="flex items-center gap-2 mb-1">
+                    <i data-lucide="wifi" class="w-5 h-5" style="color: var(--color-primary);"></i>
+                    <h2 class="text-[var(--font-size-md)] font-semibold" style="color: var(--color-text-primary);">Wi-Fi 传书</h2>
+                    <span class="inline-flex items-center gap-1 ml-auto">
+                        <span class="w-2 h-2 rounded-full" style="background: var(--state-success);"></span>
+                        <span class="text-[var(--font-size-xs)]" style="color: var(--state-success);">已开启</span>
+                    </span>
+                </div>
+                <p class="text-[var(--font-size-sm)] mb-5" style="color: var(--color-text-tertiary);">确保手机与电脑在同一 Wi-Fi 网络下</p>
+
+                <!-- IP Address Stamp (Soul Element) -->
+                <div class="flex justify-center mb-2">
+                    <div class="inline-flex items-center justify-center rounded-[10px] px-6 py-3" style="background: var(--color-primary); min-width: 200px; box-shadow: 0 2px 8px rgba(196,92,74,0.2);">
+                        <span class="font-medium text-[var(--font-size-xl)] tracking-wide" style="color: var(--color-text-on-primary); font-family: var(--font-family-mono);">192.168.1.42</span>
+                    </div>
+                </div>
+                <p class="text-center text-[var(--font-size-xs)]" style="color: var(--color-text-tertiary);">在电脑浏览器中输入此地址</p>
+            </section>
+
+            <!-- Upload Area -->
+            <section data-dom-id="upload-area" class="rounded-xl flex flex-col items-center justify-center py-8 px-4" style="border: 2px dashed var(--color-border-strong);">
+                <i data-lucide="upload-cloud" class="w-8 h-8 mb-3" style="color: var(--color-text-tertiary);"></i>
+                <p class="text-[var(--font-size-base)] mb-1" style="color: var(--color-text-secondary);">或将文件拖拽到此处</p>
+                <p class="text-[var(--font-size-xs)]" style="color: var(--color-text-tertiary);">.epub  .txt</p>
+            </section>
+
+            <!-- Upload Task List -->
+            <section>
+                <h2 class="text-[var(--font-size-sm)] font-medium mb-3" style="color: var(--color-text-secondary);">导入任务</h2>
+                <div class="rounded-xl overflow-hidden ios-frosted-card space-y-px" style="border: 0.5px solid rgba(44, 44, 44, 0.06); background: var(--color-divider);">
+                    <!-- Uploading -->
+                    <div class="flex items-center gap-3 px-4 py-3" style="background: var(--color-bg-card);">
+                        <div class="inline-flex items-center justify-center w-9 h-9 rounded-lg shrink-0" style="background: var(--color-primary-light);">
+                            <i data-lucide="loader-2" class="w-[18px] h-[18px] animate-spin" style="color: var(--color-primary);"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[var(--font-size-sm)] font-medium truncate" style="color: var(--color-text-primary);">人间草木.epub</p>
+                            <div class="flex items-center gap-2 mt-1.5">
+                                <div class="flex-1 h-1 rounded-full overflow-hidden" style="background: var(--color-divider);">
+                                    <div class="h-full rounded-full" style="width: 65%; background: var(--color-primary);"></div>
+                                </div>
+                                <span class="text-[10px] tabular-nums shrink-0" style="color: var(--color-primary);">65%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Success -->
+                    <div class="flex items-center gap-3 px-4 py-3" style="background: var(--color-bg-card);">
+                        <div class="inline-flex items-center justify-center w-9 h-9 rounded-lg shrink-0" style="background: rgba(74,140,111,0.1);">
+                            <i data-lucide="check-circle" class="w-[18px] h-[18px]" style="color: #4A8C6F;"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[var(--font-size-sm)] font-medium truncate" style="color: var(--color-text-primary);">围城.txt</p>
+                            <p class="text-[10px] truncate" style="color: var(--color-text-tertiary);">2.3 MB · 导入成功</p>
+                        </div>
+                        <i data-lucide="book-open" class="w-4 h-4 shrink-0" style="color: #4A8C6F;"></i>
+                    </div>
+                    <!-- Failed -->
+                    <div class="flex items-center gap-3 px-4 py-3" style="background: var(--color-bg-card);">
+                        <div class="inline-flex items-center justify-center w-9 h-9 rounded-lg shrink-0" style="background: rgba(196,74,74,0.1);">
+                            <i data-lucide="alert-circle" class="w-[18px] h-[18px]" style="color: #C44A4A;"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[var(--font-size-sm)] font-medium truncate" style="color: var(--color-text-primary);">红楼梦.pdf</p>
+                            <p class="text-[10px] truncate" style="color: #C44A4A;">不支持的文件格式</p>
+                        </div>
+                        <button class="text-xs px-3 h-7 rounded-lg border transition-colors duration-150 shrink-0" style="border-color: var(--color-border-strong); color: var(--color-text-tertiary);">
+                            重试
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Other Import Methods -->
+            <section>
+                <h2 class="text-[var(--font-size-sm)] font-medium mb-3" style="color: var(--color-text-secondary);">其他导入方式</h2>
+                <div class="rounded-xl overflow-hidden ios-frosted-card" style="border: 0.5px solid rgba(44, 44, 44, 0.06);">
+                    <!-- AirDrop -->
+                    <div class="flex items-center gap-3 px-4 py-3.5" style="border-bottom: 1px solid var(--color-divider);">
+                        <div class="inline-flex items-center justify-center w-9 h-9 rounded-lg shrink-0" style="background: var(--color-primary-light);">
+                            <i data-lucide="share" class="w-[18px] h-[18px]" style="color: var(--color-primary);"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[var(--font-size-base)] font-medium truncate" style="color: var(--color-text-primary);">隔空投送</p>
+                            <p class="text-[var(--font-size-xs)] truncate" style="color: var(--color-text-tertiary);">通过 AirDrop 发送文件到墨斋</p>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+                    </div>
+                    <!-- Files App -->
+                    <div class="flex items-center gap-3 px-4 py-3.5">
+                        <div class="inline-flex items-center justify-center w-9 h-9 rounded-lg shrink-0" style="background: var(--color-primary-light);">
+                            <i data-lucide="folder" class="w-[18px] h-[18px]" style="color: var(--color-primary);"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-[var(--font-size-base)] font-medium truncate" style="color: var(--color-text-primary);">文件 App</p>
+                            <p class="text-[var(--font-size-xs)] truncate" style="color: var(--color-text-tertiary);">在「文件」中选择墨斋打开</p>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bottom Tip -->
+            <p class="text-center text-[var(--font-size-xs)] pt-1" style="color: var(--color-text-tertiary);">支持 epub 和 txt 格式，单文件最大 100MB</p>
+        </div>
+
+        <!-- Custom style for page-specific treatment -->
+        <style>
+            @media (prefers-reduced-motion: reduce) {
+                button { transition-duration: 0.01ms !important; }
+            }
+        </style>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>空状态 - 墨斋原型</title>
+    <style id="theme-vars">
+:root {
+  --color-primary: #C45C4A;
+  --color-primary-hover: #B04A39;
+  --color-primary-light: rgba(196, 92, 74, 0.12);
+  --color-primary-muted: rgba(196, 92, 74, 0.06);
+  --color-bg-primary: #F5F0E8;
+  --color-bg-secondary: #EDE7DB;
+  --color-bg-elevated: #FAF7F2;
+  --color-bg-card: #FFFFFF;
+  --color-bg-overlay: rgba(44, 44, 44, 0.5);
+  --color-text-primary: #2C2C2C;
+  --color-text-secondary: #6B6B6B;
+  --color-text-tertiary: #9A9A9A;
+  --color-text-inverse: #F5F0E8;
+  --color-text-on-primary: #FFFFFF;
+  --color-border: rgba(44, 44, 44, 0.08);
+  --color-border-strong: rgba(44, 44, 44, 0.16);
+  --color-divider: rgba(44, 44, 44, 0.06);
+  --state-success: #4A8C6F;
+  --state-warning: #C49A4A;
+  --state-error: #C44A4A;
+  --state-info: #4A7BC4;
+  --font-family-base: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+  --font-family-display: "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 34px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-base: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 40px;
+  --spacing-4xl: 48px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+.dark {
+  --color-bg-primary: #1A1A1A;
+  --color-bg-secondary: #242424;
+  --color-bg-elevated: #2A2A2A;
+  --color-bg-card: #2E2E2E;
+  --color-bg-overlay: rgba(0, 0, 0, 0.6);
+  --color-text-primary: #D4CFC7;
+  --color-text-secondary: #A0A0A0;
+  --color-text-tertiary: #6B6B6B;
+  --color-text-inverse: #2C2C2C;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+  --color-divider: rgba(255, 255, 255, 0.06);
+}
+.typo-display { font-family: var(--font-family-display); font-weight: var(--font-weight-bold); letter-spacing: 0.04em; }
+.typo-heading { font-family: var(--font-family-base); font-weight: var(--font-weight-semibold); letter-spacing: -0.02em; }
+.ios-frosted-bar {
+  background: rgba(250, 247, 242, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+.ios-frosted-tab {
+  background: rgba(250, 247, 242, 0.78);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-inkroom-primary: var(--color-primary);
+    --color-inkroom-primary-light: var(--color-primary-light);
+    --color-inkroom-bg-primary: var(--color-bg-primary);
+    --color-inkroom-text-primary: var(--color-text-primary);
+    --color-inkroom-text-secondary: var(--color-text-secondary);
+    --color-inkroom-text-tertiary: var(--color-text-tertiary);
+    --color-inkroom-border: var(--color-border);
+    --color-inkroom-divider: var(--color-divider);
+  }
+  @layer base {
+    body { background: var(--color-bg-primary); color: var(--color-text-primary); }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <!-- Status bar safe area -->
+    <div class="h-11"></div>
+
+    <!-- Top navigation -->
+    <header class="sticky top-0 z-30 flex items-center px-4 h-11 ios-frosted-bar" style="border-bottom: 0.5px solid rgba(44, 44, 44, 0.08);">
+      <button onclick="location.href='library.html'" class="inline-flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-150 hover:bg-[rgba(44,44,44,0.06)] active:scale-[0.94]" aria-label="返回">
+        <i data-lucide="chevron-left" class="w-5 h-5" style="color: var(--color-text-primary);"></i>
+      </button>
+      <h1 class="flex-1 text-center text-sm font-semibold truncate" style="color: var(--color-text-primary); margin-right: 32px;">空状态展示</h1>
+    </header>
+
+    <main class="pb-24">
+
+      <!-- Segment Control -->
+      <section class="px-5 pt-4 pb-5">
+        <div class="flex items-center p-1 rounded-xl" style="background: var(--color-bg-elevated);">
+          <button onclick="showEmptyState('shelf')" id="tab-shelf" class="flex-1 h-9 rounded-lg text-xs font-medium transition-all duration-200" style="background: var(--color-primary); color: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            空书架
+          </button>
+          <button onclick="showEmptyState('search')" id="tab-search" class="flex-1 h-9 rounded-lg text-xs font-medium transition-all duration-200" style="color: var(--color-text-secondary);">
+            空搜索
+          </button>
+          <button onclick="showEmptyState('category')" id="tab-category" class="flex-1 h-9 rounded-lg text-xs font-medium transition-all duration-200" style="color: var(--color-text-secondary);">
+            空分类
+          </button>
+        </div>
+      </section>
+
+      <!-- Empty Shelf -->
+      <section id="empty-shelf" class="px-5">
+        <div class="flex flex-col items-center justify-center py-16 text-center">
+          <div class="w-24 h-24 rounded-3xl flex items-center justify-center mb-5" style="background: var(--color-primary-light);">
+            <i data-lucide="library" class="w-12 h-12" style="color: var(--color-primary);"></i>
+          </div>
+          <h2 class="typo-display text-lg mb-2" style="color: var(--color-text-primary);">书架空空如也</h2>
+          <p class="text-sm max-w-[240px] leading-relaxed mb-8" style="color: var(--color-text-tertiary);">
+            开启你的阅读之旅<br>导入第一本喜欢的书吧
+          </p>
+          <button onclick="location.href='import.html'" class="inline-flex items-center gap-2 px-6 h-11 rounded-xl text-sm font-medium transition-transform duration-150 active:scale-[0.96]" style="background: var(--color-primary); color: #fff; box-shadow: 0 4px 12px rgba(196,92,74,0.25);">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            导入书籍
+          </button>
+          <button class="mt-3 inline-flex items-center gap-1.5 text-sm transition-colors duration-150" style="color: var(--color-primary);">
+            <i data-lucide="compass" class="w-4 h-4"></i>
+            发现好书
+          </button>
+        </div>
+      </section>
+
+      <!-- Empty Search (hidden by default) -->
+      <section id="empty-search" class="px-5 hidden">
+        <!-- Search bar mock -->
+        <div class="mb-6">
+          <div class="flex items-center gap-2 px-4 h-10 rounded-xl" style="background: var(--color-bg-elevated);">
+            <i data-lucide="search" class="w-4 h-4 shrink-0" style="color: var(--color-text-tertiary);"></i>
+            <span class="text-sm" style="color: var(--color-text-tertiary);">哈利波特</span>
+          </div>
+        </div>
+        <div class="flex flex-col items-center justify-center py-12 text-center">
+          <div class="w-20 h-20 rounded-3xl flex items-center justify-center mb-5" style="background: rgba(74,123,196,0.1);">
+            <i data-lucide="search-x" class="w-10 h-10" style="color: #4A7BC4;"></i>
+          </div>
+          <h2 class="typo-display text-base mb-2" style="color: var(--color-text-primary);">未找到相关书籍</h2>
+          <p class="text-sm max-w-[220px] leading-relaxed" style="color: var(--color-text-tertiary);">
+            试试其他关键词<br>或检查书名是否正确
+          </p>
+        </div>
+        <!-- Search suggestions -->
+        <div class="mt-6">
+          <p class="text-xs mb-3 px-1" style="color: var(--color-text-tertiary);">大家都在搜</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="inline-flex items-center px-3 h-8 rounded-full text-xs" style="background: var(--color-bg-elevated); color: var(--color-text-secondary);">人间草木</span>
+            <span class="inline-flex items-center px-3 h-8 rounded-full text-xs" style="background: var(--color-bg-elevated); color: var(--color-text-secondary);">围城</span>
+            <span class="inline-flex items-center px-3 h-8 rounded-full text-xs" style="background: var(--color-bg-elevated); color: var(--color-text-secondary);">活着</span>
+            <span class="inline-flex items-center px-3 h-8 rounded-full text-xs" style="background: var(--color-bg-elevated); color: var(--color-text-secondary);">三体</span>
+            <span class="inline-flex items-center px-3 h-8 rounded-full text-xs" style="background: var(--color-bg-elevated); color: var(--color-text-secondary);">百年孤独</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Empty Category (hidden by default) -->
+      <section id="empty-category" class="px-5 hidden">
+        <!-- Category header mock -->
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(196,154,74,0.1);">
+            <i data-lucide="music" class="w-6 h-6" style="color: #C49A4A;"></i>
+          </div>
+          <div>
+            <h2 class="typo-display text-base" style="color: var(--color-text-primary);">诗词歌赋</h2>
+            <p class="text-xs" style="color: var(--color-text-tertiary);">0 本书</p>
+          </div>
+        </div>
+        <div class="flex flex-col items-center justify-center py-12 text-center">
+          <div class="w-20 h-20 rounded-3xl flex items-center justify-center mb-5" style="background: rgba(196,154,74,0.1);">
+            <i data-lucide="folder-open" class="w-10 h-10" style="color: #C49A4A;"></i>
+          </div>
+          <h2 class="typo-display text-base mb-2" style="color: var(--color-text-primary);">此分类暂无书籍</h2>
+          <p class="text-sm max-w-[220px] leading-relaxed mb-6" style="color: var(--color-text-tertiary);">
+            将书籍添加到此分类<br>方便整理和查找
+          </p>
+          <button class="inline-flex items-center gap-2 px-5 h-10 rounded-xl text-sm font-medium transition-transform duration-150 active:scale-[0.96]" style="background: rgba(196,154,74,0.1); color: #C49A4A;">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            添加书籍
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Tab Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 ios-frosted-tab" style="border-top: 0.5px solid rgba(44, 44, 44, 0.1);">
+      <div class="flex items-center justify-around h-[49px] max-w-lg mx-auto">
+        <a href="library.html" class="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-150" style="color: var(--color-primary);">
+          <i data-lucide="book-open" class="w-5 h-5"></i>
+          <span class="text-[10px] font-medium">书架</span>
+        </a>
+        <a href="categories.html" class="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-150" style="color: var(--color-text-tertiary);">
+          <i data-lucide="folders" class="w-5 h-5"></i>
+          <span class="text-[10px]">分类</span>
+        </a>
+        <a href="settings.html" class="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-150" style="color: var(--color-text-tertiary);">
+          <i data-lucide="user" class="w-5 h-5"></i>
+          <span class="text-[10px]">我的</span>
+        </a>
+      </div>
+      <div class="h-[env(safe-area-inset-bottom,20px)]"></div>
+    </nav>
+
+    <script>
+      lucide.createIcons();
+      function showEmptyState(type) {
+        document.getElementById('empty-shelf').classList.add('hidden');
+        document.getElementById('empty-search').classList.add('hidden');
+        document.getElementById('empty-category').classList.add('hidden');
+        ['shelf', 'search', 'category'].forEach(t => {
+          const tab = document.getElementById('tab-' + t);
+          tab.style.background = 'transparent';
+          tab.style.color = 'var(--color-text-secondary)';
+          tab.style.boxShadow = 'none';
+        });
+        document.getElementById('empty-' + type).classList.remove('hidden');
+        const activeTab = document.getElementById('tab-' + type);
+        activeTab.style.background = 'var(--color-primary)';
+        activeTab.style.color = '#fff';
+        activeTab.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        lucide.createIcons();
+      }
+    </script>
+</body>
+</html>

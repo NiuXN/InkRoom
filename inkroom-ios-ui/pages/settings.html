@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设置</title>
+    <style id="theme-vars">
+/* ============================================
+   墨斋 InkRoom — Brand Design Tokens
+   东方禅意 · 水墨书房 · iOS 阅读器
+   ============================================ */
+
+:root {
+  /* ── Color System: 水墨禅意 ── */
+  --color-primary: #C45C4A;
+  --color-primary-hover: #B04A39;
+  --color-primary-light: rgba(196, 92, 74, 0.12);
+  --color-primary-muted: rgba(196, 92, 74, 0.06);
+
+  /* ── Surface & Background: 纸张色系 ── */
+  --color-bg-primary: #F5F0E8;
+  --color-bg-secondary: #EDE7DB;
+  --color-bg-elevated: #FAF7F2;
+  --color-bg-card: #FFFFFF;
+  --color-bg-overlay: rgba(44, 44, 44, 0.5);
+
+  /* ── Text: 墨色层次 ── */
+  --color-text-primary: #2C2C2C;
+  --color-text-secondary: #6B6B6B;
+  --color-text-tertiary: #9A9A9A;
+  --color-text-inverse: #F5F0E8;
+  --color-text-on-primary: #FFFFFF;
+
+  /* ── Border & Divider ── */
+  --color-border: rgba(44, 44, 44, 0.08);
+  --color-border-strong: rgba(44, 44, 44, 0.16);
+  --color-divider: rgba(44, 44, 44, 0.06);
+
+  /* ── State Colors ── */
+  --state-success: #4A8C6F;
+  --state-warning: #C49A4A;
+  --state-error: #C44A4A;
+  --state-info: #4A7BC4;
+
+  /* ── Typography ── */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+  --font-family-display: "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+  --font-family-mono: "SF Mono", "Menlo", monospace;
+
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 34px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.04em;
+
+  /* ── Spacing ── */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-base: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 40px;
+  --spacing-4xl: 48px;
+
+  /* ── Radius ── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ── Shadow ── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.08);
+
+  /* ── Reading Theme Tokens ── */
+  --reader-bg-light: #F5F0E8;
+  --reader-bg-warm: #F0E6D0;
+  --reader-bg-dark: #1A1A1A;
+  --reader-text-light: #2C2C2C;
+  --reader-text-dark: #D4CFC7;
+}
+
+/* ── Dark Mode ── */
+.dark {
+  --color-bg-primary: #1A1A1A;
+  --color-bg-secondary: #242424;
+  --color-bg-elevated: #2A2A2A;
+  --color-bg-card: #2E2E2E;
+  --color-bg-overlay: rgba(0, 0, 0, 0.6);
+
+  --color-text-primary: #D4CFC7;
+  --color-text-secondary: #A0A0A0;
+  --color-text-tertiary: #6B6B6B;
+  --color-text-inverse: #2C2C2C;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+  --color-divider: rgba(255, 255, 255, 0.06);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Typography Classes ── */
+.typo-display {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.typo-heading {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.typo-body {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-normal);
+}
+
+.typo-caption {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Ink Wash Accent Utility ── */
+.ink-wash {
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+}
+
+.ink-accent-bar {
+  width: 32px;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+}
+
+/* ── iOS Frosted Glass Utilities ── */
+.ios-frosted-bar {
+  background: rgba(250, 247, 242, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+.ios-frosted-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: saturate(150%) blur(16px);
+  -webkit-backdrop-filter: saturate(150%) blur(16px);
+}
+.ios-frosted-tab {
+  background: rgba(250, 247, 242, 0.78);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg-primary); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="pb-24">
+      <!-- Status bar spacer -->
+      <div class="h-11"></div>
+
+      <!-- Page title -->
+      <header class="px-5 pt-2 pb-4">
+        <h1 class="typo-display text-[28px] leading-[1.25] tracking-[-0.02em]" style="color: var(--color-text-primary);">设置</h1>
+      </header>
+
+      <!-- Reading preferences group -->
+      <section class="px-5 mb-6" aria-label="阅读偏好">
+        <h2 class="text-[13px] font-medium tracking-[0.01em] uppercase px-1 pb-2" style="color: var(--color-text-tertiary);">阅读</h2>
+        <div class="rounded-xl overflow-hidden ios-frosted-card" style="border: 0.5px solid rgba(44, 44, 44, 0.06);">
+          <!-- Default font size -->
+          <div data-dom-id="setting-font-size" onclick="location.href='reading-settings.html'" class="flex items-center px-4 min-h-[44px] cursor-pointer" style="border-bottom: 1px solid var(--color-divider);">
+            <div class="flex items-center justify-center w-8 h-8 rounded-md mr-3" style="background: var(--color-primary-muted);">
+              <i data-lucide="type" class="w-[18px] h-[18px]" style="color: var(--color-primary);"></i>
+            </div>
+            <span class="flex-1 text-[15px]" style="color: var(--color-text-primary); font-family: var(--font-family-base);">默认字号</span>
+            <span class="text-[15px] mr-2" style="color: var(--color-text-tertiary);">中</span>
+            <i data-lucide="chevron-right" class="w-4 h-4" style="color: var(--color-text-tertiary);"></i>
+          </div>
+          <!-- Default line height -->
+          <div data-dom-id="setting-line-height" onclick="location.href='reading-settings.html'" class="flex items-center px-4 min-h-[44px] cursor-pointer" style="border-bottom: 1px solid var(--color-divider);">
+            <div class="flex items-center justify-center w-8 h-8 rounded-md mr-3" style="background: var(--color-primary-muted);">
+              <i data-lucide="line-height" class="w-[18px] h-[18px]" style="color: var(--color-primary);"></i>
+            </div>
+            <span class="flex-1 text-[15px]" style="color: var(--color-text-primary); font-family: var(--font-family-base);">默认行距</span>
+            <span class="text-[15px] mr-2" style="color: var(--color-text-tertiary);">宽松</span>
+            <i data-lucide="chevron-right" class="w-4 h-4" style="color: var(--color-text-tertiary);"></i>
+          </div>
+          <!-- Reading theme -->
+          <div data-dom-id="setting-theme" onclick="location.href='reading-settings.html'" class="flex items-center px-4 min-h-[44px] cursor-pointer">
+            <div class="flex items-center justify-center w-8 h-8 rounded-md mr-3" style="background: var(--color-primary-muted);">
+              <i data-lucide="palette" class="w-[18px] h-[18px]" style="color: var(--color-primary);"></i>
+            </div>
+            <span class="flex-1 text-[15px]" style="color: var(--color-text-primary); font-family: var(--font-family-base);">阅读主题</span>
+            <span class="text-[15px] mr-2" style="color: var(--color-text-tertiary);">纸张白</span>
+            <i data-lucide="chevron-right" class="w-4 h-4" style="color: var(--color-text-tertiary);"></i>
+          </div>
+        </div>
+      </section>
+
+      <!-- Transfer group -->
+      <section class="px-5 mb-6" aria-label="传书">
+        <h2 class="text-[13px] font-medium tracking-[0.01em] uppercase px-1 pb-2" style="color: var(--color-text-tertiary);">传书</h2>
+        <div class="rounded-xl overflow-hidden ios-frosted-card" style="border: 0.5px solid rgba(44, 44, 44, 0.06);">
+          <!-- Wi-Fi transfer toggle -->
+          <div data-dom-id="setting-wifi" class="flex items-center px-4 min-h-[44px]">
+            <div class="flex items-center justify-center w-8 h-8 rounded-md mr-3" style="background: var(--color-primary-muted);">
+              <i data-lucide="wifi" class="w-[18px] h-[18px]" style="color: var(--color-primary);"></i>
+            </div>
+            <span class="flex-1 text-[15px]" style="color: var(--color-text-primary); font-family: var(--font-family-base);">Wi-Fi 传书</span>
+            <!-- iOS-style toggle switch - ON state -->
+            <div class="relative w-[51px] h-[31px] rounded-full flex-shrink-0 cursor-pointer transition-colors duration-200 ease-out" style="background: var(--color-primary); box-shadow: 0 0.5px 0 0.5px rgba(196,92,74,0.3);">
+              <div class="absolute top-[2px] right-[2px] w-[27px] h-[27px] rounded-full bg-white transition-transform duration-200 ease-out" style="box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 0.5px 0 0.5px rgba(0,0,0,0.06);"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Appearance section -->
+      <section class="px-5 mb-6" aria-label="外观">
+        <h2 class="text-[13px] font-medium tracking-[0.01em] uppercase px-1 pb-2" style="color: var(--color-text-tertiary);">外观</h2>
+        <div class="rounded-xl overflow-hidden ios-frosted-card" style="border: 0.5px solid rgba(44, 44, 44, 0.06);">
+          <!-- Dark mode toggle -->
+          <div data-dom-id="setting-dark-mode" class="flex items-center px-4 min-h-[44px]" style="border-bottom: 1px solid var(--color-divider);">
+            <div class="flex items-center justify-center w-8 h-8 rounded-md mr-3" style="background: rgba(74,123,196,0.1);">
+              <i data-lucide="moon" class="w-[18px] h-[18px]" style="color: #4A7BC4;"></i>
+            </div>
+            <span class="flex-1 text-[15px]" style="color: var(--color-text-primary); font-family: var(--font-family-base);">深色模式</span>
+            <button id="dark-mode-toggle" onclick="toggleDarkMode()" class="relative w-[51px] h-[31px] rounded-full transition-colors duration-200 shrink-0" style="background: var(--color-primary);">
+              <span id="dark-mode-thumb" class="absolute top-0.5 w-[27px] h-[27px] rounded-full bg-white transition-all duration-200 shadow-sm" style="left: 22px;"></span>
+            </button>
+          </div>
+          <!-- Auto brightness -->
+          <div data-dom-id="setting-auto-brightness" class="flex items-center px-4 min-h-[44px]">
+            <div class="flex items-center justify-center w-8 h-8 rounded-md mr-3" style="background: rgba(196,154,74,0.1);">
+              <i data-lucide="sun" class="w-[18px] h-[18px]" style="color: #C49A4A;"></i>
+            </div>
+            <span class="flex-1 text-[15px]" style="color: var(--color-text-primary); font-family: var(--font-family-base);">跟随系统</span>
+            <button id="system-theme-toggle" onclick="toggleSystemTheme()" class="relative w-[51px] h-[31px] rounded-full transition-colors duration-200 shrink-0" style="background: rgba(44,44,44,0.16);">
+              <span id="system-theme-thumb" class="absolute top-0.5 w-[27px] h-[27px] rounded-full bg-white transition-all duration-200 shadow-sm" style="left: 2px;"></span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pro upgrade card (SOUL ELEMENT) -->
+      <section class="px-5 mb-6" aria-label="Pro升级">
+        <div class="rounded-xl p-5 border" style="background: linear-gradient(135deg, rgba(196,92,74,0.06) 0%, rgba(196,92,74,0.12) 100%); border-color: rgba(196,92,74,0.15);">
+          <div class="flex items-center mb-2">
+            <i data-lucide="crown" class="w-5 h-5 mr-2" style="color: var(--color-primary);"></i>
+            <h3 class="typo-display text-[18px] font-semibold tracking-[0.01em]" style="color: var(--color-text-primary);">升级墨斋 Pro</h3>
+          </div>
+          <p class="text-[13px] leading-[1.6] mb-4" style="color: var(--color-text-secondary); font-family: var(--font-family-base);">解锁无限书架、高级字体、完整听书体验</p>
+          <a href="#" data-dom-id="pro-learn-more" class="inline-flex items-center text-[14px] font-medium whitespace-nowrap" style="color: var(--color-primary); font-family: var(--font-family-base); transition: opacity 120ms ease-out;" onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'">
+            了解更多
+            <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+          </a>
+        </div>
+      </section>
+
+      <!-- About section -->
+      <section class="px-5 mb-6" aria-label="关于">
+        <h2 class="text-[13px] font-medium tracking-[0.01em] uppercase px-1 pb-2" style="color: var(--color-text-tertiary);">关于</h2>
+        <div class="rounded-xl overflow-hidden ios-frosted-card" style="border: 0.5px solid rgba(44, 44, 44, 0.06);">
+          <!-- Version -->
+          <div class="flex items-center px-4 min-h-[44px]" style="border-bottom: 1px solid var(--color-divider);">
+            <span class="flex-1 text-[15px]" style="color: var(--color-text-primary); font-family: var(--font-family-base);">版本</span>
+            <span class="text-[15px]" style="color: var(--color-text-tertiary);">1.0.0</span>
+          </div>
+          <!-- Privacy policy -->
+          <div data-dom-id="setting-privacy" class="flex items-center px-4 min-h-[44px]" style="border-bottom: 1px solid var(--color-divider);">
+            <span class="flex-1 text-[15px]" style="color: var(--color-text-primary); font-family: var(--font-family-base);">隐私政策</span>
+            <i data-lucide="chevron-right" class="w-4 h-4" style="color: var(--color-text-tertiary);"></i>
+          </div>
+          <!-- Thanks -->
+          <div data-dom-id="setting-thanks" class="flex items-center px-4 min-h-[44px]">
+            <span class="flex-1 text-[15px]" style="color: var(--color-text-primary); font-family: var(--font-family-base);">感谢</span>
+            <i data-lucide="chevron-right" class="w-4 h-4" style="color: var(--color-text-tertiary);"></i>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer text -->
+      <p class="text-center text-[12px] pt-2 pb-4" style="color: var(--color-text-tertiary); font-family: var(--font-family-base);">墨斋 — 你的私人书房</p>
+
+      <!-- Bottom Tab Bar (iOS Frosted Glass) -->
+      <nav class="fixed bottom-0 left-0 right-0 z-40 ios-frosted-tab" style="border-top: 0.5px solid rgba(44, 44, 44, 0.1);">
+        <div class="flex items-center justify-around h-[49px] max-w-lg mx-auto">
+          <!-- Tab: 书架 (inactive) -->
+          <a href="library.html" data-dom-id="tab-library" class="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-150" style="color: var(--color-text-tertiary);">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium">书架</span>
+          </a>
+          <!-- Tab: 分类 (inactive) -->
+          <a href="categories.html" data-dom-id="tab-categories" class="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-150" style="color: var(--color-text-tertiary);">
+            <i data-lucide="folders" class="w-5 h-5"></i>
+            <span class="text-[10px]">分类</span>
+          </a>
+          <!-- Tab: 我的 (active) -->
+          <button data-dom-id="tab-profile-current" class="flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors duration-150" style="color: var(--color-primary);">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span class="text-[10px] font-medium">我的</span>
+          </button>
+        </div>
+        <div class="h-[env(safe-area-inset-bottom,20px)]"></div>
+      </nav>
+    </main>
+    <script>
+      lucide.createIcons();
+      let isDarkMode = false;
+      let isSystemTheme = false;
+      function toggleDarkMode() {
+        isDarkMode = !isDarkMode;
+        const html = document.documentElement;
+        const toggle = document.getElementById('dark-mode-toggle');
+        const thumb = document.getElementById('dark-mode-thumb');
+        if (isDarkMode) {
+          html.classList.add('dark');
+          toggle.style.background = 'var(--color-primary)';
+          thumb.style.left = '22px';
+        } else {
+          html.classList.remove('dark');
+          toggle.style.background = 'rgba(44,44,44,0.16)';
+          thumb.style.left = '2px';
+        }
+      }
+      function toggleSystemTheme() {
+        isSystemTheme = !isSystemTheme;
+        const toggle = document.getElementById('system-theme-toggle');
+        const thumb = document.getElementById('system-theme-thumb');
+        if (isSystemTheme) {
+          toggle.style.background = 'var(--color-primary)';
+          thumb.style.left = '22px';
+        } else {
+          toggle.style.background = 'rgba(44,44,44,0.16)';
+          thumb.style.left = '2px';
+        }
+      }
+    </script>
+</body>
+</html>

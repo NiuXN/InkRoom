@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+
+# Xcode
+*.xcuserstate
+*.xcuserdatad/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Build artifacts
+InkRoom/build/
+InkRoom/InkRoom.xcodeproj/xcuserdata/
+InkRoom/InkRoom.xcodeproj/project.xcworkspace/xcuserdata/
+
+# Swift Package Manager
+.build/
+Packages/
+Package.resolved
+*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+
+# Local uploads
+.uploads/
+
+# Cursor
+.cursor/

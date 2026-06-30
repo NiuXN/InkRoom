@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>书籍详情</title>
+    <style id="theme-vars">
+/* ============================================
+   墨斋 InkRoom — Brand Design Tokens
+   东方禅意 · 水墨书房 · iOS 阅读器
+   ============================================ */
+
+:root {
+  /* ── Color System: 水墨禅意 ── */
+  --color-primary: #C45C4A;
+  --color-primary-hover: #B04A39;
+  --color-primary-light: rgba(196, 92, 74, 0.12);
+  --color-primary-muted: rgba(196, 92, 74, 0.06);
+
+  /* ── Surface & Background: 纸张色系 ── */
+  --color-bg-primary: #F5F0E8;
+  --color-bg-secondary: #EDE7DB;
+  --color-bg-elevated: #FAF7F2;
+  --color-bg-card: #FFFFFF;
+  --color-bg-overlay: rgba(44, 44, 44, 0.5);
+
+  /* ── Text: 墨色层次 ── */
+  --color-text-primary: #2C2C2C;
+  --color-text-secondary: #6B6B6B;
+  --color-text-tertiary: #9A9A9A;
+  --color-text-inverse: #F5F0E8;
+  --color-text-on-primary: #FFFFFF;
+
+  /* ── Border & Divider ── */
+  --color-border: rgba(44, 44, 44, 0.08);
+  --color-border-strong: rgba(44, 44, 44, 0.16);
+  --color-divider: rgba(44, 44, 44, 0.06);
+
+  /* ── State Colors ── */
+  --state-success: #4A8C6F;
+  --state-warning: #C49A4A;
+  --state-error: #C44A4A;
+  --state-info: #4A7BC4;
+
+  /* ── Typography ── */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
+  --font-family-display: "Noto Serif SC", "Songti SC", "STSong", Georgia, serif;
+  --font-family-mono: "SF Mono", "Menlo", monospace;
+
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 34px;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.04em;
+
+  /* ── Spacing ── */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-base: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 40px;
+  --spacing-4xl: 48px;
+
+  /* ── Radius ── */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ── Shadow ── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.08);
+
+  /* ── Reading Theme Tokens ── */
+  --reader-bg-light: #F5F0E8;
+  --reader-bg-warm: #F0E6D0;
+  --reader-bg-dark: #1A1A1A;
+  --reader-text-light: #2C2C2C;
+  --reader-text-dark: #D4CFC7;
+}
+
+/* ── Dark Mode ── */
+.dark {
+  --color-bg-primary: #1A1A1A;
+  --color-bg-secondary: #242424;
+  --color-bg-elevated: #2A2A2A;
+  --color-bg-card: #2E2E2E;
+  --color-bg-overlay: rgba(0, 0, 0, 0.6);
+
+  --color-text-primary: #D4CFC7;
+  --color-text-secondary: #A0A0A0;
+  --color-text-tertiary: #6B6B6B;
+  --color-text-inverse: #2C2C2C;
+
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+  --color-divider: rgba(255, 255, 255, 0.06);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Typography Classes ── */
+.typo-display {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.typo-heading {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.typo-body {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-normal);
+}
+
+.typo-caption {
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Ink Wash Accent Utility ── */
+.ink-wash {
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+}
+
+.ink-accent-bar {
+  width: 32px;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+}
+
+/* ── iOS Frosted Glass Utilities ── */
+.ios-frosted-bar {
+  background: rgba(250, 247, 242, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+.ios-frosted-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: saturate(150%) blur(16px);
+  -webkit-backdrop-filter: saturate(150%) blur(16px);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-bg-primary); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="min-h-screen pb-8" style="background: var(--color-bg-primary);">
+      <!-- Status bar spacer -->
+      <div class="h-11"></div>
+
+      <!-- Top navigation (iOS Frosted Glass) -->
+      <header class="sticky top-0 z-30 flex h-11 items-center px-4 ios-frosted-bar" style="border-bottom: 0.5px solid rgba(44, 44, 44, 0.08);">
+        <button data-dom-id="back-library" onclick="location.href='library.html'" class="inline-flex h-8 w-8 items-center justify-center rounded-md transition-all duration-150 hover:bg-[rgba(44,44,44,0.06)] active:scale-[0.94]" style="color: var(--color-text-primary);" aria-label="返回书架">
+          <i data-lucide="chevron-left" class="h-5 w-5"></i>
+        </button>
+        <h1 class="min-w-0 flex-1 text-center text-sm font-semibold truncate" style="color: var(--color-text-primary); letter-spacing: var(--letter-spacing-tight);">书籍详情</h1>
+        <div class="w-8"></div>
+      </header>
+
+      <!-- Content wrapper -->
+      <div class="mx-auto max-w-lg px-6 pt-8">
+
+        <!-- Cover section -->
+        <section class="flex flex-col items-center pb-6">
+          <div class="relative" style="perspective: 600px;">
+            <img
+              src="../assets/book-detail-cover.jpg"
+              alt="人间草木 封面"
+              class="block w-[180px] h-[260px] rounded-lg object-cover"
+              style="box-shadow: var(--shadow-md); transform: rotateY(-3deg) rotateX(1deg); transition: transform 320ms cubic-bezier(0.3, 0, 0, 1);"
+              onmouseenter="this.style.transform='rotateY(0deg) rotateX(0deg)'"
+              onmouseleave="this.style.transform='rotateY(-3deg) rotateX(1deg)'"
+            >
+          </div>
+        </section>
+
+        <!-- Book metadata -->
+        <section class="flex flex-col items-center pb-6">
+          <h2 class="typo-display text-center" style="font-size: var(--font-size-lg); color: var(--color-text-primary); line-height: var(--line-height-tight); text-wrap: balance; word-break: keep-all;">人间草木</h2>
+          <p class="mt-2 text-center" style="font-size: var(--font-size-base); color: var(--color-text-secondary);">汪曾祺</p>
+          <p class="mt-1 text-center" style="font-size: var(--font-size-sm); color: var(--color-text-tertiary);">2019年 · 人民文学出版社</p>
+
+          <!-- Divider -->
+          <div class="ink-accent-bar mx-auto mt-5"></div>
+
+          <!-- Description -->
+          <p class="mt-4 max-w-xs text-center" style="font-size: var(--font-size-base); color: var(--color-text-secondary); line-height: var(--line-height-relaxed);">从草木之情到人间百态，汪曾祺以从容淡雅的笔触描绘生活中的美好与哲思。</p>
+        </section>
+
+        <!-- Reading progress card (iOS Frosted Glass) -->
+        <section class="mx-auto w-full max-w-sm rounded-xl p-4 mt-2 ios-frosted-card" style="border: 0.5px solid rgba(44, 44, 44, 0.06);">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-medium" style="color: var(--color-text-primary);">阅读进度</span>
+            <span class="text-sm font-semibold tabular-nums" style="color: var(--color-primary);">35%</span>
+          </div>
+          <!-- Progress bar -->
+          <div class="mt-2.5 h-1.5 w-full rounded-full overflow-hidden" style="background: var(--color-primary-muted);">
+            <div class="h-full rounded-full" style="width: 35%; background: var(--color-primary); transition: width 480ms cubic-bezier(0.32, 0.72, 0, 1);"></div>
+          </div>
+          <p class="mt-2 text-xs" style="color: var(--color-text-tertiary);">已读至：第三章 春风十里</p>
+        </section>
+
+        <!-- Action buttons -->
+        <section class="mx-auto mt-6 w-full max-w-sm flex flex-col gap-3">
+          <button
+            data-dom-id="start-reading"
+            onclick="location.href='reader.html'"
+            class="flex h-[52px] w-full items-center justify-center rounded-xl text-base font-semibold transition-all duration-150 active:scale-[0.96]"
+            style="background: var(--color-primary); color: var(--color-text-on-primary); box-shadow: 0 0.5px 0 0.5px rgba(0,0,0,0.04);"
+            onmouseenter="this.style.background='var(--color-primary-hover)'"
+            onmouseleave="this.style.background='var(--color-primary)'"
+            aria-label="开始阅读"
+          >开始阅读</button>
+          <button
+            data-dom-id="continue-reading"
+            onclick="location.href='reader.html'"
+            class="flex h-[52px] w-full items-center justify-center rounded-xl text-base font-medium transition-all duration-150 active:scale-[0.96]"
+            style="background: rgba(255,255,255,0.65); color: var(--color-text-primary); border: 0.5px solid rgba(44, 44, 44, 0.1); backdrop-filter: saturate(150%) blur(16px); -webkit-backdrop-filter: saturate(150%) blur(16px);"
+            onmouseenter="this.style.background='rgba(255,255,255,0.85)'"
+            onmouseleave="this.style.background='rgba(255,255,255,0.65)'"
+            aria-label="从上次继续"
+          >从上次继续</button>
+        </section>
+
+        <!-- Bottom action -->
+        <div class="mt-8 flex justify-center pb-4">
+          <button data-dom-id="delete-book" class="text-xs transition-colors duration-150" style="color: var(--color-text-tertiary);" onmouseenter="this.style.color='var(--color-text-secondary)'" onmouseleave="this.style.color='var(--color-text-tertiary)'" aria-label="删除书籍">删除书籍</button>
+        </div>
+
+      </div>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

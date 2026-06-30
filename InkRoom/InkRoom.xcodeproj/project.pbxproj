@@ -1,0 +1,1053 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		00A30E35CAB9CE8EE2F4E8C2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99E51D408A933A39AC2ADCC4 /* SettingsView.swift */; };
+		0322BB7C433B1F12019AEFD8 /* DatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A21D632F55683E65FF6B345 /* DatabaseService.swift */; };
+		050DAA5808CB0BDAF47F058D /* BookCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E055C9C5CA3D497F4203739 /* BookCard.swift */; };
+		0773AE5C643024E2F09568DE /* InkRoomWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4D7166A5B5CFFCEFC0F53A /* InkRoomWidgetView.swift */; };
+		0B7222197122AE0745E1F897 /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63526B65343C67ED73B5DD23 /* Bookmark.swift */; };
+		0C5EA5E4F653CC40A06D22FF /* BookParserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F575BF8151EBF4090DC2464E /* BookParserService.swift */; };
+		0DFFF8AC2A6EB4AC1BFE9E32 /* InkRoomComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B762EB4B4D069E30D1B41187 /* InkRoomComponents.swift */; };
+		1C855031564D6D1D564E316A /* TTSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2739ABCDE2885D0CA29170C2 /* TTSService.swift */; };
+		1E68A6F42F1D3DCC7CA5EBA2 /* InkRoomWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE4D7166A5B5CFFCEFC0F53A /* InkRoomWidgetView.swift */; };
+		21F488DC4A86E1CD6CB63E7C /* TextEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316CB2986C5AFEF112472A38 /* TextEncoding.swift */; };
+		22EDAE3BE8F64F3C714AB898 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = 776432DF5DFC4EAEDDB41BAC /* SQLite */; };
+		232A41866ABCD553E8B8A7F5 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99E51D408A933A39AC2ADCC4 /* SettingsView.swift */; };
+		27C657B106BD43B45337F59C /* WidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B97D7257E1818B235014703 /* WidgetData.swift */; };
+		28B56C38732D84FDC0575D99 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6D7F5A9291E859639E02C2D /* LibraryView.swift */; };
+		2AAEF4F095E563203813C354 /* ReadingSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3DF5AA08AF148AE2DBE11B /* ReadingSettingsView.swift */; };
+		31192FFFBDE18693ED8BAC85 /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE53CFD5FBB4DE12EE11BD27 /* LibraryViewModel.swift */; };
+		3211C97CD093EF3F1FB8EA4A /* AppNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCB505E0D51C97BC02FECD2 /* AppNotifications.swift */; };
+		37841F5E90AA6339F1FA3C46 /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CE055E1467E1992D20536E /* Book.swift */; };
+		38E0ADC5ED17AB3F13361FC2 /* Color+InkRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A3D05D8F892B07EC371B26 /* Color+InkRoom.swift */; };
+		3A3F96B96A54AEA8A8781AB8 /* BookFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EAAA8FB9E635E700490E585 /* BookFilter.swift */; };
+		3AA5AA96E5328E19707BC6A7 /* Book.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CE055E1467E1992D20536E /* Book.swift */; };
+		3BD830F9D89B9EC3F874D765 /* AddCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C7AA135403FE0B4B74C485 /* AddCategoryView.swift */; };
+		42CB22E1ACA8476794838E26 /* InkRoomWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09328011300025A77511F75F /* InkRoomWidgetBundle.swift */; };
+		44021807A2B35A5E9E998048 /* TextEncoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316CB2986C5AFEF112472A38 /* TextEncoding.swift */; };
+		4C25CDC4CC6C0B72FC07A035 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = ED65EE54F0D9E870688E7BC7 /* Swifter */; };
+		4DF20821946525CA2D3C7554 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0469B5F9143E266C1E019C37 /* StatisticsView.swift */; };
+		5DB7994049436ED8731F4401 /* InkRoomApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A083CA5706C09D16B7E536 /* InkRoomApp.swift */; };
+		645011CFEF13EE2EEC76EADB /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646048B33D21356443CCAF5F /* CategoriesView.swift */; };
+		656CB10FA3946DFEFD550518 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93723830DEE0C8766683CFD /* ContentView.swift */; };
+		65FCE2BD0044C6570231A693 /* ReadingStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6FEA29A8987881869E5616 /* ReadingStatistics.swift */; };
+		6E5F2331E5B9A3D83CEC2A82 /* WidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B97D7257E1818B235014703 /* WidgetData.swift */; };
+		6EEF2444710D30F2644804B8 /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = F0429FBBBDEFED43F7001E6F /* Swifter */; };
+		70592BB8FE1A8D8FBC5F1CCF /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 24BD68214F2F73A09EFA54C0 /* ZIPFoundation */; };
+		707676717F2E573C50F11723 /* Color+InkRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A3D05D8F892B07EC371B26 /* Color+InkRoom.swift */; };
+		73839E6A572B39442DC605D9 /* ReadingStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D6FEA29A8987881869E5616 /* ReadingStatistics.swift */; };
+		75C3259509E2A9A899CDFA71 /* GridLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE0675E6CC80142B0566359 /* GridLayoutHelper.swift */; };
+		75CDEC5D4161D72E22CD8207 /* GridLayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE0675E6CC80142B0566359 /* GridLayoutHelper.swift */; };
+		77D9321311C997F604FBC1B1 /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63526B65343C67ED73B5DD23 /* Bookmark.swift */; };
+		7DE1A704DC87259787CA20D5 /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35916C1A3EB12A5B98B4FD44 /* ReaderView.swift */; };
+		7E717A4E33D5CD20935CEC63 /* BookFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EAAA8FB9E635E700490E585 /* BookFilter.swift */; };
+		7FE36730534870126FE13109 /* AdaptiveLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAE0E3FF9FCFD6F11C39C4B /* AdaptiveLayout.swift */; };
+		87567EE0730A2C0C0FE4B568 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A450D34BFC6C498DF40F2F /* DurationFormatter.swift */; };
+		8F08232326DF5A5E604502E8 /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646048B33D21356443CCAF5F /* CategoriesView.swift */; };
+		91C22F9BAF7184A913F76C41 /* InkRoomWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09328011300025A77511F75F /* InkRoomWidgetBundle.swift */; };
+		927928CE190BC159D880831E /* BookCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E055C9C5CA3D497F4203739 /* BookCard.swift */; };
+		9B901E847F5929E7CE07AE64 /* WiFiTransferService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0EDA023BCA4C37EBDCD168 /* WiFiTransferService.swift */; };
+		9CE97D18CBC021CAB4E8F82C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93723830DEE0C8766683CFD /* ContentView.swift */; };
+		9DB66D7E2B97E7B96599DB28 /* DatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A21D632F55683E65FF6B345 /* DatabaseService.swift */; };
+		A0476DB987910FDC4B4B25C7 /* ReadingSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B27779A506D974C8BAB641 /* ReadingSettings.swift */; };
+		A323029BC889F88109FCAE12 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = C36D0876C0E6791E4171DD4F /* ZIPFoundation */; };
+		A55DC65755112EA189869ECF /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CA06C8125EA40DDC88D5196 /* AppDependencies.swift */; };
+		ADEF9FAAA53C23C2FE5AA2B1 /* ReadingSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E3DF5AA08AF148AE2DBE11B /* ReadingSettingsView.swift */; };
+		AE2967766B466EED36D170DB /* WidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B97D7257E1818B235014703 /* WidgetData.swift */; };
+		AF5BE612A7AC77D52A2306A0 /* ReadingSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D09A4510405801662D8AA3B /* ReadingSession.swift */; };
+		B0F232A0747D4659C14E3373 /* WiFiTransferService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0EDA023BCA4C37EBDCD168 /* WiFiTransferService.swift */; };
+		B42A13F71B4DA56736329BD6 /* AdaptiveLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EAE0E3FF9FCFD6F11C39C4B /* AdaptiveLayout.swift */; };
+		B55B97845289BE594FCAE6FE /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CA06C8125EA40DDC88D5196 /* AppDependencies.swift */; };
+		B748F957D1760C9AEB554943 /* DurationFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A450D34BFC6C498DF40F2F /* DurationFormatter.swift */; };
+		B9E4E7D056F066028429B06D /* InkRoomWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98BB3FB5E18F85020AD3325 /* InkRoomWidget.swift */; };
+		BD879998171E31E1D489F838 /* AppNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCB505E0D51C97BC02FECD2 /* AppNotifications.swift */; };
+		C15DA38479EAE8724E6A42B4 /* InkRoomWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98BB3FB5E18F85020AD3325 /* InkRoomWidget.swift */; };
+		C8D24C7908C07134E0783DFB /* InkRoomApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A083CA5706C09D16B7E536 /* InkRoomApp.swift */; };
+		C969943CDBF2047083D4EBE9 /* Color+InkRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A3D05D8F892B07EC371B26 /* Color+InkRoom.swift */; };
+		CD47D544E9E855C5E73FAB37 /* ReadingSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D09A4510405801662D8AA3B /* ReadingSession.swift */; };
+		D46B968580AAADB8CE562903 /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4349B07D9711667D86C5FD8 /* BookDetailView.swift */; };
+		D5B130487DE203F182ED58C3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 21B5593407AC8830ACC0F939 /* Assets.xcassets */; };
+		D642D095C0343A36277EECC1 /* Color+InkRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A3D05D8F892B07EC371B26 /* Color+InkRoom.swift */; };
+		D66D0524148AE60D9AD38086 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 21B5593407AC8830ACC0F939 /* Assets.xcassets */; };
+		D83D31ED559C6176DD1A3382 /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B4C8DB54DC1C205C3D23F2 /* ImportView.swift */; };
+		D931B23B38C4C6E557092421 /* WidgetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B97D7257E1818B235014703 /* WidgetData.swift */; };
+		D9380A3CCEECA15F00D9EC8F /* InkRoomComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B762EB4B4D069E30D1B41187 /* InkRoomComponents.swift */; };
+		DB3B5AE255B0D6A3DE5461FD /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4349B07D9711667D86C5FD8 /* BookDetailView.swift */; };
+		E25E9535E5145103B3B8BAF4 /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35916C1A3EB12A5B98B4FD44 /* ReaderView.swift */; };
+		E3F156ACAEA7C2DB80657F93 /* LibraryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE53CFD5FBB4DE12EE11BD27 /* LibraryViewModel.swift */; };
+		E556504848B3FE0FFBC655F2 /* TTSService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2739ABCDE2885D0CA29170C2 /* TTSService.swift */; };
+		E6D14FC4DE00954AB1D050BB /* ImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B4C8DB54DC1C205C3D23F2 /* ImportView.swift */; };
+		EB86C4723276988143C151AA /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A026A3802E382F2004003C0 /* SettingsViewModel.swift */; };
+		F0068A6E0CD4C4A01091834D /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0469B5F9143E266C1E019C37 /* StatisticsView.swift */; };
+		F4F74D6FCF65CF48DF2A1798 /* AddCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05C7AA135403FE0B4B74C485 /* AddCategoryView.swift */; };
+		F7F125EFF1363EC83935294E /* ReadingSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B27779A506D974C8BAB641 /* ReadingSettings.swift */; };
+		F911E1215A12338A3ABAD043 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A026A3802E382F2004003C0 /* SettingsViewModel.swift */; };
+		F9853BC2A531EA5E1017408C /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6D7F5A9291E859639E02C2D /* LibraryView.swift */; };
+		FC7F2D257ECEB865C6454FD3 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = BB50B19B49B4ED88F61214B9 /* SQLite */; };
+		FCA3D64DBAAFDFC275D34D78 /* BookParserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F575BF8151EBF4090DC2464E /* BookParserService.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0469B5F9143E266C1E019C37 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
+		05C7AA135403FE0B4B74C485 /* AddCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCategoryView.swift; sourceTree = "<group>"; };
+		09328011300025A77511F75F /* InkRoomWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InkRoomWidgetBundle.swift; sourceTree = "<group>"; };
+		0EAE0E3FF9FCFD6F11C39C4B /* AdaptiveLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveLayout.swift; sourceTree = "<group>"; };
+		1CA06C8125EA40DDC88D5196 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
+		1D6FEA29A8987881869E5616 /* ReadingStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingStatistics.swift; sourceTree = "<group>"; };
+		1E055C9C5CA3D497F4203739 /* BookCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookCard.swift; sourceTree = "<group>"; };
+		21B5593407AC8830ACC0F939 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2739ABCDE2885D0CA29170C2 /* TTSService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTSService.swift; sourceTree = "<group>"; };
+		2E3DF5AA08AF148AE2DBE11B /* ReadingSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingSettingsView.swift; sourceTree = "<group>"; };
+		2EAAA8FB9E635E700490E585 /* BookFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookFilter.swift; sourceTree = "<group>"; };
+		316CB2986C5AFEF112472A38 /* TextEncoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEncoding.swift; sourceTree = "<group>"; };
+		35916C1A3EB12A5B98B4FD44 /* ReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderView.swift; sourceTree = "<group>"; };
+		3A026A3802E382F2004003C0 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		49A3D05D8F892B07EC371B26 /* Color+InkRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+InkRoom.swift"; sourceTree = "<group>"; };
+		4D09A4510405801662D8AA3B /* ReadingSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingSession.swift; sourceTree = "<group>"; };
+		63526B65343C67ED73B5DD23 /* Bookmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bookmark.swift; sourceTree = "<group>"; };
+		646048B33D21356443CCAF5F /* CategoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesView.swift; sourceTree = "<group>"; };
+		68A450D34BFC6C498DF40F2F /* DurationFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationFormatter.swift; sourceTree = "<group>"; };
+		7A21D632F55683E65FF6B345 /* DatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseService.swift; sourceTree = "<group>"; };
+		7B97D7257E1818B235014703 /* WidgetData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetData.swift; sourceTree = "<group>"; };
+		7FC3D6601A47A2859F2BCB48 /* InkRoomWidget.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = InkRoomWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B0EDA023BCA4C37EBDCD168 /* WiFiTransferService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WiFiTransferService.swift; sourceTree = "<group>"; };
+		8CD8B85A07911DE54FAB9687 /* InkRoomWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = InkRoomWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		97CE055E1467E1992D20536E /* Book.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Book.swift; sourceTree = "<group>"; };
+		99E51D408A933A39AC2ADCC4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		ABCB505E0D51C97BC02FECD2 /* AppNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNotifications.swift; sourceTree = "<group>"; };
+		B1A083CA5706C09D16B7E536 /* InkRoomApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InkRoomApp.swift; sourceTree = "<group>"; };
+		B762EB4B4D069E30D1B41187 /* InkRoomComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InkRoomComponents.swift; sourceTree = "<group>"; };
+		B7B4C8DB54DC1C205C3D23F2 /* ImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportView.swift; sourceTree = "<group>"; };
+		C93723830DEE0C8766683CFD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		CBE0675E6CC80142B0566359 /* GridLayoutHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GridLayoutHelper.swift; sourceTree = "<group>"; };
+		D6D7F5A9291E859639E02C2D /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		DC875B8F4F1B7AB2EBFDC527 /* InkRoom.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = InkRoom.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE4D7166A5B5CFFCEFC0F53A /* InkRoomWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InkRoomWidgetView.swift; sourceTree = "<group>"; };
+		DE53CFD5FBB4DE12EE11BD27 /* LibraryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryViewModel.swift; sourceTree = "<group>"; };
+		E4349B07D9711667D86C5FD8 /* BookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailView.swift; sourceTree = "<group>"; };
+		E5CB14E794B62A963745E5EA /* InkRoom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = InkRoom.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E7B27779A506D974C8BAB641 /* ReadingSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingSettings.swift; sourceTree = "<group>"; };
+		F575BF8151EBF4090DC2464E /* BookParserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookParserService.swift; sourceTree = "<group>"; };
+		F98BB3FB5E18F85020AD3325 /* InkRoomWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InkRoomWidget.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		08AC7BD83C509AF9402A1150 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22EDAE3BE8F64F3C714AB898 /* SQLite in Frameworks */,
+				A323029BC889F88109FCAE12 /* ZIPFoundation in Frameworks */,
+				6EEF2444710D30F2644804B8 /* Swifter in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		58FFBBDDD6328EE68C008618 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC7F2D257ECEB865C6454FD3 /* SQLite in Frameworks */,
+				70592BB8FE1A8D8FBC5F1CCF /* ZIPFoundation in Frameworks */,
+				4C25CDC4CC6C0B72FC07A035 /* Swifter in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0EC8DEC1A001BA7DD511C8EA /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				F98BB3FB5E18F85020AD3325 /* InkRoomWidget.swift */,
+				09328011300025A77511F75F /* InkRoomWidgetBundle.swift */,
+				DE4D7166A5B5CFFCEFC0F53A /* InkRoomWidgetView.swift */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+		10B89F2EA11B83C1C80CF070 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				05C7AA135403FE0B4B74C485 /* AddCategoryView.swift */,
+				646048B33D21356443CCAF5F /* CategoriesView.swift */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
+		18743C14F2C64A422E634F9F /* BookDetail */ = {
+			isa = PBXGroup;
+			children = (
+				E4349B07D9711667D86C5FD8 /* BookDetailView.swift */,
+			);
+			path = BookDetail;
+			sourceTree = "<group>";
+		};
+		1EDAAF5A7EE5FD97447E742A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6E0467DD40FFED5ECD06D0D6 /* Fonts */,
+				21B5593407AC8830ACC0F939 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		21419760D050B86D26515D3B /* Reader */ = {
+			isa = PBXGroup;
+			children = (
+				35916C1A3EB12A5B98B4FD44 /* ReaderView.swift */,
+			);
+			path = Reader;
+			sourceTree = "<group>";
+		};
+		2ED6E1E1A23340A789716126 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				DE53CFD5FBB4DE12EE11BD27 /* LibraryViewModel.swift */,
+				3A026A3802E382F2004003C0 /* SettingsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		3C53B790D5EEB01873767CB0 = {
+			isa = PBXGroup;
+			children = (
+				668F6C1BD64FFD529DE986F9 /* Models */,
+				1EDAAF5A7EE5FD97447E742A /* Resources */,
+				60A53357FB1686794A69DC11 /* Sources */,
+				CE53424F86F58CAF0F4CCDF9 /* Utilities */,
+				0EC8DEC1A001BA7DD511C8EA /* Widget */,
+				749749F4030EF48D5B271C14 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		40252CD47B4C955A88917DA9 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				1CA06C8125EA40DDC88D5196 /* AppDependencies.swift */,
+				ABCB505E0D51C97BC02FECD2 /* AppNotifications.swift */,
+				C93723830DEE0C8766683CFD /* ContentView.swift */,
+				B1A083CA5706C09D16B7E536 /* InkRoomApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		4E2C0B50D573DD00D7879A85 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				2E3DF5AA08AF148AE2DBE11B /* ReadingSettingsView.swift */,
+				99E51D408A933A39AC2ADCC4 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		60A53357FB1686794A69DC11 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				40252CD47B4C955A88917DA9 /* App */,
+				668F6C1BD64FFD529DE986F9 /* Models */,
+				A56CE5D988ED8A5C41075D75 /* Services */,
+				CE53424F86F58CAF0F4CCDF9 /* Utilities */,
+				2ED6E1E1A23340A789716126 /* ViewModels */,
+				711374CA88C06131646C0C62 /* Views */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		6250C8C06C50ADE89DE55416 /* Statistics */ = {
+			isa = PBXGroup;
+			children = (
+				0469B5F9143E266C1E019C37 /* StatisticsView.swift */,
+			);
+			path = Statistics;
+			sourceTree = "<group>";
+		};
+		668F6C1BD64FFD529DE986F9 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				97CE055E1467E1992D20536E /* Book.swift */,
+				63526B65343C67ED73B5DD23 /* Bookmark.swift */,
+				4D09A4510405801662D8AA3B /* ReadingSession.swift */,
+				E7B27779A506D974C8BAB641 /* ReadingSettings.swift */,
+				1D6FEA29A8987881869E5616 /* ReadingStatistics.swift */,
+				7B97D7257E1818B235014703 /* WidgetData.swift */,
+			);
+			name = Models;
+			path = Sources/Models;
+			sourceTree = "<group>";
+		};
+		6D368DD8923DFFE3F5D84D19 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				B7B4C8DB54DC1C205C3D23F2 /* ImportView.swift */,
+				D6D7F5A9291E859639E02C2D /* LibraryView.swift */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
+		6E0467DD40FFED5ECD06D0D6 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		711374CA88C06131646C0C62 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				18743C14F2C64A422E634F9F /* BookDetail */,
+				10B89F2EA11B83C1C80CF070 /* Categories */,
+				AD4E17D6BE9CD124D2DEA6EC /* Components */,
+				6D368DD8923DFFE3F5D84D19 /* Library */,
+				21419760D050B86D26515D3B /* Reader */,
+				4E2C0B50D573DD00D7879A85 /* Settings */,
+				6250C8C06C50ADE89DE55416 /* Statistics */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		749749F4030EF48D5B271C14 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DC875B8F4F1B7AB2EBFDC527 /* InkRoom.app */,
+				E5CB14E794B62A963745E5EA /* InkRoom.app */,
+				7FC3D6601A47A2859F2BCB48 /* InkRoomWidget.appex */,
+				8CD8B85A07911DE54FAB9687 /* InkRoomWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A56CE5D988ED8A5C41075D75 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				F575BF8151EBF4090DC2464E /* BookParserService.swift */,
+				7A21D632F55683E65FF6B345 /* DatabaseService.swift */,
+				2739ABCDE2885D0CA29170C2 /* TTSService.swift */,
+				8B0EDA023BCA4C37EBDCD168 /* WiFiTransferService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		AD4E17D6BE9CD124D2DEA6EC /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				1E055C9C5CA3D497F4203739 /* BookCard.swift */,
+				B762EB4B4D069E30D1B41187 /* InkRoomComponents.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		CE53424F86F58CAF0F4CCDF9 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				0EAE0E3FF9FCFD6F11C39C4B /* AdaptiveLayout.swift */,
+				2EAAA8FB9E635E700490E585 /* BookFilter.swift */,
+				49A3D05D8F892B07EC371B26 /* Color+InkRoom.swift */,
+				68A450D34BFC6C498DF40F2F /* DurationFormatter.swift */,
+				CBE0675E6CC80142B0566359 /* GridLayoutHelper.swift */,
+				316CB2986C5AFEF112472A38 /* TextEncoding.swift */,
+			);
+			name = Utilities;
+			path = Sources/Utilities;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6A43B060E611DCBA097DB455 /* InkRoom_iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F7947AA8088E0467883F1D88 /* Build configuration list for PBXNativeTarget "InkRoom_iOS" */;
+			buildPhases = (
+				F249BE8013842E33398AEB7C /* Sources */,
+				5CC25D889431B8524BE82E0B /* Resources */,
+				58FFBBDDD6328EE68C008618 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = InkRoom_iOS;
+			packageProductDependencies = (
+				BB50B19B49B4ED88F61214B9 /* SQLite */,
+				24BD68214F2F73A09EFA54C0 /* ZIPFoundation */,
+				ED65EE54F0D9E870688E7BC7 /* Swifter */,
+			);
+			productName = InkRoom_iOS;
+			productReference = DC875B8F4F1B7AB2EBFDC527 /* InkRoom.app */;
+			productType = "com.apple.product-type.application";
+		};
+		737DCB8581FC79049582B8DE /* InkRoom_macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 96E26A293460A6CE07772864 /* Build configuration list for PBXNativeTarget "InkRoom_macOS" */;
+			buildPhases = (
+				5FB64A802939A4390DF5F684 /* Sources */,
+				FC8750D87957A36E15AF32FA /* Resources */,
+				08AC7BD83C509AF9402A1150 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = InkRoom_macOS;
+			packageProductDependencies = (
+				776432DF5DFC4EAEDDB41BAC /* SQLite */,
+				C36D0876C0E6791E4171DD4F /* ZIPFoundation */,
+				F0429FBBBDEFED43F7001E6F /* Swifter */,
+			);
+			productName = InkRoom_macOS;
+			productReference = E5CB14E794B62A963745E5EA /* InkRoom.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B93A2EB64DEAC64546BA7806 /* InkRoomWidget_iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2BB7E34D39EB127068734ED3 /* Build configuration list for PBXNativeTarget "InkRoomWidget_iOS" */;
+			buildPhases = (
+				46B30A9421F13B19FCF96E8A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = InkRoomWidget_iOS;
+			packageProductDependencies = (
+			);
+			productName = InkRoomWidget_iOS;
+			productReference = 7FC3D6601A47A2859F2BCB48 /* InkRoomWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		D4AB2D32211901EF07201FF1 /* InkRoomWidget_macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9F51395BBC35A08EA36BEBE9 /* Build configuration list for PBXNativeTarget "InkRoomWidget_macOS" */;
+			buildPhases = (
+				E1B9AE9D9E79627CFFCC7F98 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = InkRoomWidget_macOS;
+			packageProductDependencies = (
+			);
+			productName = InkRoomWidget_macOS;
+			productReference = 8CD8B85A07911DE54FAB9687 /* InkRoomWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		621EFCDB27F73A924C0AC2A8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					6A43B060E611DCBA097DB455 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					737DCB8581FC79049582B8DE = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					B93A2EB64DEAC64546BA7806 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					D4AB2D32211901EF07201FF1 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 671556D776A11907A2472EA6 /* Build configuration list for PBXProject "InkRoom" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 3C53B790D5EEB01873767CB0;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				844D48283284D44D71369228 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
+				B5C4030E0BCCEFF1A6388411 /* XCRemoteSwiftPackageReference "swifter" */,
+				7BDE3808D465D2576005B138 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 749749F4030EF48D5B271C14 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B93A2EB64DEAC64546BA7806 /* InkRoomWidget_iOS */,
+				D4AB2D32211901EF07201FF1 /* InkRoomWidget_macOS */,
+				6A43B060E611DCBA097DB455 /* InkRoom_iOS */,
+				737DCB8581FC79049582B8DE /* InkRoom_macOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5CC25D889431B8524BE82E0B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D5B130487DE203F182ED58C3 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC8750D87957A36E15AF32FA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D66D0524148AE60D9AD38086 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		46B30A9421F13B19FCF96E8A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				707676717F2E573C50F11723 /* Color+InkRoom.swift in Sources */,
+				B9E4E7D056F066028429B06D /* InkRoomWidget.swift in Sources */,
+				42CB22E1ACA8476794838E26 /* InkRoomWidgetBundle.swift in Sources */,
+				1E68A6F42F1D3DCC7CA5EBA2 /* InkRoomWidgetView.swift in Sources */,
+				AE2967766B466EED36D170DB /* WidgetData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5FB64A802939A4390DF5F684 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7FE36730534870126FE13109 /* AdaptiveLayout.swift in Sources */,
+				3BD830F9D89B9EC3F874D765 /* AddCategoryView.swift in Sources */,
+				B55B97845289BE594FCAE6FE /* AppDependencies.swift in Sources */,
+				3211C97CD093EF3F1FB8EA4A /* AppNotifications.swift in Sources */,
+				37841F5E90AA6339F1FA3C46 /* Book.swift in Sources */,
+				927928CE190BC159D880831E /* BookCard.swift in Sources */,
+				DB3B5AE255B0D6A3DE5461FD /* BookDetailView.swift in Sources */,
+				3A3F96B96A54AEA8A8781AB8 /* BookFilter.swift in Sources */,
+				FCA3D64DBAAFDFC275D34D78 /* BookParserService.swift in Sources */,
+				77D9321311C997F604FBC1B1 /* Bookmark.swift in Sources */,
+				8F08232326DF5A5E604502E8 /* CategoriesView.swift in Sources */,
+				38E0ADC5ED17AB3F13361FC2 /* Color+InkRoom.swift in Sources */,
+				656CB10FA3946DFEFD550518 /* ContentView.swift in Sources */,
+				9DB66D7E2B97E7B96599DB28 /* DatabaseService.swift in Sources */,
+				87567EE0730A2C0C0FE4B568 /* DurationFormatter.swift in Sources */,
+				75CDEC5D4161D72E22CD8207 /* GridLayoutHelper.swift in Sources */,
+				D83D31ED559C6176DD1A3382 /* ImportView.swift in Sources */,
+				5DB7994049436ED8731F4401 /* InkRoomApp.swift in Sources */,
+				0DFFF8AC2A6EB4AC1BFE9E32 /* InkRoomComponents.swift in Sources */,
+				28B56C38732D84FDC0575D99 /* LibraryView.swift in Sources */,
+				E3F156ACAEA7C2DB80657F93 /* LibraryViewModel.swift in Sources */,
+				7DE1A704DC87259787CA20D5 /* ReaderView.swift in Sources */,
+				AF5BE612A7AC77D52A2306A0 /* ReadingSession.swift in Sources */,
+				F7F125EFF1363EC83935294E /* ReadingSettings.swift in Sources */,
+				2AAEF4F095E563203813C354 /* ReadingSettingsView.swift in Sources */,
+				65FCE2BD0044C6570231A693 /* ReadingStatistics.swift in Sources */,
+				00A30E35CAB9CE8EE2F4E8C2 /* SettingsView.swift in Sources */,
+				F911E1215A12338A3ABAD043 /* SettingsViewModel.swift in Sources */,
+				4DF20821946525CA2D3C7554 /* StatisticsView.swift in Sources */,
+				E556504848B3FE0FFBC655F2 /* TTSService.swift in Sources */,
+				44021807A2B35A5E9E998048 /* TextEncoding.swift in Sources */,
+				B0F232A0747D4659C14E3373 /* WiFiTransferService.swift in Sources */,
+				27C657B106BD43B45337F59C /* WidgetData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E1B9AE9D9E79627CFFCC7F98 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C969943CDBF2047083D4EBE9 /* Color+InkRoom.swift in Sources */,
+				C15DA38479EAE8724E6A42B4 /* InkRoomWidget.swift in Sources */,
+				91C22F9BAF7184A913F76C41 /* InkRoomWidgetBundle.swift in Sources */,
+				0773AE5C643024E2F09568DE /* InkRoomWidgetView.swift in Sources */,
+				D931B23B38C4C6E557092421 /* WidgetData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F249BE8013842E33398AEB7C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B42A13F71B4DA56736329BD6 /* AdaptiveLayout.swift in Sources */,
+				F4F74D6FCF65CF48DF2A1798 /* AddCategoryView.swift in Sources */,
+				A55DC65755112EA189869ECF /* AppDependencies.swift in Sources */,
+				BD879998171E31E1D489F838 /* AppNotifications.swift in Sources */,
+				3AA5AA96E5328E19707BC6A7 /* Book.swift in Sources */,
+				050DAA5808CB0BDAF47F058D /* BookCard.swift in Sources */,
+				D46B968580AAADB8CE562903 /* BookDetailView.swift in Sources */,
+				7E717A4E33D5CD20935CEC63 /* BookFilter.swift in Sources */,
+				0C5EA5E4F653CC40A06D22FF /* BookParserService.swift in Sources */,
+				0B7222197122AE0745E1F897 /* Bookmark.swift in Sources */,
+				645011CFEF13EE2EEC76EADB /* CategoriesView.swift in Sources */,
+				D642D095C0343A36277EECC1 /* Color+InkRoom.swift in Sources */,
+				9CE97D18CBC021CAB4E8F82C /* ContentView.swift in Sources */,
+				0322BB7C433B1F12019AEFD8 /* DatabaseService.swift in Sources */,
+				B748F957D1760C9AEB554943 /* DurationFormatter.swift in Sources */,
+				75C3259509E2A9A899CDFA71 /* GridLayoutHelper.swift in Sources */,
+				E6D14FC4DE00954AB1D050BB /* ImportView.swift in Sources */,
+				C8D24C7908C07134E0783DFB /* InkRoomApp.swift in Sources */,
+				D9380A3CCEECA15F00D9EC8F /* InkRoomComponents.swift in Sources */,
+				F9853BC2A531EA5E1017408C /* LibraryView.swift in Sources */,
+				31192FFFBDE18693ED8BAC85 /* LibraryViewModel.swift in Sources */,
+				E25E9535E5145103B3B8BAF4 /* ReaderView.swift in Sources */,
+				CD47D544E9E855C5E73FAB37 /* ReadingSession.swift in Sources */,
+				A0476DB987910FDC4B4B25C7 /* ReadingSettings.swift in Sources */,
+				ADEF9FAAA53C23C2FE5AA2B1 /* ReadingSettingsView.swift in Sources */,
+				73839E6A572B39442DC605D9 /* ReadingStatistics.swift in Sources */,
+				232A41866ABCD553E8B8A7F5 /* SettingsView.swift in Sources */,
+				EB86C4723276988143C151AA /* SettingsViewModel.swift in Sources */,
+				F0068A6E0CD4C4A01091834D /* StatisticsView.swift in Sources */,
+				1C855031564D6D1D564E316A /* TTSService.swift in Sources */,
+				21F488DC4A86E1CD6CB63E7C /* TextEncoding.swift in Sources */,
+				9B901E847F5929E7CE07AE64 /* WiFiTransferService.swift in Sources */,
+				6E5F2331E5B9A3D83CEC2A82 /* WidgetData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		05D91AC9256C449CA278A86A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "墨斋小组件";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 InkRoom. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.inkroom.app.widget;
+				PRODUCT_NAME = InkRoomWidget;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = RELEASE;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		6C18390D364C7E69A4D6DF26 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "墨斋小组件";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 InkRoom. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.inkroom.app.widget;
+				PRODUCT_NAME = InkRoomWidget;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = RELEASE;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		6EFF9C35EE2A09A04DC42B5D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "墨斋小组件";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 InkRoom. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.inkroom.app.widget;
+				PRODUCT_NAME = InkRoomWidget;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		85AB698FFCF4BF728EE50533 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 InkRoom. All rights reserved.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.inkroom.app;
+				PRODUCT_NAME = InkRoom;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+			};
+			name = Debug;
+		};
+		B49D5DAE6225FAD520875565 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 InkRoom. All rights reserved.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.inkroom.app;
+				PRODUCT_NAME = InkRoom;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B63BCEAC1D49E5AE1B8AE8DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 InkRoom. All rights reserved.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.inkroom.app;
+				PRODUCT_NAME = InkRoom;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = RELEASE;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BC146C9645D96AC2507CC3D9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.books";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 InkRoom. All rights reserved.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.inkroom.app;
+				PRODUCT_NAME = InkRoom;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = RELEASE;
+			};
+			name = Release;
+		};
+		BDB6B8A1E1D191B163A54FFB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		DBFCADA71E43550B69F804DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "墨斋小组件";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2025 InkRoom. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.inkroom.app.widget;
+				PRODUCT_NAME = InkRoomWidget;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		EE7F08FFD9C40B415B3BF160 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2BB7E34D39EB127068734ED3 /* Build configuration list for PBXNativeTarget "InkRoomWidget_iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6EFF9C35EE2A09A04DC42B5D /* Debug */,
+				05D91AC9256C449CA278A86A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		671556D776A11907A2472EA6 /* Build configuration list for PBXProject "InkRoom" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EE7F08FFD9C40B415B3BF160 /* Debug */,
+				BDB6B8A1E1D191B163A54FFB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		96E26A293460A6CE07772864 /* Build configuration list for PBXNativeTarget "InkRoom_macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85AB698FFCF4BF728EE50533 /* Debug */,
+				BC146C9645D96AC2507CC3D9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9F51395BBC35A08EA36BEBE9 /* Build configuration list for PBXNativeTarget "InkRoomWidget_macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DBFCADA71E43550B69F804DE /* Debug */,
+				6C18390D364C7E69A4D6DF26 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F7947AA8088E0467883F1D88 /* Build configuration list for PBXNativeTarget "InkRoom_iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B49D5DAE6225FAD520875565 /* Debug */,
+				B63BCEAC1D49E5AE1B8AE8DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7BDE3808D465D2576005B138 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.0;
+			};
+		};
+		844D48283284D44D71369228 /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.0;
+			};
+		};
+		B5C4030E0BCCEFF1A6388411 /* XCRemoteSwiftPackageReference "swifter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/httpswift/swifter";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		24BD68214F2F73A09EFA54C0 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7BDE3808D465D2576005B138 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		776432DF5DFC4EAEDDB41BAC /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 844D48283284D44D71369228 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			productName = SQLite;
+		};
+		BB50B19B49B4ED88F61214B9 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 844D48283284D44D71369228 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			productName = SQLite;
+		};
+		C36D0876C0E6791E4171DD4F /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7BDE3808D465D2576005B138 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+		ED65EE54F0D9E870688E7BC7 /* Swifter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5C4030E0BCCEFF1A6388411 /* XCRemoteSwiftPackageReference "swifter" */;
+			productName = Swifter;
+		};
+		F0429FBBBDEFED43F7001E6F /* Swifter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5C4030E0BCCEFF1A6388411 /* XCRemoteSwiftPackageReference "swifter" */;
+			productName = Swifter;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 621EFCDB27F73A924C0AC2A8 /* Project object */;
+}
