@@ -38,7 +38,7 @@ struct ReaderCompactBottomBar: View {
                         Text("上一页")
                     }
                     .font(.inkRoomBody)
-                    .foregroundStyle(currentPage > 1 ? textColor : textColor.opacity(0.3))
+                    .foregroundStyle(textColor)
                 }
                 .disabled(currentPage <= 1)
                 .accessibilityLabel("上一页")
@@ -77,7 +77,7 @@ struct ReaderCompactBottomBar: View {
                         Image(systemName: "chevron.right")
                     }
                     .font(.inkRoomBody)
-                    .foregroundStyle(currentPage < totalPages ? textColor : textColor.opacity(0.3))
+                    .foregroundStyle(textColor)
                 }
                 .disabled(currentPage >= totalPages)
                 .accessibilityLabel("下一页")
@@ -114,7 +114,7 @@ struct ReaderExpandedBottomBar: View {
                         Text("上一页")
                     }
                     .font(.inkRoomBody)
-                    .foregroundStyle(currentPage > 1 ? textColor : textColor.opacity(0.3))
+                    .foregroundStyle(textColor)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(textColor.opacity(0.08))
@@ -139,7 +139,7 @@ struct ReaderExpandedBottomBar: View {
                         Image(systemName: "chevron.right")
                     }
                     .font(.inkRoomBody)
-                    .foregroundStyle(currentPage < totalPages ? textColor : textColor.opacity(0.3))
+                    .foregroundStyle(textColor)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(textColor.opacity(0.08))

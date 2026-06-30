@@ -57,6 +57,7 @@ struct CategoriesView: View {
                                             .font(.system(size: 22))
                                             .symbolRenderingMode(.palette)
                                             .foregroundStyle(Color.inkRoomOnPrimary, .red)
+                                            .accessibilityHidden(true)
                                     }
                                     .accessibilityLabel("删除分类")
                                     .offset(x: 6, y: -6)
@@ -287,10 +288,9 @@ struct CategoryCard: View {
             Image(systemName: "chevron.right")
                 .font(.system(size: 14))
                 .foregroundStyle(Color.inkRoomTextTertiary)
+                .accessibilityHidden(true)
         }
-        .padding(LayoutMetrics.cardPadding)
-        .background(Color.inkRoomCard)
-        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
+        .inkRoomCard()
         .shadow(color: Color.inkRoomShadow(opacity: 0.03), radius: 2, y: 1)
     }
 }

@@ -73,15 +73,7 @@ struct StatisticsView: View {
     private func summaryCard(title: String, value: String, icon: String, iconColor: Color) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                ZStack {
-                    Circle()
-                        .fill(iconColor.opacity(0.15))
-                        .frame(width: 32, height: 32)
-
-                    Image(safeSystemName: icon)
-                        .font(.system(size: 14))
-                        .foregroundStyle(iconColor)
-                }
+                IconBadgeView(icon: icon, iconSize: 16, color: iconColor, background: iconColor.opacity(0.15))
 
                 Spacer()
             }
@@ -100,7 +92,7 @@ struct StatisticsView: View {
         }
         .padding(LayoutMetrics.cardPadding)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .frame(height: sizeClass == .compact ? 104 : 112)
+        .frame(minHeight: sizeClass == .compact ? 104 : 112)
         .background(Color.inkRoomCard)
         .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
         .shadow(color: Color.inkRoomShadow(opacity: 0.03), radius: 4, x: 0, y: 2)
@@ -150,15 +142,7 @@ struct StatisticsView: View {
 
     private func bookRow(_ stat: BookReadingStat) -> some View {
         HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(Color.inkRoomPrimaryLight)
-                    .frame(width: 36, height: 36)
-
-                Image(safeSystemName: "book.fill")
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color.inkRoomPrimary)
-            }
+            IconBadgeView(icon: "book.closed", iconSize: 18, badgeSize: 36)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(stat.title)

@@ -155,9 +155,7 @@ struct ImportView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        .padding(LayoutMetrics.cardPadding)
-        .background(Color.inkRoomCard)
-        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
+        .inkRoomCard()
     }
 
     private var uploadArea: some View {
@@ -233,30 +231,23 @@ struct ImportView: View {
 
     private func uploadTaskRow(_ task: UploadTask) -> some View {
         HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(statusColor(task.status).opacity(0.15))
-                    .frame(width: 36, height: 36)
+            if task.status == .uploading {
+                ZStack {
+                    Circle()
+                        .fill(statusColor(task.status).opacity(0.15))
+                        .frame(width: 36, height: 36)
 
-                switch task.status {
-                case .pending, .uploading:
-                    if task.status == .uploading {
-                        ProgressView()
-                            .tint(Color.inkRoomPrimary)
-                    } else {
-                        Image(systemName: "clock")
-                            .font(.system(size: 16))
-                            .foregroundStyle(Color.inkRoomTextTertiary)
-                    }
-                case .success:
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Color.stateSuccess)
-                case .failed:
-                    Image(systemName: "exclamationmark.circle.fill")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Color.stateError)
+                    ProgressView()
+                        .tint(Color.inkRoomPrimary)
                 }
+            } else {
+                IconBadgeView(
+                    icon: statusIcon(task.status),
+                    iconSize: 18,
+                    badgeSize: 36,
+                    color: statusColor(task.status),
+                    background: statusColor(task.status).opacity(0.15)
+                )
             }
 
             VStack(alignment: .leading, spacing: 4) {
@@ -274,7 +265,7 @@ struct ImportView: View {
                     HStack(spacing: 8) {
                         ProgressBar(progress: task.progress)
                         Text("\(Int(task.progress * 100))%")
-                            .font(.system(size: 10, weight: .medium))
+                            .font(.inkRoomCaptionEmphasized)
                             .foregroundStyle(Color.inkRoomPrimary)
                     }
                 case .success:
@@ -318,6 +309,15 @@ struct ImportView: View {
         }
     }
 
+    private func statusIcon(_ status: UploadTask.Status) -> String {
+        switch status {
+        case .pending: return "clock"
+        case .uploading: return "arrow.clockwise"
+        case .success: return "checkmark.circle.fill"
+        case .failed: return "exclamationmark.circle.fill"
+        }
+    }
+
     private var otherMethodsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("其他导入方式")
@@ -346,6 +346,7 @@ struct ImportView: View {
                         Image(systemName: "chevron.right")
                             .font(.inkRoomBody)
                             .foregroundStyle(Color.inkRoomTextTertiary)
+                            .accessibilityHidden(true)
                     }
                     .padding(14)
                 }
@@ -374,6 +375,7 @@ struct ImportView: View {
                         Image(systemName: "chevron.right")
                             .font(.inkRoomBody)
                             .foregroundStyle(Color.inkRoomTextTertiary)
+                            .accessibilityHidden(true)
                     }
                     .padding(14)
                 }

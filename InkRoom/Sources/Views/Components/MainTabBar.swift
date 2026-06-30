@@ -17,7 +17,7 @@ struct MainTabBar: View {
                             .symbolRenderingMode(.hierarchical)
 
                         Text(section.rawValue)
-                            .font(.system(size: 10, weight: selectedTab == section ? .semibold : .regular))
+                            .font(.inkRoomCaptionEmphasized)
                     }
                     .foregroundStyle(selectedTab == section ? Color.inkRoomPrimary : Color.inkRoomTextTertiary)
                     .frame(maxWidth: .infinity)

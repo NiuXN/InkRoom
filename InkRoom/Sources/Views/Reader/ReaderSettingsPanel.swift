@@ -144,6 +144,7 @@ struct ReaderSettingsPopover: View {
         .padding(LayoutMetrics.cardPadding)
         .frame(width: 320)
         .background(Color.inkRoomCard)
+        .sensoryFeedback(.selection, trigger: settingsViewModel.readingFontSize)
     }
 }
 
@@ -159,7 +160,7 @@ struct ReaderSettingsOverlay: View {
             Button {
                 withAnimation { isPresented = false }
             } label: {
-                Color.black.opacity(0.4).ignoresSafeArea()
+                Color.inkRoomShadow(opacity: 0.4).ignoresSafeArea()
             }
             .buttonStyle(.plain)
             .accessibilityLabel("关闭设置面板")
@@ -180,6 +181,7 @@ struct ReaderSettingsOverlay: View {
             .background(Color.inkRoomCard)
             .cornerRadius(LayoutMetrics.cornerRadiusLarge, corners: [.topLeft, .topRight])
         }
+        .sensoryFeedback(.selection, trigger: settingsViewModel.readingFontSize)
     }
 
     private var safeAreaBottom: CGFloat {

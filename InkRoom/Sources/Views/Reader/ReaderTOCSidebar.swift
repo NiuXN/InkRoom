@@ -83,6 +83,7 @@ struct ReaderTOCSidebar: View {
                     Image(systemName: "checkmark")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Color.inkRoomPrimary)
+                        .accessibilityHidden(true)
                 }
             }
             .padding(.horizontal, 16)
@@ -121,7 +122,7 @@ struct ReaderTOCSidebar: View {
                     Text(bookmark.chapterTitle)
                         .font(.inkRoomBodyEmphasized)
                         .foregroundStyle(Color.inkRoomTextPrimary)
-                        .lineLimit(1)
+                        .lineLimit(2)
                     
                     Text(bookmark.content)
                         .font(.inkRoomFootnote)
@@ -142,6 +143,7 @@ struct ReaderTOCSidebar: View {
                 Image(systemName: "trash")
                     .font(.system(size: 14))
                     .foregroundStyle(Color.inkRoomTextTertiary)
+                    .accessibilityHidden(true)
             }
             .accessibilityLabel("删除书签")
         }
@@ -200,7 +202,7 @@ struct ReaderTOCSidebar: View {
                 Text(result.chapterTitle)
                     .font(.inkRoomBodyEmphasized)
                     .foregroundStyle(Color.inkRoomTextPrimary)
-                    .lineLimit(1)
+                    .lineLimit(2)
                 
                 result.attributedContext
                     .font(.inkRoomFootnote)

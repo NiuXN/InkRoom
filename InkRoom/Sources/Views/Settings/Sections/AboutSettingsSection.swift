@@ -114,9 +114,7 @@ struct PrivacyPolicyView: View {
                 .lineSpacing(4)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(LayoutMetrics.cardPadding)
-        .background(Color.inkRoomCard)
-        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
+        .inkRoomCard()
     }
 }
 
@@ -182,8 +180,6 @@ struct ThanksView: View {
 
             Spacer()
         }
-        .padding(LayoutMetrics.cardPadding)
-        .background(Color.inkRoomCard)
-        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
+        .inkRoomCard()
     }
 }

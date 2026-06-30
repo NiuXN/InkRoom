@@ -169,6 +169,7 @@ struct UploadedFileRow: View {
 
             Image(systemName: "checkmark.circle.fill")
                 .foregroundStyle(Color.stateSuccess)
+                .accessibilityHidden(true)
         }
     }
 }

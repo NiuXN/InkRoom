@@ -147,6 +147,9 @@ struct ReadingSettingsView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .sensoryFeedback(.selection, trigger: settingsViewModel.readingFontSize)
+        .sensoryFeedback(.selection, trigger: settingsViewModel.readerThemeRaw)
+        .sensoryFeedback(.selection, trigger: settingsViewModel.pageTurnStyleRaw)
     }
 
     private var previewCard: some View {
@@ -196,9 +199,7 @@ struct ReadingSettingsView: View {
             }
 
             content()
-                .padding(LayoutMetrics.cardPadding)
-                .background(Color.inkRoomCard)
-                .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
+                .inkRoomCard()
         }
     }
 

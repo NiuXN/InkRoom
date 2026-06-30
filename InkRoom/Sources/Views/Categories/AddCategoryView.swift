@@ -123,6 +123,8 @@ struct AddCategoryView: View {
         #if os(macOS)
         .frame(minWidth: 360, minHeight: 520)
         #endif
+        .sensoryFeedback(.selection, trigger: selectedIcon)
+        .sensoryFeedback(.selection, trigger: selectedColorHex)
     }
 }
 

@@ -370,7 +370,7 @@ struct LibraryView: View {
                 Text(viewModel.sortOption.rawValue)
                     .font(.inkRoomSubheadline)
                 Image(systemName: viewModel.sortAscending ? "chevron.up" : "chevron.down")
-                    .font(.system(size: 10, weight: .semibold))
+                    .font(.inkRoomCaptionEmphasized)
             }
             .foregroundStyle(Color.inkRoomTextSecondary)
             .padding(.horizontal, 12)

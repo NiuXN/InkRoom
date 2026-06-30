@@ -236,9 +236,7 @@ struct BookDetailView: View {
                 }
             }
         }
-        .padding(LayoutMetrics.cardPadding)
-        .background(Color.inkRoomCard)
-        .clipShape(.rect(cornerRadius: LayoutMetrics.cornerRadiusCard))
+        .inkRoomCard()
     }
 
     private var actionButtons: some View {

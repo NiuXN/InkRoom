@@ -33,6 +33,7 @@ struct BookCard: View {
                     Image(systemName: "heart.fill")
                         .font(.inkRoomFootnote)
                         .foregroundStyle(Color.inkRoomPrimary)
+                        .accessibilityHidden(true)
                         .padding(6)
                         .background(.ultraThinMaterial)
                         .clipShape(Circle())
@@ -44,7 +45,7 @@ struct BookCard: View {
             Text(book.title)
                 .font(.inkRoomSubheadline)
                 .foregroundStyle(Color.inkRoomTextPrimary)
-                .lineLimit(1)
+                .lineLimit(2)
 
             // Author
             Text(book.author)
@@ -90,6 +91,7 @@ struct BookCard: View {
             Image(systemName: "chevron.right")
                 .font(.inkRoomBody)
                 .foregroundStyle(Color.inkRoomTextTertiary)
+                .accessibilityHidden(true)
         }
         .padding(LayoutMetrics.cardPaddingCompact)
         .background(Color.inkRoomCard)

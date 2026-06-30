@@ -242,7 +242,7 @@ struct ReaderView: View {
             Button {
                 withAnimation { showToc = false }
             } label: {
-                Color.black.opacity(0.4).ignoresSafeArea()
+                Color.inkRoomShadow(opacity: 0.4).ignoresSafeArea()
             }
             .buttonStyle(.plain)
             .accessibilityLabel("关闭目录")

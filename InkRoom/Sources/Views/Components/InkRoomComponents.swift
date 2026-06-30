@@ -102,6 +102,36 @@ struct ProgressBar: View {
     }
 }
 
+// MARK: - InkRoomCardStyle
+/// 卡片样式 ViewModifier，统一 padding + 背景 + 圆角
+struct InkRoomCardModifier: ViewModifier {
+    var padding: CGFloat = LayoutMetrics.cardPadding
+    var background: Color = Color.inkRoomCard
+    var cornerRadius: CGFloat = LayoutMetrics.cornerRadiusCard
+
+    func body(content: Content) -> some View {
+        content
+            .padding(padding)
+            .background(background)
+            .clipShape(.rect(cornerRadius: cornerRadius))
+    }
+}
+
+extension View {
+    /// 应用标准卡片样式（padding 16 + inkRoomCard 背景 + 圆角 12）
+    func inkRoomCard(
+        padding: CGFloat = LayoutMetrics.cardPadding,
+        background: Color = Color.inkRoomCard,
+        cornerRadius: CGFloat = LayoutMetrics.cornerRadiusCard
+    ) -> some View {
+        modifier(InkRoomCardModifier(
+            padding: padding,
+            background: background,
+            cornerRadius: cornerRadius
+        ))
+    }
+}
+
 // MARK: - EmptyStateView
 /// 统一的空状态视图
 struct EmptyStateView: View {
