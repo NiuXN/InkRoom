@@ -111,3 +111,18 @@ targets:
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
         release:
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: RELEASE
+
+  InkRoomTests:
+    type: bundle.unit-test
+    platform: [iOS, macOS]
+    sources:
+      - path: Tests
+        type: group
+    dependencies:
+      - target: InkRoom
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.inkroom.app.tests
+        GENERATE_INFOPLIST_FILE: true
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/InkRoom.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/InkRoom"
