@@ -118,26 +118,41 @@ struct ImportView: View {
                 .foregroundColor(.inkRoomTextTertiary)
 
             if wifiService.isRunning {
-                HStack {
-                    Spacer()
+                let transferURL = wifiService.ipAddress.isEmpty
+                    ? ""
+                    : "http://\(wifiService.ipAddress):\(wifiService.port)"
+
+                HStack(spacing: 20) {
+                    if !transferURL.isEmpty {
+                        VStack(spacing: 8) {
+                            QRCodeView(content: transferURL, size: 100)
+                                .padding(8)
+                                .background(Color.white)
+                                .cornerRadius(8)
+
+                            Text("扫码传书")
+                                .font(.system(size: 11))
+                                .foregroundColor(.inkRoomTextTertiary)
+                        }
+                    }
 
                     VStack(spacing: 4) {
-                        Text(wifiService.ipAddress.isEmpty ? "正在获取..." : "\(wifiService.ipAddress):\(wifiService.port)")
-                            .font(.system(size: 24, weight: .medium, design: .monospaced))
+                        Text(wifiService.ipAddress.isEmpty ? "正在获取..." : transferURL.replacingOccurrences(of: "http://", with: ""))
+                            .font(.system(size: 20, weight: .medium, design: .monospaced))
                             .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
 
                         Text("在电脑浏览器中输入此地址")
                             .font(.system(size: 11))
                             .foregroundColor(.white.opacity(0.8))
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, 20)
                     .padding(.vertical, 16)
                     .background(Color.inkRoomPrimary)
                     .cornerRadius(10)
                     .shadow(color: Color.inkRoomPrimary.opacity(0.3), radius: 8, y: 2)
-
-                    Spacer()
                 }
+                .frame(maxWidth: .infinity)
             }
         }
         .padding(16)

@@ -9,33 +9,30 @@ struct ReaderView: View {
     @Environment(\.dismiss) private var dismiss
     
     @StateObject private var ttsService = TTSService.shared
-    
+    @StateObject private var readerVM: ReaderViewModel
+
     @State private var showHeader = false
     @State private var showToc = false
     @State private var showSettings = false
     @State private var showTTSPanel = false
-    @State private var currentPage: Int
-    @State private var chapters: [Chapter] = []
-    @State private var pageText: String = ""
-    @State private var chapterText: String = ""
-    @State private var isLoading = true
-    @State private var currentChapterTitle: String = ""
-    @State private var currentChapterIndex: Int = 0
-    @State private var chapterTexts: [Int: String] = [:]
-    @State private var isCurrentPageBookmarked: Bool = false
-    @State private var bookmarks: [Bookmark] = []
     @State private var tocTab: TocTab = .chapters
     @State private var ttsTimer: Timer?
     @State private var ttsRemainingTime: TimeInterval = 0
-    @State private var readingSessionStart: Date?
-    @State private var pagesReadInSession: Int = 0
     @State private var searchText: String = ""
     @State private var searchResults: [SearchResult] = []
     @State private var isSearching: Bool = false
     @State private var searchTask: Task<Void, Never>?
-    @State private var pageLoadTask: Task<Void, Never>?
-    @State private var pageLoadGeneration: Int = 0
     @State private var pageBoundaryHit: Int = 0
+    @State private var ttsAutoAdvanceTrigger: Int = 0
+
+    private var isScrollMode: Bool {
+        settingsViewModel.pageTurnStyle == .scroll
+    }
+
+    init(book: Book) {
+        self.book = book
+        _readerVM = StateObject(wrappedValue: ReaderViewModel(book: book))
+    }
 
     enum TocTab {
         case chapters
@@ -51,11 +48,6 @@ struct ReaderView: View {
         let page: Int
     }
 
-    init(book: Book) {
-        self.book = book
-        _currentPage = State(initialValue: max(1, book.currentPage))
-    }
-
     var body: some View {
         Group {
             if sizeClass == .compact {
@@ -64,25 +56,29 @@ struct ReaderView: View {
                 expandedReader
             }
         }
-        .sensoryFeedback(.impact(weight: .light), trigger: isCurrentPageBookmarked)
+        .sensoryFeedback(.impact(weight: .light), trigger: readerVM.isCurrentPageBookmarked)
         .sensoryFeedback(.warning, trigger: pageBoundaryHit)
         .onAppear {
-            Task {
-                await loadChapters()
-                await loadPageContent()
-                loadBookmarks()
-                checkCurrentPageBookmark()
+            readerVM.attach(library: libraryViewModel)
+            readerVM.onAppear(isScrollMode: isScrollMode)
+            if readerVM.activeBook.filePath == nil {
+                readerVM.applyDemoPageText(sampleText)
             }
             setupTTSService()
-            readingSessionStart = Date()
-            pagesReadInSession = 0
         }
         .onDisappear {
-            saveProgress()
+            readerVM.onDisappear()
             ttsService.onSpeechFinish = nil
             ttsService.stop()
             stopTTSTimer()
-            saveReadingSession()
+        }
+        .onChange(of: ttsAutoAdvanceTrigger) { _, _ in
+            if readerVM.currentPage < readerVM.activeBook.totalPages {
+                _ = readerVM.nextPage(isScrollMode: isScrollMode)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    startTTS()
+                }
+            }
         }
     }
 
@@ -210,7 +206,7 @@ struct ReaderView: View {
             if tocTab == .chapters {
                 ScrollView {
                     LazyVStack(spacing: 0) {
-                        ForEach(chapters) { chapter in
+                        ForEach(readerVM.chapters) { chapter in
                             tocRow(chapter)
                         }
                     }
@@ -218,7 +214,7 @@ struct ReaderView: View {
             } else if tocTab == .bookmarks {
                 ScrollView {
                     LazyVStack(spacing: 0) {
-                        if bookmarks.isEmpty {
+                        if readerVM.bookmarks.isEmpty {
                             VStack(spacing: 8) {
                                 Image(systemName: "bookmark")
                                     .font(.system(size: 32))
@@ -230,7 +226,7 @@ struct ReaderView: View {
                             .padding(.top, 48)
                             .frame(maxWidth: .infinity)
                         } else {
-                            ForEach(bookmarks) { bookmark in
+                            ForEach(readerVM.bookmarks) { bookmark in
                                 bookmarkRow(bookmark)
                             }
                         }
@@ -261,7 +257,7 @@ struct ReaderView: View {
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(textColor)
 
-                Text("第 \(currentPage) / \(book.totalPages) 页")
+                Text("第 \(readerVM.currentPage) / \(readerVM.activeBook.totalPages) 页")
                     .font(.system(size: 11))
                     .foregroundColor(textColor.opacity(0.6))
             }
@@ -271,9 +267,9 @@ struct ReaderView: View {
             Button {
                 toggleBookmark()
             } label: {
-                Image(systemName: isCurrentPageBookmarked ? "bookmark.fill" : "bookmark")
+                Image(systemName: readerVM.isCurrentPageBookmarked ? "bookmark.fill" : "bookmark")
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(isCurrentPageBookmarked ? .inkRoomPrimary : textColor)
+                    .foregroundColor(readerVM.isCurrentPageBookmarked ? .inkRoomPrimary : textColor)
                     .frame(width: 40, height: 40)
             }
 
@@ -308,7 +304,7 @@ struct ReaderView: View {
 
     private var expandedBottomBar: some View {
         VStack(spacing: 0) {
-            ProgressBar(progress: book.totalPages > 0 ? Double(currentPage) / Double(book.totalPages) : 0, height: 2)
+            ProgressBar(progress: readerVM.activeBook.totalPages > 0 ? Double(readerVM.currentPage) / Double(readerVM.activeBook.totalPages) : 0, height: 2)
 
             HStack {
                 Button {
@@ -319,17 +315,17 @@ struct ReaderView: View {
                         Text("上一页")
                     }
                     .font(.system(size: 14))
-                    .foregroundColor(currentPage > 1 ? textColor : textColor.opacity(0.3))
+                    .foregroundColor(readerVM.currentPage > 1 ? textColor : textColor.opacity(0.3))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(textColor.opacity(0.08))
                     .cornerRadius(8)
                 }
-                .disabled(currentPage <= 1)
+                .disabled(readerVM.currentPage <= 1)
 
                 Spacer()
 
-                Text("\(currentPage) / \(book.totalPages)")
+                Text("\(readerVM.currentPage) / \(readerVM.activeBook.totalPages)")
                     .font(.system(size: 13))
                     .foregroundColor(textColor.opacity(0.7))
 
@@ -343,13 +339,13 @@ struct ReaderView: View {
                         Image(systemName: "chevron.right")
                     }
                     .font(.system(size: 14))
-                    .foregroundColor(currentPage < book.totalPages ? textColor : textColor.opacity(0.3))
+                    .foregroundColor(readerVM.currentPage < readerVM.activeBook.totalPages ? textColor : textColor.opacity(0.3))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
                     .background(textColor.opacity(0.08))
                     .cornerRadius(8)
                 }
-                .disabled(currentPage >= book.totalPages)
+                .disabled(readerVM.currentPage >= readerVM.activeBook.totalPages)
             }
             .padding(.horizontal, 24)
             .padding(.vertical, 12)
@@ -500,7 +496,7 @@ struct ReaderView: View {
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(textColor)
 
-                    Text("第 \(currentPage) / \(book.totalPages) 页")
+                    Text("第 \(readerVM.currentPage) / \(readerVM.activeBook.totalPages) 页")
                         .font(.system(size: 11))
                         .foregroundColor(textColor.opacity(0.6))
                 }
@@ -510,9 +506,9 @@ struct ReaderView: View {
                 Button {
                     toggleBookmark()
                 } label: {
-                    Image(systemName: isCurrentPageBookmarked ? "bookmark.fill" : "bookmark")
+                    Image(systemName: readerVM.isCurrentPageBookmarked ? "bookmark.fill" : "bookmark")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundColor(isCurrentPageBookmarked ? .inkRoomPrimary : textColor)
+                        .foregroundColor(readerVM.isCurrentPageBookmarked ? .inkRoomPrimary : textColor)
                         .frame(width: 44, height: 44)
                 }
 
@@ -528,7 +524,7 @@ struct ReaderView: View {
             .padding(.horizontal, 8)
             .padding(.top, 8)
 
-            ProgressBar(progress: book.totalPages > 0 ? Double(currentPage) / Double(book.totalPages) : 0, height: 2)
+            ProgressBar(progress: readerVM.activeBook.totalPages > 0 ? Double(readerVM.currentPage) / Double(readerVM.activeBook.totalPages) : 0, height: 2)
                 .padding(.horizontal, 16)
             .padding(.top, 8)
         }
@@ -551,7 +547,7 @@ struct ReaderView: View {
                     Color.clear
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            if settingsViewModel.pageTurnStyle != .scroll {
+                            if settingsViewModel.pageTurnStyle == .tap || settingsViewModel.pageTurnStyle == .swipe {
                                 prevPage()
                             }
                         }
@@ -567,7 +563,7 @@ struct ReaderView: View {
                     Color.clear
                         .contentShape(Rectangle())
                         .onTapGesture {
-                            if settingsViewModel.pageTurnStyle != .scroll {
+                            if settingsViewModel.pageTurnStyle == .tap || settingsViewModel.pageTurnStyle == .swipe {
                                 nextPage()
                             }
                         }
@@ -578,13 +574,13 @@ struct ReaderView: View {
 
     private func pageContentView(maxWidth: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: CGFloat(settingsViewModel.readingLineSpacing)) {
-            if isLoading {
+            if readerVM.isLoading {
                 ProgressView()
                     .progressViewStyle(.circular)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                if !currentChapterTitle.isEmpty {
-                    Text(currentChapterTitle)
+                if !readerVM.currentChapterTitle.isEmpty {
+                    Text(readerVM.currentChapterTitle)
                         .font(.system(size: CGFloat(settingsViewModel.readingFontSize) * 1.2, weight: .bold))
                         .foregroundColor(textColor)
                         .padding(.bottom, 8)
@@ -592,16 +588,16 @@ struct ReaderView: View {
 
                 if ttsService.isSpeaking && settingsViewModel.ttsHighlightEnabled,
                    let range = ttsService.currentSentenceRange,
-                   let textRange = Range(range, in: pageText) {
-                    Text(pageText[pageText.startIndex..<textRange.lowerBound])
+                   let textRange = Range(range, in: readerVM.pageText) {
+                    Text(readerVM.pageText[readerVM.pageText.startIndex..<textRange.lowerBound])
                         .foregroundColor(textColor)
-                    + Text(pageText[textRange])
+                    + Text(readerVM.pageText[textRange])
                         .foregroundColor(.inkRoomPrimary)
                         .fontWeight(.semibold)
-                    + Text(pageText[textRange.upperBound..<pageText.endIndex])
+                    + Text(readerVM.pageText[textRange.upperBound..<readerVM.pageText.endIndex])
                         .foregroundColor(textColor)
                 } else {
-                    Text(pageText)
+                    Text(readerVM.pageText)
                         .foregroundColor(textColor)
                 }
             }
@@ -615,61 +611,60 @@ struct ReaderView: View {
     }
 
     private func scrollContentView(maxWidth: CGFloat) -> some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: CGFloat(settingsViewModel.readingLineSpacing)) {
-                if isLoading {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .frame(maxWidth: .infinity, minHeight: 300)
-                } else {
-                    ForEach(Array(chapters.enumerated()), id: \.offset) { index, chapter in
-                        VStack(alignment: .leading, spacing: CGFloat(settingsViewModel.readingLineSpacing)) {
-                            Text(chapter.title)
-                                .font(.system(size: CGFloat(settingsViewModel.readingFontSize) * 1.2, weight: .bold))
-                                .foregroundColor(textColor)
-                                .padding(.top, index == 0 ? 0 : 24)
-                                .padding(.bottom, 8)
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: CGFloat(settingsViewModel.readingLineSpacing)) {
+                    if readerVM.isLoading {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .frame(maxWidth: .infinity, minHeight: 300)
+                    } else {
+                        ForEach(Array(readerVM.chapters.enumerated()), id: \.offset) { index, chapter in
+                            VStack(alignment: .leading, spacing: CGFloat(settingsViewModel.readingLineSpacing)) {
+                                Text(chapter.title)
+                                    .font(.system(size: CGFloat(settingsViewModel.readingFontSize) * 1.2, weight: .bold))
+                                    .foregroundColor(textColor)
+                                    .padding(.top, index == 0 ? 0 : 24)
+                                    .padding(.bottom, 8)
 
-                            Text(chapterTextForChapter(at: index))
-                                .font(.system(size: CGFloat(settingsViewModel.readingFontSize)))
-                                .foregroundColor(textColor)
-                                .lineSpacing(CGFloat(settingsViewModel.readingLineSpacing))
-                                .tracking(CGFloat(settingsViewModel.readingLetterSpacing) * 0.1)
-                        }
-                        .task(id: index) {
-                            await ensureChapterTextLoaded(at: index)
+                                Text(readerVM.chapterDisplayText(at: index))
+                                    .font(.system(size: CGFloat(settingsViewModel.readingFontSize)))
+                                    .foregroundColor(textColor)
+                                    .lineSpacing(CGFloat(settingsViewModel.readingLineSpacing))
+                                    .tracking(CGFloat(settingsViewModel.readingLetterSpacing) * 0.1)
+                            }
+                            .id("chapter-\(index)")
+                            .background(
+                                GeometryReader { geo in
+                                    Color.clear.preference(
+                                        key: ChapterFramePreferenceKey.self,
+                                        value: [index: geo.frame(in: .named("readerScroll"))]
+                                    )
+                                }
+                            )
+                            .task(id: index) {
+                                await readerVM.ensureChapterTextLoaded(at: index)
+                            }
                         }
                     }
                 }
+                .frame(maxWidth: maxWidth)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.vertical, sizeClass == .compact ? 40 : 48)
             }
-            .frame(maxWidth: maxWidth)
-            .frame(maxWidth: .infinity, alignment: .center)
-            .padding(.vertical, sizeClass == .compact ? 40 : 48)
+            .coordinateSpace(name: "readerScroll")
+            .onPreferenceChange(ChapterFramePreferenceKey.self) { frames in
+                readerVM.updateFromScroll(frames: frames)
+            }
+            .onChange(of: readerVM.pendingScrollToPage) { _, page in
+                guard let page else { return }
+                let index = ScrollReadingPosition.chapterIndex(for: page, in: readerVM.chapters)
+                withAnimation {
+                    proxy.scrollTo("chapter-\(index)", anchor: .top)
+                }
+                readerVM.pendingScrollToPage = nil
+            }
         }
-    }
-
-    private func chapterTextForChapter(at index: Int) -> String {
-        chapterTexts[index] ?? "加载中..."
-    }
-    
-    private func ensureChapterTextLoaded(at index: Int) async {
-        guard chapterTexts[index] == nil,
-              index >= 0, index < chapters.count,
-              let filePath = book.filePath else { return }
-
-        if let content = try? await BookParserService.shared.getChapterContent(
-            for: index,
-            from: filePath,
-            charsPerPage: 10000
-        ) {
-            chapterTexts[index] = content
-        }
-    }
-
-    private func preloadAdjacentChapterTexts() async {
-        await ensureChapterTextLoaded(at: currentChapterIndex)
-        await ensureChapterTextLoaded(at: currentChapterIndex - 1)
-        await ensureChapterTextLoaded(at: currentChapterIndex + 1)
     }
 
     private func contentMaxWidth(for availableWidth: CGFloat) -> CGFloat {
@@ -688,7 +683,7 @@ struct ReaderView: View {
 
     private var compactBottomBar: some View {
         VStack(spacing: 0) {
-            ProgressBar(progress: book.totalPages > 0 ? Double(currentPage) / Double(book.totalPages) : 0, height: 2)
+            ProgressBar(progress: readerVM.activeBook.totalPages > 0 ? Double(readerVM.currentPage) / Double(readerVM.activeBook.totalPages) : 0, height: 2)
 
             HStack {
                 Button {
@@ -699,9 +694,9 @@ struct ReaderView: View {
                         Text("上一页")
                     }
                     .font(.system(size: 14))
-                    .foregroundColor(currentPage > 1 ? textColor : textColor.opacity(0.3))
+                    .foregroundColor(readerVM.currentPage > 1 ? textColor : textColor.opacity(0.3))
                 }
-                .disabled(currentPage <= 1)
+                .disabled(readerVM.currentPage <= 1)
 
                 Spacer()
 
@@ -735,9 +730,9 @@ struct ReaderView: View {
                         Image(systemName: "chevron.right")
                     }
                     .font(.system(size: 14))
-                    .foregroundColor(currentPage < book.totalPages ? textColor : textColor.opacity(0.3))
+                    .foregroundColor(readerVM.currentPage < readerVM.activeBook.totalPages ? textColor : textColor.opacity(0.3))
                 }
-                .disabled(currentPage >= book.totalPages)
+                .disabled(readerVM.currentPage >= readerVM.activeBook.totalPages)
             }
             .padding(.horizontal, 16)
         }
@@ -814,7 +809,7 @@ struct ReaderView: View {
                 if tocTab == .chapters {
                     ScrollView {
                         LazyVStack(spacing: 0) {
-                            ForEach(chapters) { chapter in
+                            ForEach(readerVM.chapters) { chapter in
                                 tocRow(chapter)
                             }
                         }
@@ -822,7 +817,7 @@ struct ReaderView: View {
                 } else if tocTab == .bookmarks {
                     ScrollView {
                         LazyVStack(spacing: 0) {
-                            if bookmarks.isEmpty {
+                            if readerVM.bookmarks.isEmpty {
                                 VStack(spacing: 8) {
                                     Image(systemName: "bookmark")
                                         .font(.system(size: 32))
@@ -834,7 +829,7 @@ struct ReaderView: View {
                                 .padding(.top, 48)
                                 .frame(maxWidth: .infinity)
                             } else {
-                                ForEach(bookmarks) { bookmark in
+                                ForEach(readerVM.bookmarks) { bookmark in
                                     bookmarkRow(bookmark)
                                 }
                             }
@@ -864,7 +859,7 @@ struct ReaderView: View {
 
                 Spacer()
 
-                if currentPage >= chapter.startPage && currentPage <= chapter.endPage {
+                if readerVM.currentPage >= chapter.startPage && readerVM.currentPage <= chapter.endPage {
                     Image(systemName: "checkmark")
                         .font(.system(size: 12, weight: .medium))
                         .foregroundColor(.inkRoomPrimary)
@@ -876,7 +871,7 @@ struct ReaderView: View {
         }
         .buttonStyle(.plain)
         .background(
-            (currentPage >= chapter.startPage && currentPage <= chapter.endPage) ?
+            (readerVM.currentPage >= chapter.startPage && readerVM.currentPage <= chapter.endPage) ?
             Color.inkRoomPrimary.opacity(0.08) : Color.clear
         )
     }
@@ -924,7 +919,7 @@ struct ReaderView: View {
     }
 
     private func loadBookmarks() {
-        bookmarks = libraryViewModel.getBookmarks(for: book)
+        readerVM.loadBookmarks()
     }
 
     // MARK: - Search
@@ -1077,7 +1072,7 @@ struct ReaderView: View {
         let charsPerPage = 500
         let maxResults = 200
 
-        if let filePath = book.filePath {
+        if let filePath = readerVM.activeBook.filePath {
             do {
                 let fileURL = URL(fileURLWithPath: filePath)
                 let parsedBook = try await BookParserService.shared.parseBook(from: fileURL)
@@ -1137,25 +1132,11 @@ struct ReaderView: View {
     }
 
     private func toggleBookmark() {
-        if isCurrentPageBookmarked {
-            if let bookmark = bookmarks.first(where: { $0.page == currentPage }) {
-                libraryViewModel.removeBookmark(bookmark)
-            }
-        } else {
-            let bookmark = Bookmark(
-                bookId: book.id,
-                page: currentPage,
-                chapterTitle: currentChapterTitle,
-                content: String(pageText.prefix(80))
-            )
-            libraryViewModel.addBookmark(bookmark)
-        }
-        loadBookmarks()
-        checkCurrentPageBookmark()
+        readerVM.toggleBookmark(pageText: readerVM.pageText, chapterTitle: readerVM.currentChapterTitle)
     }
 
     private func checkCurrentPageBookmark() {
-        isCurrentPageBookmarked = libraryViewModel.isBookmarked(book, page: currentPage)
+        readerVM.checkCurrentPageBookmark()
     }
 
     #if os(iOS)
@@ -1263,136 +1244,25 @@ struct ReaderView: View {
     }
 
     private func prevPage() {
-        if currentPage > 1 {
-            currentPage -= 1
-            saveProgress()
-            pageLoadTask = Task {
-                await loadPageContent()
-                checkCurrentPageBookmark()
-            }
-        } else {
+        if !readerVM.prevPage(isScrollMode: isScrollMode) {
             pageBoundaryHit += 1
         }
     }
 
     private func nextPage() {
-        if currentPage < book.totalPages {
-            currentPage += 1
-            pagesReadInSession += 1
-            saveProgress()
-            pageLoadTask = Task {
-                await loadPageContent()
-                checkCurrentPageBookmark()
-            }
-        } else {
+        if !readerVM.nextPage(isScrollMode: isScrollMode) {
             pageBoundaryHit += 1
         }
     }
 
     private func navigateToPage(_ page: Int) {
-        guard page >= 1, page <= book.totalPages, page != currentPage else { return }
-        currentPage = page
-        saveProgress()
-        pageLoadTask = Task {
-            await loadPageContent()
-            checkCurrentPageBookmark()
-        }
-    }
-
-    private func saveProgress() {
-        libraryViewModel.updateReadingProgress(for: book, to: currentPage)
-    }
-
-    private func saveReadingSession() {
-        guard let start = readingSessionStart else { return }
-        let end = Date()
-        let duration = end.timeIntervalSince(start)
-        // 仅记录有效阅读（超过 5 秒且至少翻过一页）
-        guard duration >= 5, pagesReadInSession > 0 else {
-            readingSessionStart = nil
-            return
-        }
-        let session = ReadingSession(
-            id: UUID(),
-            bookId: book.id,
-            bookTitle: book.title,
-            startTime: start,
-            endTime: end,
-            duration: duration,
-            pagesRead: pagesReadInSession
-        )
-        do {
-            try DatabaseService.shared.insertReadingSession(session)
-        } catch {
-            print("Save reading session failed: \(error)")
-        }
-        readingSessionStart = nil
-    }
-
-    private func loadChapters() async {
-        if book.filePath != nil {
-            chapters = await BookParserService.shared.getChapters(for: book)
-        } else {
-            chapters = [
-                Chapter(title: "第一章 · 人间草木", startPage: 1, endPage: 25),
-                Chapter(title: "第二章 · 四时佳兴", startPage: 26, endPage: 58),
-                Chapter(title: "第三章 · 美食美味", startPage: 59, endPage: 95),
-                Chapter(title: "第四章 · 人物风物", startPage: 96, endPage: 145),
-                Chapter(title: "第五章 · 往事如烟", startPage: 146, endPage: 198),
-                Chapter(title: "第六章 · 旅途见闻", startPage: 199, endPage: 256)
-            ]
-        }
-    }
-
-    private func loadPageContent() async {
-        let generation = pageLoadGeneration + 1
-        pageLoadGeneration = generation
-        isLoading = true
-
-        if book.filePath != nil {
-            if let content = await BookParserService.shared.getChapterContent(for: book, page: currentPage) {
-                guard generation == pageLoadGeneration else { return }
-                pageText = content
-            } else {
-                guard generation == pageLoadGeneration else { return }
-                pageText = "无法加载页面内容"
-            }
-        } else {
-            pageText = sampleText
-        }
-
-        currentChapterTitle = findChapterTitle(for: currentPage)
-        currentChapterIndex = findChapterIndex(for: currentPage)
-        await preloadAdjacentChapterTexts()
-        guard generation == pageLoadGeneration else { return }
-        isLoading = false
-    }
-
-    private func findChapterIndex(for page: Int) -> Int {
-        for (index, chapter) in chapters.enumerated() {
-            if page >= chapter.startPage && page <= chapter.endPage {
-                return index
-            }
-        }
-        return 0
-    }
-
-    private func findChapterTitle(for page: Int) -> String {
-        for chapter in chapters {
-            if page >= chapter.startPage && page <= chapter.endPage {
-                return chapter.title
-            }
-        }
-        return ""
+        readerVM.navigateToPage(page, isScrollMode: isScrollMode)
     }
 
     private func setupTTSService() {
         ttsService.onSpeechFinish = {
-            if currentPage < book.totalPages {
-                nextPage()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    startTTS()
-                }
+            Task { @MainActor in
+                ttsAutoAdvanceTrigger += 1
             }
         }
     }
@@ -1406,11 +1276,11 @@ struct ReaderView: View {
     }
 
     private func startTTS() {
-        let text = pageText
+        let text = readerVM.pageText
         guard !text.isEmpty else { return }
 
         let voiceId = settingsViewModel.ttsVoiceIdentifier.isEmpty ? nil : settingsViewModel.ttsVoiceIdentifier
-        ttsService.setBookInfo(title: book.title, chapter: currentChapterTitle)
+        ttsService.setBookInfo(title: readerVM.activeBook.title, chapter: readerVM.currentChapterTitle)
         ttsService.speak(
             text: text,
             voiceIdentifier: voiceId,

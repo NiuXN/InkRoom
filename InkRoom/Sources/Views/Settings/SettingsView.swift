@@ -2,11 +2,13 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var settingsViewModel: SettingsViewModel
+    @EnvironmentObject var updateService: AppStoreUpdateService
     @Environment(\.layoutSizeClass) private var sizeClass
     @StateObject private var wifiService = WiFiTransferService.shared
     @State private var showReadingSettings = false
     @State private var wifiError: String?
     @State private var showProAlert = false
+    @State private var showUpdateStatus = false
 
     var body: some View {
         NavigationStack {
@@ -151,9 +153,61 @@ struct SettingsView: View {
                     HStack {
                         Text("版本")
                         Spacer()
-                        Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")
-                            .foregroundColor(.inkRoomTextTertiary)
+                        if updateService.isChecking {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                        } else {
+                            Text(AppVersion.displayString)
+                                .foregroundColor(.inkRoomTextTertiary)
+                        }
                     }
+
+                    Button {
+                        Task {
+                            await updateService.checkForUpdate()
+                            showUpdateStatus = true
+                        }
+                    } label: {
+                        HStack(spacing: 12) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.inkRoomPrimaryLight)
+                                    .frame(width: 32, height: 32)
+
+                                Image(systemName: "arrow.down.circle")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.inkRoomPrimary)
+                            }
+
+                            Text("检查 App Store 更新")
+
+                            Spacer()
+
+                            if updateService.pendingUpdate != nil {
+                                Text("有新版本")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(.inkRoomPrimary)
+                            }
+                        }
+                    }
+                    .disabled(updateService.isChecking)
+
+                    Toggle(isOn: $settingsViewModel.autoCheckUpdates) {
+                        HStack(spacing: 12) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.stateInfo.opacity(0.15))
+                                    .frame(width: 32, height: 32)
+
+                                Image(systemName: "bell.badge")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.stateInfo)
+                            }
+
+                            Text("自动检查更新")
+                        }
+                    }
+                    .tint(.inkRoomPrimary)
 
                     NavigationLink {
                         privacyPolicyView
@@ -170,6 +224,10 @@ struct SettingsView: View {
                     Text("关于")
                         .textCase(nil)
                         .foregroundColor(.inkRoomTextSecondary)
+                } footer: {
+                    Text("自动检查更新每 24 小时最多执行一次，仅在发现新版本时弹出提醒。")
+                        .textCase(nil)
+                        .font(.system(size: 12))
                 }
                 .listRowBackground(Color.inkRoomCard)
             }
@@ -199,6 +257,18 @@ struct SettingsView: View {
             Button("确定", role: .cancel) {}
         } message: {
             Text(wifiError ?? "")
+        }
+        .alert("检查更新", isPresented: $showUpdateStatus) {
+            if updateService.pendingUpdate != nil {
+                Button("稍后", role: .cancel) {}
+                Button("前往 App Store") {
+                    updateService.openAppStore()
+                }
+            } else {
+                Button("好的", role: .cancel) {}
+            }
+        } message: {
+            Text(updateService.statusMessage ?? "")
         }
     }
 
@@ -288,9 +358,13 @@ struct SettingsView: View {
                 .foregroundColor(.inkRoomTextSecondary)
 
             Button {
-                showProAlert = true
+                if AppConfig.proUpgradeURL != nil {
+                    updateService.openProUpgradePage()
+                } else {
+                    showProAlert = true
+                }
             } label: {
-                Text("了解更多")
+                Text(AppConfig.proUpgradeURL != nil ? "前往 App Store" : "了解更多")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.inkRoomPrimary)
             }
@@ -553,4 +627,5 @@ struct SettingsView: View {
 #Preview {
     SettingsView()
         .environmentObject(SettingsViewModel())
+        .environmentObject(AppStoreUpdateService.shared)
 }

@@ -74,7 +74,7 @@ struct BookDetailView: View {
         .alert("删除书籍", isPresented: $showDeleteConfirmation) {
             Button("取消", role: .cancel) {}
             Button("删除", role: .destructive) {
-                viewModel.deleteBook(book)
+                viewModel.deleteBook(currentBook)
                 dismiss()
             }
         } message: {
@@ -212,7 +212,7 @@ struct BookDetailView: View {
 
             if currentBook.isStarted {
                 HStack {
-                    Text("第 \(currentBook.currentPage) / \(currentBook.totalPages) 页")
+                    Text("第 \(max(1, currentBook.currentPage)) / \(currentBook.totalPages) 页")
                         .font(.system(size: 12))
                         .foregroundColor(.inkRoomTextTertiary)
 

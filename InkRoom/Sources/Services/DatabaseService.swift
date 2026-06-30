@@ -327,33 +327,7 @@ final class DatabaseService {
 
     func fetchAllCategories() -> [Category] {
         synchronized {
-            guard let db = db else { return [] }
-
-            var results: [Category] = []
-            do {
-                var categoryBookMap: [String: [UUID]] = [:]
-                for row in try db.prepare("SELECT category_id, book_id FROM book_category_relations") {
-                    if let categoryIdStr = row[0] as? String, let bookIdStr = row[1] as? String {
-                        let bookUUID = parseUUID(bookIdStr, context: "book_category_relations.book_id")
-                        categoryBookMap[categoryIdStr, default: []].append(bookUUID)
-                    }
-                }
-
-                for row in try db.prepare(categories) {
-                    let categoryIdStr = row[categoryId]
-                    let category = Category(
-                        id: parseUUID(categoryIdStr, context: "categories.id"),
-                        name: row[categoryName],
-                        iconName: row[categoryIconName],
-                        colorHex: row[categoryColorHex],
-                        bookIds: categoryBookMap[categoryIdStr] ?? []
-                    )
-                    results.append(category)
-                }
-            } catch {
-                print("Fetch categories failed: \(error)")
-            }
-            return results
+            fetchAllCategoriesUnsafe()
         }
     }
 
@@ -372,6 +346,9 @@ final class DatabaseService {
     func insertChapters(_ chaptersList: [Chapter], forBookId bookIdValue: UUID) throws {
         try synchronized {
             guard let db = db else { return }
+
+            let existing = chapters.filter(chapterBookId == bookIdValue.uuidString)
+            try db.run(existing.delete())
 
             try db.transaction {
                 for (index, chapter) in chaptersList.enumerated() {

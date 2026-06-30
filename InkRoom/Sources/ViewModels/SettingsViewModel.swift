@@ -16,6 +16,7 @@ class SettingsViewModel: ObservableObject {
     @AppStorage("ttsVoiceIdentifier") var ttsVoiceIdentifier: String = ""
     @AppStorage("ttsTimerMinutes") var ttsTimerMinutes: Int = 0
     @AppStorage("ttsHighlightEnabled") var ttsHighlightEnabled: Bool = true
+    @AppStorage("autoCheckUpdates") var autoCheckUpdates: Bool = true
 
     var readerTheme: ReadingSettings.ReaderTheme {
         get { ReadingSettings.ReaderTheme(rawValue: readerThemeRaw) ?? .light }

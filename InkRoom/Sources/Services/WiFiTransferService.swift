@@ -17,6 +17,10 @@ final class WiFiTransferService: ObservableObject {
     @Published var uploadedFiles: [UploadedFile] = []
     @Published var uploadProgress: [String: Double] = [:]
 
+    private let statusLock = NSLock()
+    private var cachedUploadCount = 0
+    private var cachedStatusPort: UInt16 = 8080
+
     private init() {}
 
     struct UploadedFile: Identifiable {
@@ -78,6 +82,7 @@ final class WiFiTransferService: ObservableObject {
                             Task { @MainActor in
                                 self.uploadedFiles.insert(uploadedFile, at: 0)
                                 self.uploadProgress.removeValue(forKey: filename)
+                                self.refreshStatusCache()
                             }
 
                             // Import the book
@@ -101,12 +106,10 @@ final class WiFiTransferService: ObservableObject {
         // API endpoint for status
         server["/api/status"] = { [weak self] _ in
             guard let self else { return .ok(.text("{}")) }
-            var fileCount = 0
-            var portValue: UInt16 = 8080
-            DispatchQueue.main.sync {
-                fileCount = self.uploadedFiles.count
-                portValue = self.port
-            }
+            self.statusLock.lock()
+            let fileCount = self.cachedUploadCount
+            let portValue = self.cachedStatusPort
+            self.statusLock.unlock()
             let status = """
             {
               "status": "running",
@@ -121,6 +124,7 @@ final class WiFiTransferService: ObservableObject {
         self.server = server
         self.isRunning = true
         self.ipAddress = getWiFiAddress() ?? "Wi-Fi 未连接"
+        refreshStatusCache()
 
         #else
         throw NSError(domain: "WiFiTransfer", code: -1, userInfo: [NSLocalizedDescriptionKey: "Swifter framework not available"])
@@ -134,14 +138,26 @@ final class WiFiTransferService: ObservableObject {
         #endif
         isRunning = false
         ipAddress = ""
+        refreshStatusCache()
+    }
+
+    private func refreshStatusCache() {
+        statusLock.lock()
+        cachedUploadCount = uploadedFiles.count
+        cachedStatusPort = port
+        statusLock.unlock()
     }
 
     // MARK: - File Import
     private func importUploadedBook(url: URL) async {
         do {
             let book = try await BookParserService.shared.importBook(from: url, copyFile: false)
+            let chapters = await BookParserService.shared.getChapters(for: book)
             try await MainActor.run {
                 try DatabaseService.shared.insertBook(book)
+                if !chapters.isEmpty {
+                    try DatabaseService.shared.insertChapters(chapters, forBookId: book.id)
+                }
                 NotificationCenter.default.post(name: .bookImportedNotification, object: nil)
             }
         } catch {

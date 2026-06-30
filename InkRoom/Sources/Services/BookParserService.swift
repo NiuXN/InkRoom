@@ -137,7 +137,7 @@ final class BookParserService {
         // Find and parse container.xml
         let containerPath = tempDirectory.appendingPathComponent("META-INF/container.xml")
         guard let containerData = try? Data(contentsOf: containerPath),
-              let containerRootfile = parseContainerXML(containerData) else {
+              let containerRootfile = EPUBXMLParser.containerRootPath(from: containerData) else {
             throw BookParserError.invalidEpubStructure
         }
 
@@ -146,10 +146,24 @@ final class BookParserService {
         let opfData = try Data(contentsOf: opfURL)
         let opfBaseURL = opfURL.deletingLastPathComponent()
 
-        let (metadata, spineItems, manifest) = try parseOPF(opfData, baseURL: opfBaseURL)
+        guard let opfResult = EPUBXMLParser.parseOPF(from: opfData) else {
+            throw BookParserError.invalidOPF
+        }
+
+        let metadata = OPFMetadata(title: opfResult.title, author: opfResult.author)
+        let spineItems = opfResult.spineItemRefs
+        var manifest: [String: ManifestItem] = [:]
+        for (id, item) in opfResult.manifest {
+            manifest[id] = ManifestItem(href: item.href, mediaType: item.mediaType, title: nil, id: item.id)
+        }
 
         // Extract cover image
-        let coverImage = extractCoverImage(manifest: manifest, baseURL: opfBaseURL, archive: archive)
+        let coverImage = extractCoverImage(
+            manifest: manifest,
+            coverItemId: opfResult.coverItemId,
+            baseURL: opfBaseURL,
+            archive: archive
+        )
 
         // Parse chapters from spine
         var chapters: [ParsedBook.ParsedChapter] = []
@@ -180,19 +194,6 @@ final class BookParserService {
         )
     }
 
-    private func parseContainerXML(_ data: Data) -> String? {
-        guard let xmlString = String(data: data, encoding: .utf8) else { return nil }
-
-        // Simple XML parsing for rootfile path
-        let pattern = #"full-path=\"([^\"]+)\""#
-        if let regex = try? NSRegularExpression(pattern: pattern),
-           let match = regex.firstMatch(in: xmlString, range: NSRange(xmlString.startIndex..., in: xmlString)),
-           let range = Range(match.range(at: 1), in: xmlString) {
-            return String(xmlString[range])
-        }
-        return nil
-    }
-
     private struct OPFMetadata {
         var title: String?
         var author: String?
@@ -205,85 +206,61 @@ final class BookParserService {
         var id: String?
     }
 
-    private func parseManifestItems(from xmlString: String) -> [String: ManifestItem] {
-        var manifest: [String: ManifestItem] = [:]
-        let itemPattern = #"<item\s+([^>/]+)/?>"#
-        guard let regex = try? NSRegularExpression(pattern: itemPattern, options: .caseInsensitive) else {
-            return manifest
+    private func decodeHTMLEntities(_ text: String) -> String {
+        var result = text
+        let named: [(String, String)] = [
+            ("&nbsp;", " "), ("&amp;", "&"), ("&lt;", "<"), ("&gt;", ">"),
+            ("&quot;", "\""), ("&#39;", "'"), ("&apos;", "'")
+        ]
+        for (entity, char) in named {
+            result = result.replacingOccurrences(of: entity, with: char)
         }
 
-        for match in regex.matches(in: xmlString, range: NSRange(xmlString.startIndex..., in: xmlString)) {
-            guard let attrRange = Range(match.range(at: 1), in: xmlString) else { continue }
-            let attrs = String(xmlString[attrRange])
-            guard let id = extractXMLAttribute("id", from: attrs),
-                  let href = extractXMLAttribute("href", from: attrs) else { continue }
-            let mediaType = extractXMLAttribute("media-type", from: attrs)
-                ?? extractXMLAttribute("mediaType", from: attrs)
-                ?? "application/xhtml+xml"
-            manifest[id] = ManifestItem(href: href, mediaType: mediaType, title: nil, id: id)
-        }
-        return manifest
-    }
-
-    private func extractXMLAttribute(_ name: String, from attrs: String) -> String? {
-        let pattern = "\(name)=\"([^\"]+)\""
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
-              let match = regex.firstMatch(in: attrs, range: NSRange(attrs.startIndex..., in: attrs)),
-              let range = Range(match.range(at: 1), in: attrs) else {
-            return nil
-        }
-        return String(attrs[range])
-    }
-
-    private func parseOPF(_ data: Data, baseURL: URL) throws -> (OPFMetadata, [String], [String: ManifestItem]) {
-        guard let xmlString = String(data: data, encoding: .utf8) else {
-            throw BookParserError.invalidOPF
-        }
-
-        var metadata = OPFMetadata()
-        var spineItems: [String] = []
-        var manifest: [String: ManifestItem] = [:]
-
-        // Parse title
-        if let titleMatch = xmlString.range(of: #"<dc:title[^>]*>([^<]+)</dc:title>"#, options: .regularExpression) {
-            let titleString = String(xmlString[titleMatch])
-            if let contentMatch = titleString.range(of: ">([^<]+)<", options: .regularExpression) {
-                let content = String(titleString[contentMatch]).dropFirst().dropLast()
-                metadata.title = String(content)
-            }
-        }
-
-        // Parse author/creator
-        if let authorMatch = xmlString.range(of: #"<dc:creator[^>]*>([^<]+)</dc:creator>"#, options: .regularExpression) {
-            let authorString = String(xmlString[authorMatch])
-            if let contentMatch = authorString.range(of: ">([^<]+)<", options: .regularExpression) {
-                let content = String(authorString[contentMatch]).dropFirst().dropLast()
-                metadata.author = String(content)
-            }
-        }
-
-        manifest = parseManifestItems(from: xmlString)
-
-        // Parse spine
-        let spinePattern = #"<itemref[^>]+idref=\"([^\"]+)\""#
-        if let regex = try? NSRegularExpression(pattern: spinePattern) {
-            let matches = regex.matches(in: xmlString, range: NSRange(xmlString.startIndex..., in: xmlString))
+        if let decimalRegex = try? NSRegularExpression(pattern: #"&#(\d+);"#) {
+            let nsRange = NSRange(result.startIndex..., in: result)
+            let matches = decimalRegex.matches(in: result, range: nsRange).reversed()
             for match in matches {
-                if let idRange = Range(match.range(at: 1), in: xmlString) {
-                    spineItems.append(String(xmlString[idRange]))
+                guard let codeRange = Range(match.range(at: 1), in: result),
+                      let code = Int(result[codeRange]),
+                      let scalar = UnicodeScalar(code) else { continue }
+                if let fullRange = Range(match.range, in: result) {
+                    result.replaceSubrange(fullRange, with: String(Character(scalar)))
                 }
             }
         }
 
-        return (metadata, spineItems, manifest)
+        if let hexRegex = try? NSRegularExpression(pattern: #"&#x([0-9a-fA-F]+);"#) {
+            let nsRange = NSRange(result.startIndex..., in: result)
+            let matches = hexRegex.matches(in: result, range: nsRange).reversed()
+            for match in matches {
+                guard let codeRange = Range(match.range(at: 1), in: result),
+                      let code = Int(result[codeRange], radix: 16),
+                      let scalar = UnicodeScalar(code) else { continue }
+                if let fullRange = Range(match.range, in: result) {
+                    result.replaceSubrange(fullRange, with: String(Character(scalar)))
+                }
+            }
+        }
+
+        return result
     }
 
-    private func extractCoverImage(manifest: [String: ManifestItem], baseURL: URL, archive: Archive) -> Data? {
-        // Find cover image in manifest
+    private func extractCoverImage(
+        manifest: [String: ManifestItem],
+        coverItemId: String?,
+        baseURL: URL,
+        archive: Archive
+    ) -> Data? {
+        if let coverItemId, let item = manifest[coverItemId] {
+            let imageURL = URL(string: item.href, relativeTo: baseURL) ?? baseURL.appendingPathComponent(item.href)
+            if let data = try? Data(contentsOf: imageURL) { return data }
+        }
+
+        // Find cover image in manifest by filename
         for (_, item) in manifest {
             let lowerHref = item.href.lowercased()
             if lowerHref.contains("cover") && (item.mediaType.contains("image") || lowerHref.hasSuffix(".jpg") || lowerHref.hasSuffix(".png") || lowerHref.hasSuffix(".jpeg")) {
-                let imageURL = baseURL.appendingPathComponent(item.href)
+                let imageURL = URL(string: item.href, relativeTo: baseURL) ?? baseURL.appendingPathComponent(item.href)
                 return try? Data(contentsOf: imageURL)
             }
         }
@@ -307,12 +284,7 @@ final class BookParserService {
         result = result.replacingOccurrences(of: #"<[^>]+>"#, with: "", options: .regularExpression)
 
         // Decode HTML entities
-        result = result.replacingOccurrences(of: "&nbsp;", with: " ")
-        result = result.replacingOccurrences(of: "&amp;", with: "&")
-        result = result.replacingOccurrences(of: "&lt;", with: "<")
-        result = result.replacingOccurrences(of: "&gt;", with: ">")
-        result = result.replacingOccurrences(of: "&quot;", with: "\"")
-        result = result.replacingOccurrences(of: "&#39;", with: "'")
+        result = decodeHTMLEntities(result)
 
         // Clean up whitespace
         result = result.replacingOccurrences(of: "\n{3,}", with: "\n\n", options: .regularExpression)

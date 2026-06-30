@@ -7,14 +7,22 @@ import AppKit
 struct InkRoomApp: App {
     @StateObject private var libraryViewModel = LibraryViewModel()
     @StateObject private var settingsViewModel = SettingsViewModel()
+    @StateObject private var updateService = AppStoreUpdateService.shared
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(libraryViewModel)
                 .environmentObject(settingsViewModel)
+                .environmentObject(updateService)
                 .preferredColorScheme(colorScheme)
                 .adaptiveLayout()
+                .appUpdateAlert(updateService: updateService)
+                .task {
+                    await updateService.checkOnLaunchIfNeeded(
+                        autoCheckEnabled: settingsViewModel.autoCheckUpdates
+                    )
+                }
         }
         #if os(macOS)
         .windowStyle(.hiddenTitleBar)
@@ -55,6 +63,7 @@ struct InkRoomApp: App {
             SettingsView()
                 .environmentObject(settingsViewModel)
                 .environmentObject(libraryViewModel)
+                .environmentObject(updateService)
                 .adaptiveLayout()
                 .frame(width: 560, height: 640)
         }

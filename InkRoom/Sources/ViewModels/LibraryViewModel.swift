@@ -146,6 +146,10 @@ class LibraryViewModel: ObservableObject {
         do {
             let book = try await bookParser.importBook(from: url)
             try database.insertBook(book)
+            let chapters = await bookParser.getChapters(for: book)
+            if !chapters.isEmpty {
+                try database.insertChapters(chapters, forBookId: book.id)
+            }
             reloadBooks()
         } catch {
             errorMessage = InkRoomErrorMessage.friendly(for: error)
