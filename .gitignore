@@ -30,6 +30,12 @@ Package.resolved
 # Cursor
 .cursor/
 
+# AI assistant local metadata (WorkBuddy / CodeBuddy / agents)
+.workbuddy/
+.codebuddy/
+.agents/
+skills-lock.json
+
 # Logs
 *.log
 
